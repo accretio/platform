@@ -1,0 +1,36 @@
+{
+  "name": "Accretio-lab",
+  "version": "0.0.1",
+  "description": "Create or Import designs",
+  "main": "app.js",
+  "scripts": {
+    "watch": "watchify app.js -o public/js/bundle.js -v",
+    "browserify": "browserify app.js | uglifyjs > public/js/bundle.js",
+    "build": "npm run browserify ",
+    "start": "npm run watch & nodemon server.js"
+  },
+  "author": "William Le Ferrand",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "bootstrap": "~4.0.0-alpha.6",
+    "express": "^4.15.2",
+    "express-handlebars": "^3.0.0",
+    "node-jsx": "^0.13.3",
+    "react": "^15.4.2",
+    "reactify": "^1.1.1",
+    "uglify-js": "^2.8.12",
+    "watchify": "^3.9.0"
+  },
+  "devDependencies": {
+    "browserify": "^14.1.0",
+    "nodemon": "*",
+    "reactify": "^1.1.1",
+    "uglify-js": "^2.8.12",
+    "watchify": "^3.9.0"
+  },
+  "browserify": {
+    "transform": [
+      "reactify"
+    ]
+  }
+}
