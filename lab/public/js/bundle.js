@@ -1,1 +1,0 @@
-console.error("Error: Parsing file /Users/wleferrand/dev/accretio/platform/lab/components/Recipe.react: Unexpected token (5:11)");
