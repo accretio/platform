@@ -7,13 +7,22 @@ const path = require('path');
 
 module.exports = {
   devtool: debug ? 'inline-sourcemap' : null,
-  entry: path.join(__dirname, 'src', 'app-client.js'),
+  entry: [
+    path.resolve(__dirname, "src/static/css/test.scss"),
+    path.join(__dirname, 'src', 'app-client.js')
+  ],
   devServer: {
     inline: true,
     port: 3333,
     contentBase: "src/static/",
     historyApiFallback: {
       index: '/index-static.html'
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000/api',
+        secure: false
+      }
     }
   },
   output: {
@@ -22,15 +31,17 @@ module.exports = {
     filename: 'bundle.js'
   },
   module: {
-    loaders: [{
-      test: path.join(__dirname, 'src'),
-      loader: ['babel-loader'],
-      query: {
-        cacheDirectory: 'babel_cache',
-        presets: debug ? ['react', 'es2015', 'react-hmre'] : ['react', 'es2015']
-      }
-    }]
-  },
+    loaders: [
+      { test: /\.js$/,
+        loader: "babel-loader",
+        query: {
+          cacheDirectory: 'babel_cache',
+          presets: debug ? ['react', 'es2015', 'react-hmre'] : ['react', 'es2015']
+        }
+      },
+      { test: /\.scss$/, loaders: [ "style-loader", "css-loader", "sass-loader" ] },
+    ]
+  }, 
   plugins: debug ? [] : [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)

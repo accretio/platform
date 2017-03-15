@@ -1,5 +1,6 @@
 'use strict';
 
+
 import path from 'path';
 import { Server } from 'http';
 import Express from 'express';
@@ -8,6 +9,7 @@ import { renderToString } from 'react-dom/server';
 import { match, RouterContext } from 'react-router';
 import routes from './routes';
 import NotFoundPage from './components/NotFoundPage';
+import { Button } from 'reactstrap';
 
 // initialize the server and configure support for ejs templates
 const app = new Express();
@@ -38,16 +40,15 @@ app.get('*', (req, res) => {
 
       // generate the React markup for the current route
       let markup;
-     /*  if (renderProps) {
+      if (renderProps) {
         // if the current route matched we have renderProps
         markup = renderToString(<RouterContext {...renderProps}/>);
-      } else { */
+      } else { 
         // otherwise we can render a 404 page
-        markup = renderToString(<NotFoundPage/>);
-        res.status(200);
-     //  }
+        markup = renderToString(<NotfoundPage />);
+        res.status(404);
+      }
 
-      markup = "coucou"; 
       // render the index template with the embedded React markup
       return res.render('index', { markup });
     }

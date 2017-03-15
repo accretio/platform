@@ -3,14 +3,36 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Judo Heroes - A Universal JavaScript demo application with React</title>
+    <title>Accretio Lab</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://npmcdn.com/bootstrap@4.0.0-alpha.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
+
+     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+        
   </head>
   <body>
+
+  <!-- the nav bar -->
+  
+              <nav class="navbar navbar-toggleable-md navbar-light bg-faded" >
+                  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="#">accret.io</a>
+            <div class="navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                 <!--  <a class="nav-item nav-link" href="http://slackin.accret.io">AngelList</a> -->
+                    <a class="nav-item nav-link" href="http://slackin.accret.io">Slack</a>
+                    <a class="nav-item nav-link" href="http://workshop.accret.io">Workshop</a>
+                    <a class="nav-item nav-link" href="mailto:team@accret.io">Contact</a>
+                </ul>
+            </div>
+        </nav>
+        
     <div id="main"><%- markup -%></div>
-    <div id="abar">
-      <a href="https://nodejsdesignpatterns.com" target="_blank">Want to know more about Node.js, React and Universal Javascript?</a>
-    </div>
+   
     <script src="/js/bundle.js"></script>
   </body>
 </html>
