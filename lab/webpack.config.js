@@ -5,12 +5,15 @@ const debug = process.env.NODE_ENV !== "production";
 const webpack = require('webpack');
 const path = require('path');
 
+//const nodeExternals = require('webpack-node-externals');
+
 module.exports = {
   devtool: debug ? 'inline-sourcemap' : null,
   entry: [
     path.resolve(__dirname, "src/static/css/test.scss"),
     path.join(__dirname, 'src', 'app-client.js')
   ],
+  //externals: [nodeExternals()],
   devServer: {
     inline: true,
     port: 3333,
@@ -33,6 +36,7 @@ module.exports = {
   module: {
     loaders: [
       { test: /\.js$/,
+        exclude: /node_modules/,
         loader: "babel-loader",
         query: {
           cacheDirectory: 'babel_cache',

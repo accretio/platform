@@ -17,23 +17,30 @@
 
   <!-- the nav bar -->
       
-      <nav class="navbar navbar-toggleable-md navbar-light bg-faded" >
+         <nav class="navbar navbar-toggleable-md navbar-light fixed-top bg-faded" >
           <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
           </button>
-          <a class="navbar-brand" href="#">accret.io</a>
+          <a class="navbar-brand" href="/">accret.io</a>
           <div class="navbar-collapse" id="navbarNav">
               <ul class="navbar-nav">
 
                   <a class="nav-item nav-link" href="http://slackin.accret.io">Slack</a>
                   <a class="nav-item nav-link" href="http://workshop.accret.io">Workshop</a>
+                  <a class="nav-item nav-link" href="https://github.com/accretio">Github</a>
                   <a class="nav-item nav-link" href="mailto:team@accret.io">Contact</a>
               </ul>
           </div>
       </nav>
       
-      <div id="main"></div>
-      
-      <script src="/js/bundle.js"></script>
+      <div id="main" class="main"></div>
+
+      <footer class="footer">
+      <div class="container">
+        <span class="text-muted">(c) 2017 Autonomous Industrial Tools Incorporated</span>
+      </div>
+      </footer>
+
+    <script src="/js/bundle.js"></script>
   </body>
 </html>
