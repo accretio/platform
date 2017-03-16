@@ -14,7 +14,7 @@ export default class NotFoundPage extends React.Component {
         </div>
         <div className="row justify-content-center">
         <div className="col-6">
-        Oops ... I found a bearing, but not the page requested!
+        Oops ... I found a bearing, but not the page you requested!
            </div>
         </div>
       </div>
@@ -22,3 +22,5 @@ export default class NotFoundPage extends React.Component {
     );
   }
 }
+
+
