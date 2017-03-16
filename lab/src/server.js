@@ -14,9 +14,15 @@ import { Button } from 'reactstrap';
 import formidable from 'formidable';
 import fs from 'fs';
 
+import AWS from 'aws-sdk';
+
 // initialize the server and configure support for ejs templates
 const app = new Express();
 const server = new Server(app);
+
+// initialize the AWS credentials
+var credentials = new AWS.SharedIniFileCredentials({profile: 'accretio'});
+AWS.config.credentials = credentials;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -27,7 +33,18 @@ app.use(Express.static(path.join(__dirname, 'static')));
 console.log("loading twice");
 
 // api methods
-app.post('/api/upload', function(req, res){
+
+app.use('/api/s3', require('react-s3-uploader/s3router')({
+  bucket: "accretio-lab-files",
+  region: 'us-west-1',
+  signatureVersion: 'v4', 
+  headers: {'Access-Control-Allow-Origin': '*'}, // optional
+  uploadRequestHeaders: {},
+    ACL: 'private', // this is default
+   uniquePrefix: false // (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
+}));
+
+app.get('/api/upload', function(req, res){
 
   // create an incoming form object
   var form = new formidable.IncomingForm();
