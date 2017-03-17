@@ -8,13 +8,15 @@ import LandingPage from './components/LandingPage';
 import ImportSingleOpenScadFile from './components/ImportSingleOpenScadFile';
 import NotFoundPage from './components/NotFoundPage';
 import Product from './components/Product';
+import Purchase from './components/Purchase';
 
 const routes = (
   <Route path="/" component={Layout}>
     <IndexRoute component={LandingPage}/>
     <Route path="/import/" component={Layout}>
         <Route path="importSingleOpenScadFile" component={ImportSingleOpenScadFile}/>
-    </Route>
+        </Route>
+         <Route path="/product/:id/purchase" component={Purchase}/>
     <Route path="/product/:id" component={Product}/>
     <Route path="*" component={NotFoundPage}/> 
   </Route>
