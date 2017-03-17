@@ -11,10 +11,13 @@ import routes from './routes';
 import NotFoundPage from './components/NotFoundPage';
 import { Button } from 'reactstrap';
 
-import formidable from 'formidable';
+import Recipe from './recipe'
+
 import fs from 'fs';
 
 import AWS from 'aws-sdk';
+import bodyParser from 'body-parser'
+import elasticsearch from 'elasticsearch'
 
 // initialize the server and configure support for ejs templates
 const app = new Express();
@@ -24,13 +27,19 @@ const server = new Server(app);
 var credentials = new AWS.SharedIniFileCredentials({profile: 'accretio'});
 AWS.config.credentials = credentials;
 
+// initialize the ES client
+var ESClient = new elasticsearch.Client({
+  host: 'localhost:9200',
+  log: 'trace',
+  httpAuth: 'elastic:changeme'
+});
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // define the folder that will be used for static assets
 app.use(Express.static(path.join(__dirname, 'static')));
-
-console.log("loading twice");
+app.use(bodyParser.json({ type: 'application/json' }))
 
 // api methods
 
@@ -44,36 +53,51 @@ app.use('/api/s3', require('react-s3-uploader/s3router')({
    uniquePrefix: false // (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
 }));
 
-app.get('/api/upload', function(req, res){
+var recipeIndex = "recipes";
+var recipeType = "recipe";
 
-  // create an incoming form object
-  var form = new formidable.IncomingForm();
+app.post('/api/createRecipe', function(req, res){
+  console.log(req.body);
 
-  // specify that we want to allow the user to upload multiple files in a single request
-  form.multiples = true;
+  var recipe = new Recipe(req.body);
 
-  // store all uploads in the /uploads directory
-  form.uploadDir = path.join(__dirname, '/uploads');
-
-  // every time a file has been uploaded successfully,
-  // rename it to it's orignal name
-  form.on('file', function(field, file) {
-    fs.rename(file.path, path.join(form.uploadDir, file.name));
+  ESClient.index({
+    index: recipeIndex,
+    type: recipeType,
+    body: recipe.toESJson()
+  }).then(function (body) {
+    console.log(body);
+    res.status(200);
+    res.json({ id: body._id });
+  }, function (error) {
+    console.trace(error.message);
+    res.status(500);
+    res.send(error.message);
   });
+  
+    
+});
 
-  // log any errors that occur
-  form.on('error', function(err) {
-    console.log('An error has occured: \n' + err);
+app.post('/api/getRecipe', function(req, res){
+  console.log(req.body);
+
+  var id = req.body.id;
+
+  ESClient.get({
+    index: recipeIndex,
+    type: recipeType,
+    id: id
+  }).then(function (body) {
+    console.log(body);
+    res.status(200);
+    res.json(body._source);
+  }, function (error) {
+    console.trace(error.message);
+    res.status(500);
+    res.send(error.message);
   });
-
-  // once all the files have been uploaded, send a response to the client
-  form.on('end', function() {
-    res.end('success');
-  });
-
-  // parse the incoming request containing the form data
-  form.parse(req);
-
+  
+    
 });
 
 
