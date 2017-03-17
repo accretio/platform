@@ -44,13 +44,12 @@ app.use(bodyParser.json({ type: 'application/json' }))
 // api methods
 
 app.use('/api/s3', require('react-s3-uploader/s3router')({
-  bucket: "accretio-lab-files",
-  region: 'us-west-1',
-  signatureVersion: 'v4', 
-  headers: {'Access-Control-Allow-Origin': '*'}, // optional
-  uploadRequestHeaders: {},
+    bucket: "accretio-lab-files",
+    region: 'us-west-1',
+    headers: {'Access-Control-Allow-Origin': '*'}, // optional
+    uploadRequestHeaders: {},
     ACL: 'private', // this is default
-   uniquePrefix: false // (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
+    uniquePrefix: false// (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
 }));
 
 var recipeIndex = "recipes";

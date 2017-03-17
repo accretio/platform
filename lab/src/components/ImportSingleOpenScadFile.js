@@ -68,7 +68,7 @@ export default class ImportSingleOpenScadFile extends React.Component {
     }
     
     gotoRecipe(response) {
-        this.props.history.push('/recipe/' + response.id);
+        this.props.history.push('/product/' + response.id);
     }
 
     onUploadStart(file, next) {
@@ -205,7 +205,7 @@ export default class ImportSingleOpenScadFile extends React.Component {
                 <ReactS3Uploader
         key="0"
         signingUrl="/api/s3/sign"
-        signingUrlMethod="GET"
+        signingUrlMethod="GET" 
         accept="*"
         preprocess={this.onUploadStart.bind(this)}
         onProgress={this.onUploadProgress.bind(this)}

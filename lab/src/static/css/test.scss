@@ -60,3 +60,25 @@ h2 {
     }
     
 }
+
+.recipe{
+    h2 {
+        margin-bottom: 40px;
+    }
+
+    .description {
+        margin-bottom: 40px; 
+    }
+
+    .material {
+        margin-bottom: 40px;
+    }
+    
+    .price {
+        margin-bottom: 40px;
+    }
+    
+    .buy {
+        text-align: left;
+    }
+}
