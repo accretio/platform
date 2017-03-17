@@ -3,8 +3,11 @@
 export default class Recipe {
   
   constructor(obj) {
+    this.name = obj.name
     this.description = obj.description
     this.steps = []
+    this.gallery = obj.gallery
+    this.materials = [ "Taulman FDA-approved Nylon" ]
 
     // let's create a single step here
     if (obj.singleOpenScadFile) {
@@ -13,7 +16,7 @@ export default class Recipe {
         kind: "openscad",
         storage: {
           store: "s3",
-          key: obj.singleOpenScadFile.fileKey
+          file: obj.singleOpenScadFile
         },
         args: obj.args
       } ]
@@ -24,8 +27,11 @@ export default class Recipe {
   
   toESJson() {
     return({
+      name: this.name,
       description: this.description,
-      steps: this.steps
+      gallery: this.gallery,
+      steps: this.steps,
+      materials: this.materials
     })
 
   }
