@@ -6,7 +6,6 @@ const debug = process.env.NODE_ENV !== "production";
 const webpack = require('webpack');
 const path = require('path');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
     devtool: false,
@@ -48,16 +47,10 @@ module.exports = {
                   presets: debug ? ['react', 'es2015', 'react-hmre'] : ['react', 'es2015']
               }
              },
-            { // regular css files
-                test: /\.css$/,
-                loader: ExtractTextPlugin.extract({
-                    loader: 'css-loader?importLoaders=1'
-                })
-            },
             { // sass / scss loader for webpack
                 test: /\.(sass|scss)$/,
-                loader: ExtractTextPlugin.extract(['css-loader', 'sass-loader'])
-            }
+                loaders: ['css-loader', 'sass-loader']
+            } 
         ]
     }, 
     plugins: debug ? [] : [
