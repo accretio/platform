@@ -37,8 +37,10 @@
     "react-router": "^2.6.1",
     "react-s3-uploader": "^4.0.3",
     "react-slick": "^0.14.7",
+    "react-stripe-checkout": "^2.2.5",
     "reactstrap": "^4.2.0",
     "slick-carousel": "^1.6.0",
+    "stripe": "^4.15.1",
     "style-loader": "^0.13.2",
     "superagent": "^3.5.0"
   },

@@ -11,35 +11,40 @@ import routes from './routes';
 import NotFoundPage from './components/NotFoundPage';
 import { Button } from 'reactstrap';
 
-import Recipe from './recipe'
+import Recipe from './recipe';
 
 import fs from 'fs';
 
 import AWS from 'aws-sdk';
-import bodyParser from 'body-parser'
-import elasticsearch from 'elasticsearch'
+import bodyParser from 'body-parser';
+import elasticsearch from 'elasticsearch';
+
+// import stripePackage from 'stripe';
 
 // initialize the server and configure support for ejs templates
 const app = new Express();
 const server = new Server(app);
 
 // initialize the AWS credentials
-var credentials = new AWS.SharedIniFileCredentials({profile: 'accretio'});
+const credentials = new AWS.SharedIniFileCredentials({profile: 'accretio'});
 AWS.config.credentials = credentials;
 
 // initialize the ES client
-var ESClient = new elasticsearch.Client({
+const ESClient = new elasticsearch.Client({
   host: 'localhost:9200',
   log: 'trace',
   httpAuth: 'elastic:changeme'
 });
+
+// initialize the stripe client
+// const stripe = stripePackage('sk_test_g5POvv9nMfo0kQBCGoWSDFOt');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // define the folder that will be used for static assets
 app.use(Express.static(path.join(__dirname, 'static')));
-app.use(bodyParser.json({ type: 'application/json' }))
+app.use(bodyParser.json({ type: 'application/json' }));
 
 // api methods
 
@@ -97,6 +102,17 @@ app.post('/api/getRecipe', function(req, res){
   });
   
     
+});
+
+
+app.post('/api/order', function(req, res){
+    console.log(req.body);
+    
+    var id = req.body.id;
+    
+    res.status(500);
+    res.send("it failed");
+   
 });
 
 
