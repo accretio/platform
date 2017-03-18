@@ -5,7 +5,12 @@ const debug = process.env.NODE_ENV !== "production";
 
 const webpack = require('webpack');
 const path = require('path');
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+
+const extractSass = new ExtractTextPlugin({
+    filename: "/css/style.css",
+    allChunks: true
+});
 
 module.exports = {
     devtool: false,
@@ -48,19 +53,16 @@ module.exports = {
               }
              },
             { // sass / scss loader for webpack
-                test: /\.(sass|scss)$/,
-                loaders: ['css-loader', 'sass-loader']
+              test: /\.(sass|scss)$/,
+              use: ExtractTextPlugin.extract(['css-loader', 'sass-loader'])
             } 
         ]
     }, 
-    plugins: debug ? [] : [
+    plugins: debug ? [extractSass] : [
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
         }),
-        new ExtractTextPlugin({
-			filename: "/css/style.css",
-			allChunks: true
-	}),
+        extractSass,
         new webpack.optimize.UglifyJsPlugin({
             compress: { warnings: false },
             mangle: true,
