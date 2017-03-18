@@ -1,5 +1,5 @@
 {
-  "name": "Accretio-lab",
+  "name": "platform.lab",
   "version": "0.0.1",
   "description": "Create or Import designs",
   "main": "src/server.js",
@@ -27,8 +27,11 @@
     "css-loader": "^0.27.3",
     "ejs": "^2.5.1",
     "elasticsearch": "^12.1.3",
+    "es6-promise": "^4.1.0",
     "express": "^4.14.0",
     "formidable": "^1.1.1",
+    "isomorphic-fetch": "^2.2.1",
+    "node-fetch": "^1.6.3",
     "react": "^15.4.2",
     "react-addons-css-transition-group": "^15.4.2",
     "react-addons-transition-group": "^15.4.2",
@@ -45,6 +48,7 @@
     "superagent": "^3.5.0"
   },
   "devDependencies": {
+    "extract-text-webpack-plugin": "^2.1.0",
     "gulp": "^3.9.1",
     "gulp-util": "^3.0.8",
     "http-server": "^0.9.0",

@@ -3,7 +3,7 @@
 import React from 'react';
 import Slider from 'react-slick';
 
-// http://localhost:3333/recipe/AVraUhwDYiWPzcptPXX9
+import fetch from 'isomorphic-fetch';
 
 export default class Product extends React.Component {
 

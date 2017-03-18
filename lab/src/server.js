@@ -2,6 +2,8 @@
 
 
 import path from 'path';
+import Config from './config';
+
 import { Server } from 'http';
 import Express from 'express';
 import React from 'react';
@@ -12,6 +14,7 @@ import NotFoundPage from './components/NotFoundPage';
 import { Button } from 'reactstrap';
 
 import Recipe from './recipe';
+import Order from './order';
 
 import fs from 'fs';
 
@@ -43,6 +46,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // define the folder that will be used for static assets
+console.log(__dirname);
 app.use(Express.static(path.join(__dirname, 'static')));
 app.use(bodyParser.json({ type: 'application/json' }));
 
@@ -59,6 +63,9 @@ app.use('/api/s3', require('react-s3-uploader/s3router')({
 
 var recipeIndex = "recipes";
 var recipeType = "recipe";
+
+var orderIndex = "order";
+var orderType = "order";
 
 app.post('/api/createRecipe', function(req, res){
   console.log(req.body);
@@ -105,8 +112,27 @@ app.post('/api/getRecipe', function(req, res){
 });
 
 
-app.post('/api/order', function(req, res){
+app.post('/api/createOrder', function(req, res){
     console.log(req.body);
+
+    var order = new Order(req.body);
+
+    
+
+    
+    ESClient.index({
+        index: orderIndex,
+        type: orderType,
+        body: order.toESJson()
+    }).then(function (body) {
+        console.log(body);
+        res.status(200);
+        res.json({ id: body._id });
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
     
     var id = req.body.id;
     

@@ -4,6 +4,9 @@ import React from 'react';
 import Modal from 'react-modal';
 import StripeCheckout from 'react-stripe-checkout';
 
+import Config from '../../config';
+
+import fetch from 'isomorphic-fetch';
 
 export default class Purchase extends React.Component {
     constructor(props) {
@@ -29,15 +32,19 @@ export default class Purchase extends React.Component {
     }
     
     updateArg(arg, event) {
-        var order = (this.state.order != null) ? JSON.parse(JSON.stringify(this.state.order)) : { args: [] }; 
-        order.args.push({ key: arg, value: event.target.value });
-        this.setState({ order: order });
-        return true;
-    }
+        
+        var order = (this.state.order != null) ? JSON.parse(JSON.stringify(this.state.order)) : { args: new Array() };
+        
+        var pos = order.args.findIndex(function(v) { return(v.key === arg);});
 
-    updateOrder(field, event) {
-        var order = (this.state.order != null) ? JSON.parse(JSON.stringify(this.state.order)) : { args: [] };
-        order[field] = event.target.value;
+        if (pos > -1) {
+            order.args[pos] = event.target.value;
+        } else {
+            order.args.push({ key: arg, value: event.target.value });
+        }
+        
+        this.setState({ order: order });
+      
         return true;
     }
     
@@ -48,16 +55,18 @@ export default class Purchase extends React.Component {
                     recipe: this.state.recipe,
                     order: this.state.order
                 };
-        fetch('/api/order', {
+        fetch('/api/createOrder', {
             method: 'POST',
             headers: new Headers({
 	        'Content-Type': 'application/json'
             }),
             body: JSON.stringify(order)
         }).then(this.handleErrors.bind(this))
-            .then(function(response) {
-                alert("ok"); 
-            });
+            .then(this.gotoThanks.bind(this));
+    }
+
+    gotoThanks() {
+        this.props.history.push('/product/' + this.props.params.id + '/thanks');
     }
     
     handleErrors(response) {
@@ -108,48 +117,15 @@ export default class Purchase extends React.Component {
             </form></div>;
         } 
 
-        var shipping =
-                <div className="container shipping">
-                <h3>Shipping details</h3>
-                <form>
-                <div className="form-group row">
-                  <label className='col-2 col-form-label'>Name</label>
-                  <div className="col-10">
-                   <input className="form-control" type="text" onChange={this.updateArg.bind(this, 'name')} />
-                   </div>
-            </div>
-
-
-           <div className="form-group row">
-                  <label className='col-2 col-form-label'>Street</label>
-                  <div className="col-10">
-                   <input className="form-control" type="text" onChange={this.updateArg.bind(this, 'street')} />
-                   </div>
-            </div>
-
-            <div className="form-group row">
-                  <label className='col-2 col-form-label'>City</label>
-                  <div className="col-6">
-                   <input className="form-control" type="text" onChange={this.updateArg.bind(this, 'city')} />
-                   </div>
-           <label className='col-2 col-form-label'>Zipcode</label>
-                  <div className="col-2">
-            <input className="form-control" type="text" onChange={this.updateArg.bind(this, 'zipcode')} />
-                   </div>
-            </div>
-
-            </form>
-            </div>;
-
-
         var payment =
                 <div className="payment-box">
                 <StripeCheckout
+        shippingAddress={true}
         name={this.state.recipe.name}
         description={this.state.recipe.description}
         token={this.onToken.bind(this)}
         amount={this.state.recipe.price * 100}
-        stripeKey="pk_test_KNYK2I1UsxoIXX0jDiG46mmj"
+        stripeKey={Config.stripe_pk}
         label="Purchase via Stripe"
             /></div> ;
 
@@ -213,7 +189,6 @@ export default class Purchase extends React.Component {
               { modal }
               <h2>Purchase {this.state.recipe.name}</h2>
               { customize }
-              { shipping }
               { payment }
             </div>
         );

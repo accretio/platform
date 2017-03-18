@@ -6,6 +6,7 @@ import { Route, IndexRoute } from 'react-router';
 import Layout from './components/Layout';
 import LandingPage from './components/LandingPage';
 import ImportSingleOpenScadFile from './components/ImportSingleOpenScadFile';
+import Thanks from './components/Thanks';
 import NotFoundPage from './components/NotFoundPage';
 import Product from './components/Product';
 import Purchase from './components/Purchase';
@@ -16,7 +17,8 @@ const routes = (
     <Route path="/import/" component={Layout}>
         <Route path="importSingleOpenScadFile" component={ImportSingleOpenScadFile}/>
         </Route>
-         <Route path="/product/:id/purchase" component={Purchase}/>
+        <Route path="/product/:id/purchase" component={Purchase}/>
+        <Route path="/product/:id/thanks" component={Thanks}/>
     <Route path="/product/:id" component={Product}/>
     <Route path="*" component={NotFoundPage}/> 
   </Route>
