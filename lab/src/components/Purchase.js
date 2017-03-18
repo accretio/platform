@@ -4,8 +4,7 @@ import React from 'react';
 import Modal from 'react-modal';
 import StripeCheckout from 'react-stripe-checkout';
 
-import Config from '../../config';
-
+import {stripe_pk} from '../myconfig';
 import fetch from 'isomorphic-fetch';
 
 export default class Purchase extends React.Component {
@@ -116,16 +115,17 @@ export default class Purchase extends React.Component {
                 { argsInputs }
             </form></div>;
         } 
-
+       
         var payment =
                 <div className="payment-box">
                 <StripeCheckout
         shippingAddress={true}
+        billingAddress={true}
         name={this.state.recipe.name}
         description={this.state.recipe.description}
         token={this.onToken.bind(this)}
         amount={this.state.recipe.price * 100}
-        stripeKey={Config.stripe_pk}
+        stripeKey={stripe_pk}
         label="Purchase via Stripe"
             /></div> ;
 

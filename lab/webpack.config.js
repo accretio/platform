@@ -6,6 +6,7 @@ const debug = process.env.NODE_ENV !== "production";
 const webpack = require('webpack');
 const path = require('path');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var nodeExternals = require('webpack-node-externals');
 
 module.exports = {
     devtool: false,
@@ -13,8 +14,8 @@ module.exports = {
         path.join(__dirname, 'src', 'app-client.js'),
         path.join(__dirname, 'src', 'style', 'style.scss')
     ],
-    externals: {
-    },
+    
+    // externals: [nodeExternals()],
     devServer: {
         inline: true,
         port: 3333,

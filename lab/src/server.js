@@ -2,7 +2,6 @@
 
 
 import path from 'path';
-import Config from './config';
 
 import { Server } from 'http';
 import Express from 'express';
@@ -34,9 +33,9 @@ AWS.config.credentials = credentials;
 
 // initialize the ES client
 const ESClient = new elasticsearch.Client({
-  host: 'localhost:9200',
-  log: 'trace',
-  httpAuth: 'elastic:changeme'
+    host: 'localhost:9200',
+    log: 'trace',
+    httpAuth: 'elastic:changeme'
 });
 
 // initialize the stripe client
@@ -46,7 +45,6 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // define the folder that will be used for static assets
-console.log(__dirname);
 app.use(Express.static(path.join(__dirname, 'static')));
 app.use(bodyParser.json({ type: 'application/json' }));
 
@@ -68,64 +66,14 @@ var orderIndex = "order";
 var orderType = "order";
 
 app.post('/api/createRecipe', function(req, res){
-  console.log(req.body);
-
-  var recipe = new Recipe(req.body);
-
-  ESClient.index({
-    index: recipeIndex,
-    type: recipeType,
-    body: recipe.toESJson()
-  }).then(function (body) {
-    console.log(body);
-    res.status(200);
-    res.json({ id: body._id });
-  }, function (error) {
-    console.trace(error.message);
-    res.status(500);
-    res.send(error.message);
-  });
-  
     
-});
+    var recipe = new Recipe(req.body);
 
-app.post('/api/getRecipe', function(req, res){
-  console.log(req.body);
-
-  var id = req.body.id;
-
-  ESClient.get({
-    index: recipeIndex,
-    type: recipeType,
-    id: id
-  }).then(function (body) {
-    console.log(body);
-    res.status(200);
-    res.json(body._source);
-  }, function (error) {
-    console.trace(error.message);
-    res.status(500);
-    res.send(error.message);
-  });
-  
-    
-});
-
-
-app.post('/api/createOrder', function(req, res){
-    console.log(req.body);
-
-    var order = new Order(req.body);
-
-    
-
-    
     ESClient.index({
-        index: orderIndex,
-        type: orderType,
-        body: order.toESJson()
+        index: recipeIndex,
+        type: recipeType,
+        body: recipe.toESJson()
     }).then(function (body) {
-        console.log(body);
         res.status(200);
         res.json({ id: body._id });
     }, function (error) {
@@ -134,54 +82,91 @@ app.post('/api/createOrder', function(req, res){
         res.send(error.message);
     });
     
-    var id = req.body.id;
     
-    res.status(500);
-    res.send("it failed");
-   
+});
+
+app.post('/api/getRecipe', function(req, res){
+
+    var id = req.body.id;
+
+    ESClient.get({
+        index: recipeIndex,
+        type: recipeType,
+        id: id
+    }).then(function (body) {
+        res.status(200);
+        res.json(body._source);
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
+    
+    
+});
+
+
+app.post('/api/createOrder', function(req, res){
+
+    var order = new Order(req.body);
+    
+    ESClient.index({
+        index: orderIndex,
+        type: orderType,
+        body: order.toESJson()
+    }).then(function (body) {
+        res.status(200);
+        res.json({ id: body._id });
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
+    
+    
 });
 
 
 // universal routing and rendering
 
 app.get('*', (req, res) => {
-  match(
-    { routes, location: req.url },
-    (err, redirectLocation, renderProps) => {
-      console.error(err);
-      // in case of error display the error message
-      if (err) {
-        return res.status(500).send(err.message);
-      }
+    match(
+        { routes, location: req.url },
+        (err, redirectLocation, renderProps) => {
+            console.error(err);
+            // in case of error display the error message
+            if (err) {
+                return res.status(500).send(err.message);
+            }
 
-      // in case of redirect propagate the redirect to the browser
-      if (redirectLocation) {
-        return res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-      }
+            // in case of redirect propagate the redirect to the browser
+            if (redirectLocation) {
+                return res.redirect(302, redirectLocation.pathname + redirectLocation.search);
+            }
 
-      // generate the React markup for the current route
-      let markup;
-      if (renderProps) {
-        // if the current route matched we have renderProps
-        markup = renderToString(<RouterContext {...renderProps}/>);
-      } else { 
-        // otherwise we can render a 404 page
-        markup = renderToString(<NotfoundPage />);
-        res.status(404);
-      }
+            // generate the React markup for the current route
+            let markup;
+            if (renderProps) {
+                // if the current route matched we have renderProps
+                markup = renderToString(<RouterContext {...renderProps}/>);
+            } else { 
+                // otherwise we can render a 404 page
+                markup = renderToString(<NotfoundPage />);
+                res.status(404);
+            }
 
-      // render the index template with the embedded React markup
-      return res.render('index', { markup });
-    }
-  );
+            // render the index template with the embedded React markup
+            return res.render('index', { markup });
+        }
+    );
 });
 
 // start the server
 const port = process.env.PORT || 3000;
 const env = process.env.NODE_ENV || 'production';
 server.listen(port, err => {
-  if (err) {
-    return console.error(err);
-  }
-  console.info(`Server running on http://localhost:${port} [${env}]`);
+    if (err) {
+        return console.error(err);
+    }
+    console.info(`Server running on http://localhost:${port} [${env}]`);
 });
