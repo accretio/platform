@@ -14,7 +14,8 @@ import { Button } from 'reactstrap';
 
 import Recipe from './recipe';
 import Order from './order';
-import { slack } from './lib/slack';
+import { notifyWorkshop } from './lib/slack';
+import { env, port } from './myconfig';
 
 import fs from 'fs';
 
@@ -117,7 +118,7 @@ app.post('/api/createOrder', function(req, res){
         body: order.toESJson()
     }).then(function (body) {
         res.status(200);
-        slack('#workshop', 'Order ' + body._id + ' is waiting for production');
+        notifyWorkshop(body._id);
         res.json({ id: body._id });
     }, function (error) {
         console.trace(error.message);
@@ -164,8 +165,6 @@ app.get('*', (req, res) => {
 });
 
 // start the server
-const port = process.env.PORT || 3000;
-const env = process.env.NODE_ENV || 'production';
 server.listen(port, err => {
     if (err) {
         return console.error(err);
