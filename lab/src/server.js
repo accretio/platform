@@ -15,6 +15,7 @@ import { Button } from 'reactstrap';
 import Recipe from './recipe';
 import Order from './order';
 import { slack } from './lib/slack';
+import { env, port } from './myconfig';
 
 import fs from 'fs';
 
@@ -164,8 +165,6 @@ app.get('*', (req, res) => {
 });
 
 // start the server
-const port = process.env.PORT || 3000;
-const env = process.env.NODE_ENV || 'production';
 server.listen(port, err => {
     if (err) {
         return console.error(err);

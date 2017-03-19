@@ -1,6 +1,6 @@
 'use strict';
 
-import {slack_webhook} from '../myconfig';
+import { slack_webhook, slack_dev_channel, env } from '../myconfig';
 
 export function slack(channel, text) {
   console.log("DEBUG Calling slack")
@@ -11,7 +11,7 @@ export function slack(channel, text) {
     }),
     body: JSON.stringify({
       text: text,
-      channel: channel
+      channel: (env === 'production')? channel : slack_dev_channel
     })
   };
   fetch(slack_webhook, opt)
