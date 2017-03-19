@@ -2,8 +2,7 @@
 
 import { slack_webhook, slack_dev_channel, env } from '../myconfig';
 
-export function slack(channel, text) {
-  console.log("DEBUG Calling slack")
+function slack(channel, text) {
   const opt = {
     method: 'post',
     headers: new Headers({
@@ -19,3 +18,9 @@ export function slack(channel, text) {
       console.log("Failed to send slack message: %j", err);
     });
 } 
+
+export function notifyWorkshop(jobId) {
+  const url = `http://lab.accret.io/admin/orders/search/_id:${jobId}`;
+  const message = `@channel <${url}|Job ${jobId}> is waiting for production`;
+  slack('#workshop', message);
+}
