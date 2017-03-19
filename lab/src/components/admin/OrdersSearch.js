@@ -9,9 +9,23 @@ export default class OrdersSearch extends React.Component {
     constructor(props) {
         super(props);
         this.state = { results: [], query: '' };
+        console.log(props.params);
+        if (props.params.q != null) {
+            this.state.query = props.params.q;
+            fetch('/api/admin/search', {
+                method: 'post',
+                headers: new Headers({
+	            'Content-Type': 'application/json'
+                }),
+                body: JSON.stringify({ query: this.state.query }) 
+            }).then(function(response) { return (response.json()) ; })
+                .then(this.updateResults.bind(this));
+            
+        }
     }
 
     runSearch(event) {
+        this.props.history.push('/admin/orders/search/' + this.state.query);
         fetch('/api/admin/search', {
           method: 'post',
           headers: new Headers({
@@ -64,7 +78,7 @@ export default class OrdersSearch extends React.Component {
                 <form onSubmit={this.runSearch.bind(this)}>
                   <div className="form-group row">
                 <div className="col-8">
-                <input className='form-control' type='text' onChange={this.updateQuery.bind(this)} />
+                <input className='form-control' value={this.state.query} type='text' onChange={this.updateQuery.bind(this)} />
                 </div>
             <div className="col-4">
              <button type="submit" className="btn btn-primary">Search</button>

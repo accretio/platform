@@ -22,7 +22,7 @@ const routes = (
     <Route path="/product/:id/purchase" component={Purchase}/>
     <Route path="/product/:id/thanks" component={Thanks}/>
     <Route path="/product/:id" component={Product}/>
-    <Route path="/admin/orders/search" component={AdminOrdersSearch}/>
+    <Route path="/admin/orders/search(/:q)" component={AdminOrdersSearch}/>  
         
     <Route path="*" component={NotFoundPage}/> 
   </Route>
