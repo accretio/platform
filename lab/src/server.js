@@ -21,7 +21,9 @@ import AWS from 'aws-sdk';
 import bodyParser from 'body-parser';
 import elasticsearch from 'elasticsearch';
 
-// import stripePackage from 'stripe';
+import stripePackage from 'stripe';
+
+import { stripe_sk } from './config.server';
 
 // initialize the server and configure support for ejs templates
 const app = new Express();
@@ -39,7 +41,7 @@ const ESClient = new elasticsearch.Client({
 });
 
 // initialize the stripe client
-// const stripe = stripePackage('sk_test_g5POvv9nMfo0kQBCGoWSDFOt');
+const stripe = stripePackage(stripe_sk);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -95,7 +97,9 @@ app.post('/api/getRecipe', function(req, res){
         id: id
     }).then(function (body) {
         res.status(200);
-        res.json(body._source);
+        var recipe = body._source;
+        recipe.id = id;
+        res.json(recipe);
     }, function (error) {
         console.trace(error.message);
         res.status(500);
@@ -123,6 +127,110 @@ app.post('/api/createOrder', function(req, res){
         res.send(error.message);
     });
     
+    
+});
+
+app.post('/api/updateOrder', function(req, res){
+
+    ESClient.update({
+        index: orderIndex,
+        type: orderType,
+        id: req.body.id,
+        body: {
+            doc: req.body.doc
+        }
+    }).then(function (body) {
+        res.status(200);
+        res.json({ id: req.body.id });
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
+    
+});
+
+app.post('/api/chargeOrder', function(req, res){
+
+    console.log("got charge request");
+     ESClient.get({
+        index: orderIndex,
+        type: orderType,
+        id: req.body.id
+     }).then(function (body) {
+
+         var order = body._source;
+         var token = order.token.id;
+         console.log("token is " + token);
+         ESClient.get({
+             index: recipeIndex,
+             type: recipeType,
+             id: order.recipe.id
+         }).then(function (body) {
+
+             var recipe = body._source;
+             var price = recipe.price;
+             console.log("price is " + price);
+             stripe.charges.create({
+                 amount: price * 100, // amount is in cents
+                 currency: "usd",
+                 source: token,
+                 description: ("Charge for " + recipe.name)
+             }).then(function(result){
+                 console.log("charged"); 
+                 ESClient.update({
+                     index: orderIndex,
+                     type: orderType,
+                     id: req.body.id,
+                     refresh: true,
+                     body: {
+                         doc: { status: "charged" }
+                     }
+                 }).then(function (body) {
+                     res.status(200);
+                     res.json({ id: result.id });
+                 }, function (error) {
+                     console.trace(error.message);
+                     res.status(500);
+                     res.send(error.message);
+                 });
+                 
+             }, function(error){
+                 console.log(error);
+                 res.status(500);
+                 res.json({ error: error.message });
+             });
+         
+         }, function(error){
+                 console.log(error);
+                 res.status(500);
+                 res.json({ error: error.message });
+             });
+     }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
+    
+});
+
+app.post('/api/admin/search', function(req, res){
+
+    var query = req.body.query;
+
+    console.log('running query: ' + query);
+    
+    ESClient.search({
+        index: orderIndex,
+        q: query
+    }).then(function (response) {
+        res.status(200);
+        res.json(response);
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
     
 });
 

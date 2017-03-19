@@ -88,7 +88,7 @@ export default class Product extends React.Component {
                        <b>Material:</b> { this.state.recipe.materials[0] }
                      </div>
                      <div className="price">
-                       <b>Price:</b> $ { this.state.recipe.price }
+                       <b>Price:</b> ${ this.state.recipe.price }
                      </div>
                      <div className="buy">
                        { buy }

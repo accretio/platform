@@ -1,5 +1,7 @@
 'use strict';
 
+// http://localhost:3333/product/AVrjyWwvYiWPzcptPrkx/
+
 import React from 'react';
 import Modal from 'react-modal';
 import StripeCheckout from 'react-stripe-checkout';
@@ -52,7 +54,7 @@ export default class Purchase extends React.Component {
                 {
                     token: token,
                     recipe: this.state.recipe,
-                    order: this.state.order
+                    job: this.state.order
                 };
         fetch('/api/createOrder', {
             method: 'POST',
