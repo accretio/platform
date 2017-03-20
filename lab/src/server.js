@@ -15,9 +15,7 @@ import { Button } from 'reactstrap';
 import Recipe from './recipe';
 import Order from './order';
 import { notifyWorkshop } from './lib/slack';
-import { env, port } from './myconfig';
-
-import fs from 'fs';
+import { env, port } from './config';
 
 import AWS from 'aws-sdk';
 import bodyParser from 'body-parser';

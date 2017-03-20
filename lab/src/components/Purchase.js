@@ -4,7 +4,7 @@ import React from 'react';
 import Modal from 'react-modal';
 import StripeCheckout from 'react-stripe-checkout';
 
-import {stripe_pk} from '../myconfig';
+import {stripe_pk} from '../config';
 import fetch from 'isomorphic-fetch';
 
 export default class Purchase extends React.Component {
