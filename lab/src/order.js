@@ -3,12 +3,17 @@
 export default class Order {
     
     constructor(obj) {
-        
+        this.token = obj.token;
+        this.recipe = obj.recipe;
+        this.job = obj.order;
     }
     
     toESJson() {
         return({
-            });
+            token: this.token,
+            recipe: this.recipe,
+            job: this.job
+        });
 
     }
     

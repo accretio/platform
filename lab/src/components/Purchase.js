@@ -52,7 +52,7 @@ export default class Purchase extends React.Component {
                 {
                     token: token,
                     recipe: this.state.recipe,
-                    order: this.state.order
+                    job: this.state.order
                 };
         fetch('/api/createOrder', {
             method: 'POST',

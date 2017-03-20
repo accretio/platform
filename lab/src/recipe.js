@@ -32,7 +32,8 @@ export default class Recipe {
             description: this.description,
             gallery: this.gallery,
             steps: this.steps,
-            materials: this.materials
+            materials: this.materials,
+            price: this.price
         });
 
     }
