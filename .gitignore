@@ -1,1 +1,5 @@
 *node_mod*
+config_dev.json
+babel_cache/
+static/
+npm-debug.log

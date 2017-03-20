@@ -1,6 +1,6 @@
 'use strict';
 
-import { slack_webhook, slack_dev_channel, env } from '../myconfig';
+import { slack_webhook, slack_dev_channel, env } from '../config';
 
 function slack(channel, text) {
   const opt = {
