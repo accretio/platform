@@ -1,7 +1,5 @@
 'use strict';
 
-// http://localhost:3333/product/AVrjyWwvYiWPzcptPrkx/
-
 import React from 'react';
 import Modal from 'react-modal';
 import StripeCheckout from 'react-stripe-checkout';
