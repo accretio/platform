@@ -1,0 +1,12 @@
+checkout:
+  post:
+    - echo "export default function setDevConfig(config) {}" > lab/config_dev.js
+
+general:
+  build_dir: lab
+
+deployment:
+  staging:
+    branch: master
+    commands:
+      - npm run dockerize
