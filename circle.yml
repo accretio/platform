@@ -17,7 +17,7 @@ dependencies:
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet config set container/cluster $CLUSTER_NAME
     - sudo /opt/google-cloud-sdk/bin/gcloud config set compute/zone ${CLOUDSDK_COMPUTE_ZONE}
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet container clusters get-credentials $CLUSTER_NAME
-
+  
 checkout:
   post:
     - echo "export default function setDevConfig(config) {}" > config_dev.js
@@ -30,4 +30,6 @@ deployment:
   staging:
     branch: dockerize-lab
     commands:
-      - npm run dockerize
+      - docker build -t gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 .
+      - docker tag gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1
+      - sudo /opt/google-cloud-sdk/bin/gcloud docker -- push gcr.io/${PROJECT_NAME}/lab
