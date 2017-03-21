@@ -1,9 +1,9 @@
-checkout:
-  post:
-    - echo "export default function setDevConfig(config) {}" > lab/config_dev.js
-
 general:
   build_dir: lab
+
+checkout:
+  post:
+    - echo "export default function setDevConfig(config) {}" > config_dev.js
 
 deployment:
   staging:
