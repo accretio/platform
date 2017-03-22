@@ -34,12 +34,13 @@ deployment:
     commands:
       - sudo /opt/google-cloud-sdk/bin/gcloud --quiet config set container/cluster platform-staging
       - sudo /opt/google-cloud-sdk/bin/gcloud --quiet container clusters get-credentials platform-staging
-      - docker build -t gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 .
+     # - docker build -t gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 .
       - docker tag gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 gcr.io/${PROJECT_NAME}/lab:latest
       - sudo /opt/google-cloud-sdk/bin/gcloud docker -- push gcr.io/${PROJECT_NAME}/lab:latest
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
       - export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud-service-key.json
-      - kubectl apply -f es-service.yml
-      - kubectl apply -f lab-service.yml
-      - kubectl apply -f es-deployment.yml
-      - kubectl apply -f lab-deployment.yml
+      - echo $GOOGLE_APPLICATION_CREDENTIALS
+      - sudo kubectl apply -f es-service.yml
+      - sudo kubectl apply -f lab-service.yml
+      - sudo kubectl apply -f es-deployment.yml
+      - sudo kubectl apply -f lab-deployment.yml
