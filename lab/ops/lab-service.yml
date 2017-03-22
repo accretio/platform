@@ -1,0 +1,20 @@
+{
+    "kind": "Service",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "lab"
+    },
+    "spec": {
+        "selector": {
+            "app": "lab"
+        },
+        "ports": [
+            {
+                "protocol": "TCP",
+                "port": 80,
+                "targetPort": 3000
+            }
+        ],
+        "type": "LoadBalancer"
+    }
+}

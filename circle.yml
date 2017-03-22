@@ -41,7 +41,7 @@ deployment:
       - pwd
       - ls -l
       - echo $GOOGLE_APPLICATION_CREDENTIALS
-      - kubectl apply -f ./lab/ops/es-service.yml
-      - kubectl apply -f ./lab/ops/lab-service.yml
-      - kubectl apply -f ./lab/ops/es-deployment.yml
-      - kubectl apply -f ./lab/ops/lab-deployment.yml
+      - kubectl apply -f ops/es-service.yml
+      - kubectl apply -f ops/lab-service.yml
+      - kubectl apply -f ops/es-deployment.yml
+      - kubectl apply -f ops/lab-deployment.yml

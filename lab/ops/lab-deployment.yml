@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: lab-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: lab
+    spec:
+      containers:
+      - name: lab
+        image:  gcr.io/accretio-platform/lab:latest
+        ports:
+        - containerPort: 3000
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            value: ""
+          - name: AWS_SECRET_ACCESS_KEY
+            value: ""
+  
