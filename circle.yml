@@ -6,6 +6,7 @@ machine:
     PROJECT_NAME: accretio-platform
     CLUSTER_NAME: platform-staging
     CLOUDSDK_COMPUTE_ZONE: us-central1-c
+    GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud-service-key.json
   services:
     - docker
 
@@ -14,7 +15,6 @@ dependencies:
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update --version 147.0.0
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update --version 147.0.0 kubectl
     - echo $ACCT_AUTH | base64 --decode -i > ${HOME}/gcloud-service-key.json
-    - export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud-service-key.json
     - sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
     - sudo /opt/google-cloud-sdk/bin/gcloud config set project $PROJECT_NAME
     - sudo /opt/google-cloud-sdk/bin/gcloud config set compute/zone ${CLOUDSDK_COMPUTE_ZONE}
@@ -38,9 +38,8 @@ deployment:
       - docker tag gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 gcr.io/${PROJECT_NAME}/lab:latest
       - sudo /opt/google-cloud-sdk/bin/gcloud docker -- push gcr.io/${PROJECT_NAME}/lab:latest
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-      - export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud-service-key.json
       - echo $GOOGLE_APPLICATION_CREDENTIALS
-      - sudo kubectl apply -f es-service.yml
-      - sudo kubectl apply -f lab-service.yml
-      - sudo kubectl apply -f es-deployment.yml
-      - sudo kubectl apply -f lab-deployment.yml
+      - kubectl apply -f es-service.yml
+      - kubectl apply -f lab-service.yml
+      - kubectl apply -f es-deployment.yml
+      - kubectl apply -f lab-deployment.yml
