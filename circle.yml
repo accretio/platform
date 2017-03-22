@@ -14,6 +14,7 @@ dependencies:
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update --version 147.0.0
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update --version 147.0.0 kubectl
     - echo $ACCT_AUTH | base64 --decode -i > ${HOME}/gcloud-service-key.json
+    - export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud-service-key.json
     - sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
     - sudo /opt/google-cloud-sdk/bin/gcloud config set project $PROJECT_NAME
     - sudo /opt/google-cloud-sdk/bin/gcloud config set compute/zone ${CLOUDSDK_COMPUTE_ZONE}
