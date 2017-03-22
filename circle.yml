@@ -38,8 +38,8 @@ deployment:
       - docker tag gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 gcr.io/${PROJECT_NAME}/lab:latest
       - sudo /opt/google-cloud-sdk/bin/gcloud docker -- push gcr.io/${PROJECT_NAME}/lab:latest
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
-      - echo pwd
-      - echo ls -l
+      - pwd
+      - ls -l
       - echo $GOOGLE_APPLICATION_CREDENTIALS
       - kubectl apply -f ./lab/ops/es-service.yml
       - kubectl apply -f ./lab/ops/lab-service.yml
