@@ -6,6 +6,8 @@ machine:
     PROJECT_NAME: accretio-platform
     CLUSTER_NAME: platform-staging
     CLOUDSDK_COMPUTE_ZONE: us-central1-c
+  services:
+    - docker
 
 dependencies:
   pre:
