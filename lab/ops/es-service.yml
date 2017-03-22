@@ -2,7 +2,10 @@
     "kind": "Service",
     "apiVersion": "v1",
     "metadata": {
-        "name": "elasticsearch"
+        "name": "elasticsearch",
+        "labels": {
+           "app": "es"
+         }
     },
     "spec": {
         "selector": {
@@ -10,10 +13,11 @@
         },
         "ports": [
             {
-                "protocol": "TCP",
-                "port": 9200,
-                "targetPort": 9200
-            }
+            "name": "http",
+            "protocol": "TCP",
+            "port": 9200,
+          "targetPort": 9200
+          }
         ]
     }
 }
