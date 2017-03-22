@@ -39,7 +39,7 @@ deployment:
       - sudo /opt/google-cloud-sdk/bin/gcloud docker -- push gcr.io/${PROJECT_NAME}/lab:latest
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
       - echo $GOOGLE_APPLICATION_CREDENTIALS
-      - kubectl apply -f es-service.yml
-      - kubectl apply -f lab-service.yml
-      - kubectl apply -f es-deployment.yml
-      - kubectl apply -f lab-deployment.yml
+      - kubectl apply -f ops/es-service.yml
+      - kubectl apply -f ops/lab-service.yml
+      - kubectl apply -f ops/es-deployment.yml
+      - kubectl apply -f ops/lab-deployment.yml
