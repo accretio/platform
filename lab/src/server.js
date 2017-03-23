@@ -58,7 +58,7 @@ app.use('/api/s3', require('react-s3-uploader/s3router')({
     headers: {'Access-Control-Allow-Origin': '*'}, // optional
     uploadRequestHeaders: {},
     ACL: 'private', // this is default
-    uniquePrefix: false// (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
+    uniquePrefix: true// (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
 }));
 
 var recipeIndex = "recipes";
