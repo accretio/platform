@@ -70,7 +70,7 @@ deployment:
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
       - kubectl apply -f ops/lab-service.yml
       - kubectl apply -f ops/es-service.yml
-       - cat ops/es-deployment.yml | sed s@\$\$ES_PERSISTENT_DISK@${PROD_ES_PERSISTENT_DISK}@ | kubectl apply -f  -
+      - cat ops/es-deployment.yml | sed s@\$\$ES_PERSISTENT_DISK@${PROD_ES_PERSISTENT_DISK}@ | kubectl apply -f  -
       - cat ops/lab-deployment.yml | sed s@\$\$LAB_VERSION@${CIRCLE_SHA1}@ | sed s@\$\$AWS_ACCESS_KEY_ID@${AWS_ACCESS_KEY_ID}@ | sed s@\$\$AWS_SECRET_ACCESS_KEY@${AWS_SECRET_ACCESS_KEY}@ | sed s@\$\$STRIPE_PK@${PROD_STRIPE_PK}@ | sed s@\$\$STRIPE_SK@${PROD_STRIPE_SK}@ | sed s@\$\$SLACK_WEBHOOK@${SLACK_WEBHOOK}@ | sed s@\$\$URL@${PROD_URL}@ | sed s@\$\$SLACK_CHANNEL@${PROD_SLACK_CHANNEL}@ | kubectl apply -f  - 
       - kubectl apply -f ${HOME}/lab-secret.yml
       - kubectl apply -f ops/lab-ingress.yml
