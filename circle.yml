@@ -56,7 +56,7 @@ deployment:
       - cat ops/lab-deployment.yml | sed s@\$\$LAB_VERSION@${CIRCLE_SHA1}@ | sed s@\$\$AWS_ACCESS_KEY_ID@${AWS_ACCESS_KEY_ID}@ | sed s@\$\$AWS_SECRET_ACCESS_KEY@${AWS_SECRET_ACCESS_KEY}@ | sed s@\$\$STRIPE_PK@${STAGING_STRIPE_PK}@ | sed s@\$\$STRIPE_SK@${STAGING_STRIPE_SK}@ | sed s@\$\$SLACK_WEBHOOK@${SLACK_WEBHOOK}@ | sed s@\$\$URL@${STAGING_URL}@ | sed s@\$\$SLACK_CHANNEL@${STAGING_SLACK_CHANNEL}@ | kubectl apply -f  - 
       - kubectl apply -f ${HOME}/lab-secret.yml
       - kubectl apply -f ops/lab-ingress.yml
-  staging:
+  prod:
     branch: prod
     commands:
       - sudo /opt/google-cloud-sdk/bin/gcloud config set compute/zone ${PROD_CLOUDSDK_COMPUTE_ZONE}
