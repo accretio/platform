@@ -39,7 +39,7 @@ test:
 # todo: try to factorize some of the following code
 deployment:
   staging:
-    branch: dockerize-lab
+    branch: [ dockerize-lab, master ]
     commands:
       - sudo /opt/google-cloud-sdk/bin/gcloud config set compute/zone ${STAGING_CLOUDSDK_COMPUTE_ZONE}
       - sudo /opt/google-cloud-sdk/bin/gcloud --quiet config set container/cluster $STAGING_CLUSTER_NAME
