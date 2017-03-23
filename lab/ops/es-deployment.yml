@@ -21,6 +21,6 @@ spec:
       volumes:
       - name: es-data
         gcePersistentDisk:
-          pdName: $ES_PERSISTENT_DISK
+          pdName: $$ES_PERSISTENT_DISK
           fsType: ext4
           readOnly: false
