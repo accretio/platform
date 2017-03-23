@@ -40,7 +40,7 @@ deployment:
   staging:
     branch: dockerize-lab
     commands:
-      - sudo /opt/google-cloud-sdk/bin/gcloud --quiet config set container/cluster platform $STAGING_CLUSTER_NAME
+      - sudo /opt/google-cloud-sdk/bin/gcloud --quiet config set container/cluster $STAGING_CLUSTER_NAME
       - sudo /opt/google-cloud-sdk/bin/gcloud --quiet container clusters get-credentials $STAGING_CLUSTER_NAME
       - npm run build
       - docker build -t gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 .
