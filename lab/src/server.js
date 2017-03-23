@@ -35,7 +35,7 @@ AWS.config.credentials = credentials;
 
 // initialize the ES client
 const ESClient = new elasticsearch.Client({
-    host: 'es:9200',
+    host: 'elasticsearch:9200',
     log: 'trace',
     httpAuth: 'elastic:changeme'
 });
