@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: es-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: es
+    spec:
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+        ports:
+        - containerPort: 9200
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: es-data
+          readOnly: false
+      volumes:
+      - name: es-data
+        gcePersistentDisk:
+          pdName: $ES_PERSISTENT_DISK
+          fsType: ext4
+          readOnly: false

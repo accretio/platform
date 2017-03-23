@@ -30,12 +30,12 @@ const app = new Express();
 const server = new Server(app);
 
 // initialize the AWS credentials
-const credentials = new AWS.SharedIniFileCredentials({profile: 'accretio'});
+const credentials = new AWS.EnvironmentCredentials("AWS");
 AWS.config.credentials = credentials;
 
 // initialize the ES client
 const ESClient = new elasticsearch.Client({
-    host: 'localhost:9200',
+    host: 'elasticsearch:9200',
     log: 'trace',
     httpAuth: 'elastic:changeme'
 });
@@ -58,7 +58,7 @@ app.use('/api/s3', require('react-s3-uploader/s3router')({
     headers: {'Access-Control-Allow-Origin': '*'}, // optional
     uploadRequestHeaders: {},
     ACL: 'private', // this is default
-    uniquePrefix: false// (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
+    uniquePrefix: true// (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
 }));
 
 var recipeIndex = "recipes";

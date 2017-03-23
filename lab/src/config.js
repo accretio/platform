@@ -14,9 +14,10 @@ let config = {};
 config.stripe_pk = process.env.STRIPE_PK || 'pk_test_KNYK2I1UsxoIXX0jDiG46mmj';
 config.stripe_sk = process.env.STRIPE_SK; 
 config.slack_webhook = process.env.SLACK_WEBHOOK;
-config.slack_dev_channel = '#dev';
+config.slack_channel = process.env.SLACK_CHANNEL || '#dev';
 config.env = process.env.NODE_ENV || 'production';
 config.port = process.env.PORT || 3000;
+config.service_url = process.env.URL;
 
 setDevConfig(config);
 

@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: lab-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: lab
+    spec:
+      containers:
+      - name: lab
+        image:  gcr.io/accretio-platform/lab:$$LAB_VERSION
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            value: $$AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            value: $$AWS_SECRET_ACCESS_KEY
+          - name: STRIPE_PK
+            value: $$STRIPE_PK
+          - name: STRIPE_SK
+            value: $$STRIPE_SK
+          - name: SLACK_WEBHOOK
+            value: $$SLACK_WEBHOOK
+          - name: SLACK_CHANNEL
+            value: $$SLACK_CHANNEL
+          - name: URL
+            value: $$URL
+  

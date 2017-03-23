@@ -1,0 +1,24 @@
+{
+    "kind": "Service",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "lab",
+         "labels": {
+         "app": "lab"
+         }
+    },
+    "spec": {
+        "selector": {
+            "app": "lab"
+        },
+        "type": "NodePort",
+        "ports": [
+        {
+        "name": "http",
+        "protocol": "TCP",
+        "port": 80,
+        "targetPort": 3000
+        }
+        ]
+    }
+}

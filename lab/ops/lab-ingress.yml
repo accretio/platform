@@ -1,0 +1,10 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: lab-ingress
+spec:
+  tls:
+  - secretName: lab-secret
+  backend:
+    serviceName: lab
+    servicePort: 80
