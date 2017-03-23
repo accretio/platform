@@ -30,7 +30,7 @@ const app = new Express();
 const server = new Server(app);
 
 // initialize the AWS credentials
-const credentials = new AWS.SharedIniFileCredentials({profile: 'accretio'});
+const credentials = new AWS.EnvironmentCredentials("AWS");
 AWS.config.credentials = credentials;
 
 // initialize the ES client
