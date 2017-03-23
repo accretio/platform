@@ -17,7 +17,7 @@ config.slack_webhook = process.env.SLACK_WEBHOOK;
 config.slack_channel = process.env.SLACK_CHANNEL || '#dev';
 config.env = process.env.NODE_ENV || 'production';
 config.port = process.env.PORT || 3000;
-config.url = process.env.URL;
+config.service_url = process.env.URL;
 
 setDevConfig(config);
 
