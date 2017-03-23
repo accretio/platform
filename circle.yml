@@ -40,6 +40,7 @@ deployment:
       - docker tag gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 gcr.io/${PROJECT_NAME}/lab:latest
       - sudo /opt/google-cloud-sdk/bin/gcloud docker -- push gcr.io/${PROJECT_NAME}/lab:latest
       - sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+      - find .
       - kubectl apply -f ops/lab-service.yml
       - kubectl apply -f ops/es-service.yml
       - kubectl apply -f ops/es-deployment.yml
