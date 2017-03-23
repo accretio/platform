@@ -61,10 +61,8 @@ deployment:
     commands:
       - sudo /opt/google-cloud-sdk/bin/gcloud config set compute/zone ${PROD_CLOUDSDK_COMPUTE_ZONE}
       - sudo /opt/google-cloud-sdk/bin/gcloud --quiet config set container/cluster $PROD_CLUSTER_NAME
-      - sudo /opt/google-cloud-sdk/bin/gcloud --quiet container
-      clusters get-credentials $PROD_CLUSTER_NAME
-      - echo "export default function setDevConfig(config) {
-      config.stripe_pk = \"${PROD_STRIPE_PK}\"; }" > config_dev.js
+      - sudo /opt/google-cloud-sdk/bin/gcloud --quiet container clusters get-credentials $PROD_CLUSTER_NAME
+      - echo "export default function setDevConfig(config) { config.stripe_pk = '"${PROD_STRIPE_PK}"'; }" > config_dev.js
       - npm run build
       - docker build -t gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 .
       - docker tag gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 gcr.io/${PROJECT_NAME}/lab:latest
