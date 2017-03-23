@@ -1,12 +1,19 @@
 general:
   build_dir: lab
-
+  branches:
+    only:
+      - master
+      - dockerize-lab
+      - /release.*/
+      
 machine:
   environment:
     PROJECT_NAME: accretio-platform
-    CLUSTER_NAME: platform-staging
+    STAGING_CLUSTER_NAME: platform-staging
+    PROD_CLUSTER_NAME: platform-prod
     CLOUDSDK_COMPUTE_ZONE: us-central1-c
     GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud-service-key.json
+    
   services:
     - docker
 
@@ -33,8 +40,8 @@ deployment:
   staging:
     branch: dockerize-lab
     commands:
-      - sudo /opt/google-cloud-sdk/bin/gcloud --quiet config set container/cluster platform-staging
-      - sudo /opt/google-cloud-sdk/bin/gcloud --quiet container clusters get-credentials platform-staging
+      - sudo /opt/google-cloud-sdk/bin/gcloud --quiet config set container/cluster platform $ STAGING_CLUSTER_NAME
+      - sudo /opt/google-cloud-sdk/bin/gcloud --quiet container clusters get-credentials $ STAGING_CLUSTER_NAME
       - npm run build
       - docker build -t gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 .
       - docker tag gcr.io/${PROJECT_NAME}/lab:$CIRCLE_SHA1 gcr.io/${PROJECT_NAME}/lab:latest
@@ -45,6 +52,6 @@ deployment:
       - kubectl apply -f ops/lab-service.yml
       - kubectl apply -f ops/es-service.yml
       - kubectl apply -f ops/es-deployment.yml
-      - cat ops/lab-deployment.yml | sed s/\$\$LAB_VERSION/${CIRCLE_SHA1}/ | kubectl apply -f  - 
+      - cat ops/lab-deployment.yml | sed s/\$\$LAB_VERSION/${CIRCLE_SHA1}/ | sed s/\$\$AWS_ACCESS_KEY_ID/${AWS_ACCESS_KEY_ID}/ | sed s/\$\$AWS_SECRET_ACCESS_KEY/${AWS_SECRET_ACCESS_KEY}/ | sed s/\$\$STRIPE_PK/${STAGING_STRIPE_PK}/ | sed s/\$\$STRIPE_SK/${STAGING_STRIPE_SK}/ | sed s/\$\$SLACK_WEBHOOK/${SLACK_WEBHOOK}/ | sed s/\$\$URL/${STAGING_URL}/ | sed s/\$\$SLACK_CHANNEL/${STAGING_SLACK_CHANNEL}/ | kubectl apply -f  - 
       - kubectl apply -f ${HOME}/lab-secret.yml
       - kubectl apply -f ops/lab-ingress.yml
