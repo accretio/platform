@@ -44,6 +44,6 @@ deployment:
       - kubectl apply -f ops/lab-service.yml
       - kubectl apply -f ops/es-service.yml
       - kubectl apply -f ops/es-deployment.yml
-      - cat ops/es-deployment.yaml | sed s/\$\$LAB_VERSION/${CIRCLE_SHA1}/ | kubectl apply -f  - 
+      - cat ops/lab-deployment.yml | sed s/\$\$LAB_VERSION/${CIRCLE_SHA1}/ | kubectl apply -f  - 
       - kubectl apply -f ${HOME}/lab-secret.yml
       - kubectl apply -f ops/lab-ingress.yml
