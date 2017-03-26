@@ -1,6 +1,6 @@
 'use strict';
 
-import { slack_webhook, slack_dev_channel, slack_channel, env, service_url } from '../config';
+import { slack_webhook, env, service_url } from '../config';
 
 function slack(channel, text) {
   const opt = {
@@ -10,7 +10,7 @@ function slack(channel, text) {
     }),
     body: JSON.stringify({
       text: text,
-      channel: channel
+      channel: (env === 'production') ? channel : '#dev'
     })
   };
   fetch(slack_webhook, opt)
@@ -20,7 +20,7 @@ function slack(channel, text) {
 } 
 
 export function notifyWorkshop(jobId) {
-  const url = `${service_url}/admin/orders/search/_id:${jobId}`;
-  const message = `@channel <${url}|Job ${jobId}> is waiting for production`;
-  slack(slack_channel, message);
+    const url = `${service_url}/admin/orders/search/_id:${jobId}`;
+    const message = `@channel <${url}|Job ${jobId}> is waiting for production`;
+    slack('#workshop', message);
 }
