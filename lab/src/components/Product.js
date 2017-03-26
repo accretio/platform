@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { PropTypes} from 'react';
 import Slider from 'react-slick';
 
 import fetch from 'isomorphic-fetch';
@@ -25,16 +25,17 @@ export default class Product extends React.Component {
     }
     
     updateError(error) {
-    console.log(error);
-      this.setState({ error: error });
-  }
+        console.log(error);
+        this.setState({ error: error });
+    }
     
     purchase() {
+        this.context.mixpanel.track('clicking purchase', { 'uid': this.props.params.id });
         this.props.history.push('/product/' + this.props.params.id + '/purchase');
     }
     
-  render() {
-    console.log("calling render with " + this.props.params.id + " ");
+    render() {
+        console.log("calling render with " + this.props.params.id + " ");
      
     if (this.state.recipe == null) {
       return null; 
@@ -103,3 +104,8 @@ export default class Product extends React.Component {
                
   }
 }
+
+
+Product.contextTypes = {
+    mixpanel: PropTypes.object.isRequired
+};

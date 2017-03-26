@@ -30,4 +30,8 @@ spec:
             value: $$SLACK_CHANNEL
           - name: URL
             value: $$URL
+          - name: ELASTICSEARCH_ENDPOINT
+            value: "elasticsearch"
+          - name: MIXPANEL_TOKEN
+            value: $$MIXPANEL_TOKEN 
   

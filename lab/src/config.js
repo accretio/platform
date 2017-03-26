@@ -18,6 +18,8 @@ config.slack_channel = process.env.SLACK_CHANNEL || '#dev';
 config.env = process.env.NODE_ENV || 'production';
 config.port = process.env.PORT || 3000;
 config.service_url = process.env.URL;
+config.elasticsearch_endpoint = process.env.ELASTICSEARCH_ENDPOINT || 'localhost';
+config.mixpanel_token = process.env.MIXPANEL_TOKEN || '01a6b70a0184a27fb083ff5973ac638e';
 
 setDevConfig(config);
 
@@ -27,3 +29,6 @@ export const slack_webhook = config.slack_webhook;
 export const slack_dev_channel = config.slack_dev_channel;
 export const env = config.env;
 export const port = config.port;
+export const elasticsearch_endpoint = config.elasticsearch_endpoint;
+export const mixpanel_token = config.mixpanel_token ;
+export const bypass_https = config.bypass_https || false;
