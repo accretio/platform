@@ -19,6 +19,13 @@ config.env = process.env.NODE_ENV || 'production';
 config.port = process.env.PORT || 3000;
 config.service_url = process.env.URL;
 
+// AWS and S3 configuration
+config.aws_credentials = {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+}
+config.s3_bucket_name = 'accretio-lab-files';
+
 setDevConfig(config);
 
 export const stripe_pk = config.stripe_pk;
@@ -27,3 +34,5 @@ export const slack_webhook = config.slack_webhook;
 export const slack_dev_channel = config.slack_dev_channel;
 export const env = config.env;
 export const port = config.port;
+export const aws_credentials = config.aws_credentials;
+export const s3_bucket_name = config.s3_bucket_name;

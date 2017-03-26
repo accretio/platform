@@ -23,14 +23,14 @@ import elasticsearch from 'elasticsearch';
 
 import stripePackage from 'stripe';
 
-import { stripe_sk } from './config.server';
+import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
 
 // initialize the server and configure support for ejs templates
 const app = new Express();
 const server = new Server(app);
 
 // initialize the AWS credentials
-const credentials = new AWS.EnvironmentCredentials("AWS");
+const credentials = new AWS.Credentials(aws_credentials);
 AWS.config.credentials = credentials;
 
 // initialize the ES client
@@ -53,7 +53,7 @@ app.use(bodyParser.json({ type: 'application/json' }));
 // api methods
 
 app.use('/api/s3', require('react-s3-uploader/s3router')({
-    bucket: "accretio-lab-files",
+    bucket: s3_bucket_name,
     region: 'us-west-1',
     headers: {'Access-Control-Allow-Origin': '*'}, // optional
     uploadRequestHeaders: {},
