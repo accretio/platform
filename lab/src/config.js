@@ -21,6 +21,13 @@ config.service_url = process.env.URL;
 config.elasticsearch_endpoint = process.env.ELASTICSEARCH_ENDPOINT || 'localhost';
 config.mixpanel_token = process.env.MIXPANEL_TOKEN || '01a6b70a0184a27fb083ff5973ac638e';
 
+// AWS and S3 configuration
+config.aws_credentials = {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+}
+config.s3_bucket_name = 'accretio-lab-files';
+
 setDevConfig(config);
 
 export const stripe_pk = config.stripe_pk;
@@ -29,6 +36,8 @@ export const slack_webhook = config.slack_webhook;
 export const slack_dev_channel = config.slack_dev_channel;
 export const env = config.env;
 export const port = config.port;
+export const aws_credentials = config.aws_credentials;
+export const s3_bucket_name = config.s3_bucket_name;
 export const elasticsearch_endpoint = config.elasticsearch_endpoint;
 export const mixpanel_token = config.mixpanel_token ;
 export const bypass_https = config.bypass_https || false;
