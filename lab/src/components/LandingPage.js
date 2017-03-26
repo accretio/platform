@@ -1,10 +1,15 @@
 'use strict';
 
-import React from 'react';
+import React, { PropTypes} from 'react';
 import { Link } from 'react-router';
 
 export default class LandingPage extends React.Component {
-  render() {
+
+    componentDidMount() {
+        this.context.mixpanel.track('landing page loaded');
+    }
+    
+    render() {
     return (
         <div className="landing-page">
           <h1>On-demand assembly lines</h1>
@@ -33,3 +38,7 @@ export default class LandingPage extends React.Component {
     );
   }
 }
+
+LandingPage.contextTypes = {
+    mixpanel: PropTypes.object.isRequired
+};

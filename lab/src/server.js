@@ -15,7 +15,7 @@ import { Button } from 'reactstrap';
 import Recipe from './recipe';
 import Order from './order';
 import { notifyWorkshop } from './lib/slack';
-import { env, port } from './config';
+import { env, port, elasticsearch_endpoint } from './config';
 
 import AWS from 'aws-sdk';
 import bodyParser from 'body-parser';
@@ -35,7 +35,7 @@ AWS.config.credentials = credentials;
 
 // initialize the ES client
 const ESClient = new elasticsearch.Client({
-    host: 'elasticsearch:9200',
+    host: `${elasticsearch_endpoint}:9200`,
     log: 'trace',
     httpAuth: 'elastic:changeme'
 });
