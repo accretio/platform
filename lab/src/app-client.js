@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import AppRoutes from './components/AppRoutes';
 
 window.onload = () => {
-    if (location.protocol != 'https:')
+    if ((location.protocol != 'https:') && (process.env.NODE_ENV === 'production'))
     {
         location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
     } else {
