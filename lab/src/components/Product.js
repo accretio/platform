@@ -19,6 +19,10 @@ export default class Product extends React.Component {
       }).then(function(response) { return (response.json()) ; }, this.updateError.bind(this))
           .then(this.updateRecipe.bind(this), this.updateError.bind(this));
   }
+    
+    componentDidMount() {
+        this.context.mixpanel.track('product page loaded', { 'uid': this.props.params.id });
+    }
 
     updateRecipe(recipe) {
         this.setState({ recipe: recipe });
