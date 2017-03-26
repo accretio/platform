@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { PropTypes} from 'react';
 import Modal from 'react-modal';
 import StripeCheckout from 'react-stripe-checkout';
 
@@ -8,6 +8,11 @@ import {stripe_pk} from '../config';
 import fetch from 'isomorphic-fetch';
 
 export default class Purchase extends React.Component {
+    
+    componentDidMount() {
+        this.context.mixpanel.track('purchasing page', { 'uid': this.props.params.id });
+    }
+    
     constructor(props) {
         super(props);
         this.state = { recipe: null, error: ''};
@@ -27,6 +32,7 @@ export default class Purchase extends React.Component {
     
     updateError(error) {
         console.log(error);
+        this.context.mixpanel.track('error', { 'message': error });
         this.setState({ error: error });
     }
     
@@ -48,6 +54,7 @@ export default class Purchase extends React.Component {
     }
     
     onToken(token) {
+        this.context.mixpanel.track('stripe token created', { 'uid': this.props.params.id });
         var order =
                 {
                     token: token,
@@ -65,6 +72,7 @@ export default class Purchase extends React.Component {
     }
 
     gotoThanks() {
+        this.context.mixpanel.track('successful purchase', { 'uid': this.props.params.id });
         this.props.history.push('/product/' + this.props.params.id + '/thanks');
     }
     
@@ -194,3 +202,10 @@ export default class Purchase extends React.Component {
         );
     }
 }
+
+
+
+
+Purchase.contextTypes = {
+    mixpanel: PropTypes.object.isRequired
+};
