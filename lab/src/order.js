@@ -5,7 +5,7 @@ export default class Order {
     constructor(obj) {
         this.token = obj.token;
         this.recipe = obj.recipe;
-        this.job = obj.order;
+        this.job = obj.job;
     }
     
     toESJson() {

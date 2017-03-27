@@ -31,25 +31,23 @@ export default class Purchase extends React.Component {
     }
     
     updateError(error) {
-        console.log(error);
         this.context.mixpanel.track('error', { 'message': error });
         this.setState({ error: error });
     }
     
     updateArg(arg, event) {
-        
         var order = (this.state.order != null) ? JSON.parse(JSON.stringify(this.state.order)) : { args: new Array() };
         
         var pos = order.args.findIndex(function(v) { return(v.key === arg);});
-
+       
         if (pos > -1) {
-            order.args[pos] = event.target.value;
+            order.args[pos].value = event.target.value;
         } else {
             order.args.push({ key: arg, value: event.target.value });
         }
-        
+               
         this.setState({ order: order });
-      
+        
         return true;
     }
     
