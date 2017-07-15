@@ -5,6 +5,7 @@ import { Route, IndexRoute } from 'react-router';
 
 import Layout from './components/Layout';
 import LandingPage from './components/LandingPage';
+import PanelEditor from './components/PanelEditor';
 import ImportSingleOpenScadFile from './components/ImportSingleOpenScadFile';
 import Thanks from './components/Thanks';
 import NotFoundPage from './components/NotFoundPage';
@@ -15,7 +16,7 @@ import AdminOrdersSearch from './components/admin/OrdersSearch';
 
 const routes = (
    <Route path="/" component={Layout}>
-    <IndexRoute component={LandingPage}/>
+    <IndexRoute component={PanelEditor}/>
     <Route path="/import/" component={Layout}>
         <Route path="importSingleOpenScadFile" component={ImportSingleOpenScadFile}/>
     </Route>

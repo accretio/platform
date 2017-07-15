@@ -1,0 +1,3 @@
+[submodule "lab/OpenJSCAD.org"]
+	path = lab/OpenJSCAD.org
+	url = git@github.com:jscad/OpenJSCAD.org.git
