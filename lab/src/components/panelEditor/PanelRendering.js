@@ -6,10 +6,12 @@ import Instrument from './../../models/Instrument.js';
 
 const Viewer = require('./../../../OpenJSCAD.org/src/ui/viewer/jscad-viewer');
 
+
 export default class PanelRendering extends React.Component {
     
     constructor(props) {
         super(props);
+        
     }
     
     componentDidMount() {
