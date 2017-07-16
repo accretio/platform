@@ -16,6 +16,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@jscad/openjscad": "^1.0.1",
+    "@jscad/openscad-openjscad-translator": "0.0.10",
     "aws-sdk": "^2.28.0",
     "babel-cli": "^6.11.4",
     "babel-core": "^6.13.2",

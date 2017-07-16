@@ -2,29 +2,18 @@
 import React, { PropTypes} from 'react';
 import { Link } from 'react-router';
 
-import CSG from '@jscad/csg';
-import { primitives3d, booleanOps } from '@jscad/scad-api';
+import Instrument from './../../models/Instrument.js';
 
 const Viewer = require('./../../../OpenJSCAD.org/src/ui/viewer/jscad-viewer');
 
 export default class PanelRendering extends React.Component {
-
-    generateRandomScad() {
-
-        const {cube, sphere} = primitives3d;
-        const {union} = booleanOps;
-        var base = cube({size: 1, center: true});
-        var top = sphere({r: 10, fn: 100, type: 'geodesic'});
-        var result = union(base, top);
-        
+    
+    constructor(props) {
+        super(props);
     }
     
     componentDidMount() {
-        this.generateRandomScad();
-        // var viewer = new Viewer({});
-
         var v = new Viewer(this.refs.col1, {});
-        
     }
     
     render() {
@@ -34,6 +23,7 @@ export default class PanelRendering extends React.Component {
             </div>
         );
     }
+    
 }
 
 PanelRendering.contextTypes = {
