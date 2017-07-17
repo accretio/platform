@@ -119,6 +119,28 @@ h2 {
 
 .viewer {
 
-    height: 200px;
+    margin: 5px; /* not inherited */
     
+    padding: 0px; /* not inherited */
+    
+    background: white;
+    width: 100%;
+    height: 300px;
+    
+    top: 0px;
+    bottom: 0px;
+    
+}
+
+
+canvas { 
+  margin: 0px; /* not inherited */
+ 
+  padding: 0px; /* not inherited */
+
+  width: 100%;
+ // width: 400px;
+ // height: 300px;
+
+  cursor: move; 
 }

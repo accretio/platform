@@ -41,7 +41,7 @@ export default class PanelEditor extends React.Component {
 
     componentDidMount() {
         this.context.mixpanel.track('panel editor page loaded');
-        var processor = new Processor2(this.refs.viewer);
+        var processor = new Processor2(this.refs.viewer, this.opts);
         processor.setCurrentObjects([this.state.layout.shape]);
         this.setState({ processor: processor });
     }
@@ -64,15 +64,15 @@ export default class PanelEditor extends React.Component {
         return (
             <div className="container">
               <div className="row">
-                <div className="col-1">
+                <div className="col-2">
                   <InstrumentPicker
                      catalog={this.state.catalog}
-                     addInstrument={this.addInstrument.bind(this)}
-                     />
+                     addInstrument={this.addInstrument.bind(this)} />
                 </div>
-                <div className="col-11 viewer" ref="viewer">
-                  
-                </div> 
+                <div className="col">
+                  <div className="viewer" ref="viewer">
+                  </div> 
+                </div>
               </div>
             </div>
         );
