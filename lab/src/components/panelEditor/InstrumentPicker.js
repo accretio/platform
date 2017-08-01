@@ -26,7 +26,7 @@ export default class InstrumentPicker extends React.Component {
                     return <button
                     type="button"
                     key={ i }
-                    className="btn btn-primary"
+                    className="btn btn-primary btn-instrument"
                     onClick={ function () { that.props.addInstrument(instrument); } } >
                         { instrument.name }
                     </button>; 

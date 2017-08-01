@@ -1,10 +1,12 @@
 html {
     position: relative;
     min-height: 100%;
+    height: 100%;
 }
 body {
     /* Margin bottom by footer height */
     margin-bottom: 60px;
+    height: 100%;
 }
 .footer {
     position: absolute;
@@ -18,10 +20,12 @@ body {
 
 body > .main {
     padding: 60px 0;
+     height: 100%;
 }
 
 .app-content {
-    margin-top: 40px;       
+    margin-top: 40px;
+    height: 100%;
 }
 
 .not-found {
@@ -119,13 +123,12 @@ h2 {
 
 .viewer {
 
-    margin: 5px; /* not inherited */
     
     padding: 0px; /* not inherited */
     
     background: white;
     width: 100%;
-    height: 300px;
+    height: 100%;
     
     top: 0px;
     bottom: 0px;
@@ -139,8 +142,30 @@ canvas {
   padding: 0px; /* not inherited */
 
   width: 100%;
+  height: 100%;
  // width: 400px;
  // height: 300px;
 
   cursor: move; 
+}
+
+.btn-instrument {
+    margin-bottom: 10px;
+}
+
+.row-1 {
+    height: 100%;
+}
+
+.container {
+    height: 100%;
+    padding-bottom: 80px;
+}
+
+.controls {
+    text-align:center; 
+    margin-bottom: 10px; 
+    button {
+        margin: 0 5px;
+    }
 }
