@@ -7,6 +7,10 @@ import PanelRendering from './panelEditor/PanelRendering';
 import Instrument from './../models/Instrument.js';
 import Processor2 from './../../OpenJSCAD.org/src/jscad/processor';
 
+
+import {fabric} from 'fabric';
+
+
 import { primitives3d, booleanOps } from '@jscad/scad-api';
 
 // the layouts
@@ -16,8 +20,8 @@ import { PA_23_250_E_Turbo_layout } from './../panels/PA-23-250-E-Turbo.js';
 import { GTX345 } from './../catalog/GTX345.js';
 import { GNS430 } from './../catalog/GNS430.js';
 
-var PANEL_CUT = 1;
-var SEE_ALL = 0;
+var DESIGN = 0;
+var RENDER = 1;
 
 export default class PanelEditor extends React.Component {
 
@@ -30,31 +34,41 @@ export default class PanelEditor extends React.Component {
             catalog: [ GTX345, GNS430 ],
             instruments: [],
             viewer: null,
-            renderingMode: SEE_ALL
+            canvas: null,
+            renderingMode: DESIGN
         };
 
-        this.opts = {
-            debug: true,
-            libraries: [],
-            openJsCadPath: '',
-            useAsync: true,
-            useSync: true,
-            processor: {}
-        };
+        
         
     }
 
     componentDidMount() {
         this.context.mixpanel.track('panel editor page loaded');
-        var processor = new Processor2(this.refs.viewer, this.opts);
+      /*  var processor = new Processor2(this.refs.viewer, this.opts);
         processor.setCurrentObjects([this.state.layout.shape]);
-        this.setState({ processor: processor });
+       this.setState({ processor: processor }); */
+
+
+        var canvas = new fabric.Canvas('canvas');
+
+        var rect = new fabric.Rect({
+            top : 100,
+            left : 100,
+            width : 60,
+            height : 70,
+            fill : 'red'
+        });
+        
+        canvas.add(rect);
+
+        this.setState({ canvas: canvas });
+
     }
 
     renderPanel() {
         var objects = this.state.instruments.map(function(instr){ return instr.shape; });
    
-        const {union, difference} = booleanOps;
+      /*  const {union, difference} = booleanOps;
 
         if (this.state.renderingMode == SEE_ALL) {
             var allinstrs = union(objects);
@@ -65,7 +79,7 @@ export default class PanelEditor extends React.Component {
             var allinstrs = union(objects);
             var diff = difference(this.state.layout.shape, allinstrs);
             this.state.process.setCurrentObjects(diff);
-        }
+        } */
         
     }
     
@@ -73,41 +87,87 @@ export default class PanelEditor extends React.Component {
         var instruments = JSON.parse(JSON.stringify(this.state.instruments));
         instruments.push(instrument);
         this.setState({ instruments: instruments });
+
+
+        var rect = new fabric.Rect({
+            top : 100,
+            left : 100,
+            width : 60,
+            height : 70,
+            hasControls : false,
+            fill : 'blue'
+        });
         
-        // now we need to render that new instrument somehow
-        this.renderPanel();
+        this.state.canvas.add(rect);
+       
     }
 
    
-    seeAll() {
-        this.setState({ renderingMode: SEE_ALL });
+    viewDesign() {
+        this.setState({ renderingMode: DESIGN });
         
     }
 
-    panelCut() {
-        this.setState({ renderingMode: PANEL_CUT });
+    viewRender() {
+        this.setState({ renderingMode: RENDER });
+    }
+
+    alignSelectedObjectsVertically() {
+
+        var curSelectedObjects = new Array();
+        curSelectedObjects = this.state.canvas.getObjects(this.state.canvas.getActiveGroup);
+
+        var averageLeft =
+                curSelectedObjects.map(function(obj){ return obj.left ; }).reduce(function(a,b) { return (a+b);}, 0) / curSelectedObjects.length ;
+        
+        curSelectedObjects.map(function(obj) { obj.top = averageLeft; obj.setCoords(); });
+
+        this.state.canvas.renderAll();
     }
     
     render() {
 
+        let renderOptions = null;
+
+        if (this.state.renderMode == DESIGN) {
+            renderOptions =
+                <div className="col-12">
+
+                </div>;
+        } else {
+            renderOptions =
+                <div className="col-12">
+                <button
+            type="button"
+            onClick={ this.alignSelectedObjectsVertically.bind(this) }
+            className="btn btn-primary">
+                Align Vertically
+                </button>
+                </div>;
+        }
+        
         return (
             <div className="container">
 
-              <div className="row controls">
+              <div className="row renderMode controls">
                 <div className="col-12">
                    <button
                       type="button"
-                      onClick={ this.seeAll.bind(this) }
+                      onClick={ this.viewDesign.bind(this) }
                       className="btn btn-primary">
-                     See all
+                     Design
                    </button>
                      <button
                       type="button"
-                      onClick={ this.panelCut.bind(this) }
+                      onClick={ this.viewRender.bind(this) }
                       className="btn btn-primary">
-                     Panel Cut
+                     Render
                    </button>
                 </div>
+              </div>
+
+              <div className="row renderOptions controls">
+                { renderOptions }
               </div>
               
               <div className="row row-1">
@@ -117,8 +177,7 @@ export default class PanelEditor extends React.Component {
                      addInstrument={this.addInstrument.bind(this)} />
                 </div>
                 <div className="col">
-                  <div className="viewer" ref="viewer">
-                  </div> 
+                  <canvas id="canvas" width="300" height="300"></canvas>
                 </div>
               </div>
             </div>
