@@ -11,7 +11,7 @@ const extractSass = new ExtractTextPlugin({
     filename: "css/style.css",
     allChunks: true
 });
-
+ 
 module.exports = {
     devtool: false,
     entry: [
@@ -62,13 +62,6 @@ module.exports = {
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
         }),
-        extractSass,
-        new webpack.optimize.UglifyJsPlugin({
-            compress: { warnings: false },
-            mangle: true,
-            sourcemap: false,
-            beautify: false,
-            dead_code: true
-        }),
+        extractSass
     ]
 };
