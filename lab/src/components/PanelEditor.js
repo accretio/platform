@@ -59,16 +59,6 @@ export default class PanelEditor extends React.Component {
 	
         var canvas = new fabric.Canvas('canvas');
 
-        var rect = new fabric.Rect({
-            top : 100,
-            left : 100,
-            width : 60,
-            height : 70,
-            fill : 'red'
-        });
-        
-        canvas.add(rect);
-
 	var group = [];
 	
 	fabric.loadSVGFromString(svg, function(objects,options) {
@@ -76,6 +66,10 @@ export default class PanelEditor extends React.Component {
             var loadedObjects = new fabric.Group(group);
 
             loadedObjects.set({
+		top: 0,
+		left: 0,
+		scaleX: 1,
+                scaleY: 1,
           	lockMovementX: true,
 		lockMovementY: true,
 		lockScalingX: true,
@@ -84,6 +78,7 @@ export default class PanelEditor extends React.Component {
             });
 
             canvas.add(loadedObjects);
+	    canvas.setZoom(canvas.width / loadedObjects.width);
             canvas.renderAll();
 
         },function(item, object) {
@@ -94,7 +89,6 @@ export default class PanelEditor extends React.Component {
 	// set up pan zoom
 
 	this.canvasContainer.addEventListener("mousewheel", this.zoomCanvas.bind(this));
-
 	
         this.setState({ canvas: canvas });
 
@@ -140,10 +134,10 @@ export default class PanelEditor extends React.Component {
 
 
         var rect = new fabric.Rect({
-            top : 100,
-            left : 100,
-            width : 60,
-            height : 70,
+            top : 0,
+            left : 0,
+            width :  6.25,
+            height : 2.65,
             hasControls : false,
             fill : 'blue'
         });
