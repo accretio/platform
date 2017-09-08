@@ -13,12 +13,17 @@ import {fabric} from 'fabric';
 
 import { primitives3d, booleanOps } from '@jscad/scad-api';
 
+import { parseString, toSVG } from 'dxf-to-svg/lib';
+
 // the layouts
 import { PA_23_250_E_Turbo_layout } from './../panels/PA-23-250-E-Turbo.js';
 
 // the instruments
 import { GTX345 } from './../catalog/GTX345.js';
 import { GNS430 } from './../catalog/GNS430.js';
+
+// the panels
+import { PA28 } from './../aircraft/PA40.js'; 
 
 var DESIGN = 0;
 var RENDER = 1;
@@ -63,6 +68,9 @@ export default class PanelEditor extends React.Component {
 
         this.setState({ canvas: canvas });
 
+	// dxf test
+
+	
     }
 
     renderPanel() {
@@ -129,6 +137,14 @@ export default class PanelEditor extends React.Component {
 
         let renderOptions = null;
 
+	var s = ``
+	var parsed = parseString(PA28);
+	console.log(parsed)
+	var svg = toSVG(parsed);
+
+	console.log(svg);
+	
+
         if (this.state.renderMode == DESIGN) {
             renderOptions =
                 <div className="col-12">
@@ -179,6 +195,8 @@ export default class PanelEditor extends React.Component {
                 <div className="col">
                   <canvas id="canvas" width="300" height="300"></canvas>
                 </div>
+		
+	        <div dangerouslySetInnerHTML={ {__html: svg } } />
               </div>
             </div>
         );

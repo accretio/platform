@@ -7,7 +7,7 @@
     }
 */
 
-import {setDevConfig} from '../config_dev.js';
+import setDevConfig from '../config_dev.js';
 
 let config = {};
 
