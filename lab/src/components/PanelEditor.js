@@ -53,7 +53,10 @@ export default class PanelEditor extends React.Component {
         processor.setCurrentObjects([this.state.layout.shape]);
        this.setState({ processor: processor }); */
 
-
+	var parsed = parseString(PA28);
+	console.log(parsed)
+	var svg = toSVG(parsed);
+	
         var canvas = new fabric.Canvas('canvas');
 
         var rect = new fabric.Rect({
@@ -66,11 +69,50 @@ export default class PanelEditor extends React.Component {
         
         canvas.add(rect);
 
+	var group = [];
+	
+	fabric.loadSVGFromString(svg, function(objects,options) {
+
+            var loadedObjects = new fabric.Group(group);
+
+            loadedObjects.set({
+          	lockMovementX: true,
+		lockMovementY: true,
+		lockScalingX: true,
+		lockScalingY: true,
+		selectable: false
+            });
+
+            canvas.add(loadedObjects);
+            canvas.renderAll();
+
+        },function(item, object) {
+                object.set('id',item.getAttribute('id'));
+                group.push(object);
+        });
+
+	// set up pan zoom
+
+	this.canvasContainer.addEventListener("mousewheel", this.zoomCanvas.bind(this));
+
+	
         this.setState({ canvas: canvas });
 
 	// dxf test
 
 	
+    }
+
+    zoomCanvas(e) {
+	var evt=window.event || e;
+	var delta = evt.detail? evt.detail*(-120) : evt.wheelDelta;
+	var curZoom = this.state.canvas.getZoom(),  newZoom = curZoom + delta / 4000,
+	    x = e.offsetX, y = e.offsetY;
+	//applying zoom values.
+	this.state.canvas.zoomToPoint({ x: x, y: y }, newZoom);
+	if(e != null)e.preventDefault();
+	return false;
+
     }
 
     renderPanel() {
@@ -137,15 +179,7 @@ export default class PanelEditor extends React.Component {
 
         let renderOptions = null;
 
-	var s = ``
-	var parsed = parseString(PA28);
-	console.log(parsed)
-	var svg = toSVG(parsed);
-
-	console.log(svg);
-	
-
-        if (this.state.renderMode == DESIGN) {
+	if (this.state.renderMode == DESIGN) {
             renderOptions =
                 <div className="col-12">
 
@@ -192,11 +226,10 @@ export default class PanelEditor extends React.Component {
                      catalog={this.state.catalog}
                      addInstrument={this.addInstrument.bind(this)} />
                 </div>
-                <div className="col">
+                <div ref={elem => this.canvasContainer = elem} className="col">
                   <canvas id="canvas" width="300" height="300"></canvas>
                 </div>
-		
-	        <div dangerouslySetInnerHTML={ {__html: svg } } />
+	
               </div>
             </div>
         );
