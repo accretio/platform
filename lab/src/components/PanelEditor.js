@@ -21,6 +21,7 @@ import { PA_23_250_E_Turbo_layout } from './../panels/PA-23-250-E-Turbo.js';
 // the instruments
 import { GTX345 } from './../catalog/GTX345.js';
 import { GNS430 } from './../catalog/GNS430.js';
+import { ROUND3125 } from './../catalog/ROUND3125.js';
 
 // the panels
 import { PA28 } from './../aircraft/PA40.js'; 
@@ -36,7 +37,7 @@ export default class PanelEditor extends React.Component {
         
         this.state = {
             layout: PA_23_250_E_Turbo_layout,
-            catalog: [ GTX345, GNS430 ],
+            catalog: [ GTX345, GNS430, ROUND3125 ],
             instruments: [],
             viewer: null,
             canvas: null,
@@ -113,7 +114,14 @@ export default class PanelEditor extends React.Component {
 	this.resizeCanvasContainer.bind(this);
 	window.addEventListener("resize", this.resizeCanvasContainer.bind(this));
 
-	
+	// we number elements by selection order. it comes handy when computing
+	// the pivot in alignment function
+
+	var counter = 0; 
+	canvas.on('object:selected', function(options) {
+	    counter += 1;
+	    options.target.selectionCounter = counter; 
+	});
     }
 
     zoomCanvas(e) {
@@ -151,18 +159,38 @@ export default class PanelEditor extends React.Component {
         instruments.push(instrument);
         this.setState({ instruments: instruments });
 
+	var s = instrument.factory();
 
-        var rect = new fabric.Rect({
-            top : 0,
-            left : 0,
-            width :  6.25,
-            height : 2.65,
-            hasControls : false,
-            fill : 'blue'
-        });
-        
-        this.state.canvas.add(rect);
-       
+	/* 
+
+	   // for some unknown reason adding text in the boxes wrecks alignment
+	   
+	   if (instrument.name != 'ROUND 3.125') {
+	var t = new fabric.Text(instrument.name, {
+            fontFamily: 'sans-serif',
+            fontSize: 1,
+            textAlign: 'center',
+            originX: 'center',
+            originY: 'center',
+            left: s.width/2 + 0.5 ,
+            top: s.height/2 + 0.5,
+	    
+	});
+
+	t.setColor('white');
+
+
+	    var g = new fabric.Group([s, t],{
+        // any group attributes here
+	}); 
+	    g.height = s.height ;
+	    g.width = s.width ; 
+            this.state.canvas.add(s);
+
+	} else { */ 
+
+	this.state.canvas.add(s);
+	
     }
 
    
@@ -177,29 +205,35 @@ export default class PanelEditor extends React.Component {
 
     alignSelectedObjectsVertically() {
 
-        var curSelectedObjects = this.state.canvas.getActiveObjects();
-
+        var curSelectedObjects =
+	    this.state.canvas.getActiveObjects().sort(function(a, b) {
+		return (b.selectionCounter - a.selectionCounter); 
+	    });
+	
 	if (curSelectedObjects) {
-            var averageLeft =
-		curSelectedObjects.map(function(obj){ return (obj.left + obj.width / 2) ; }).reduce(function(a,b) { return (a+b);}, 0) / curSelectedObjects.length ;
-            
-            curSelectedObjects.map(function(obj) { obj.left = (averageLeft - obj.width / 2); obj.setCoords(); });
-	    
-            this.state.canvas.renderAll();
+	    var pivot = curSelectedObjects[0].left + curSelectedObjects[0].width / 2;
+	    curSelectedObjects.map(function(obj) {
+		obj.left = (pivot - obj.width / 2);
+		obj.setCoords();
+	    });
+	    this.state.canvas.renderAll();
 	}
     }
 
      alignSelectedObjectsHorizontally() {
-      
-        var curSelectedObjects = this.state.canvas.getActiveObjects();
 
+	 var curSelectedObjects =
+	     this.state.canvas.getActiveObjects().sort(function(a, b) {
+		 return (b.selectionCounter - a.selectionCounter); 
+	     });
+	
 	 if (curSelectedObjects) {
-             var averageTop =
-                 curSelectedObjects.map(function(obj){ return obj.top ; }).reduce(function(a,b) { return (a+b);}, 0) / curSelectedObjects.length ;
-             
-             curSelectedObjects.map(function(obj) { obj.top = averageTop; obj.setCoords(); });
-	     
-             this.state.canvas.renderAll();
+             var pivot = curSelectedObjects[0].top + curSelectedObjects[0].height / 2; 
+             curSelectedObjects.map(function(obj) {
+		 obj.top = pivot - obj.height / 2;
+		 obj.setCoords();
+	     });
+	     this.state.canvas.renderAll();
 	 }
 	 
      }
@@ -222,6 +256,7 @@ export default class PanelEditor extends React.Component {
     spaceSelectedObjectsRegularlyVertically() {
 	var spacing = 1; // inches
 	var curSelectedObjects = this.state.canvas.getActiveObjects();
+	console.log(curSelectedObjects);
 	if (curSelectedObjects) {
 	    curSelectedObjects.sort(function(a, b) {
 		return a.top - b.top;
@@ -229,6 +264,7 @@ export default class PanelEditor extends React.Component {
 	    var currentTop = curSelectedObjects[0].top; // ok because if curSelectedObject isn't null, it has at least one item. 
 	    curSelectedObjects.map(function(obj) {
 		obj.top = currentTop;
+		console.log("height is " + obj.height);
 		currentTop += obj.height + spacing;
 		obj.setCoords();
 	    });

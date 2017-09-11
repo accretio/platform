@@ -1,9 +1,16 @@
 import Instrument from './../models/Instrument.js';
-import { primitives3d, booleanOps } from '@jscad/scad-api';
+import {fabric} from 'fabric';
 
-const {cube, sphere} = primitives3d;
-
-var shape = cube({ size: [ 40, 40, 20 ], center: true});
+var shape = function() {
+    return (new fabric.Rect({
+	top : 0,
+	left : 0,
+	width :  6.25,
+	height : 2.65,
+	hasControls : false,
+	fill : 'blue'
+    }));
+};
                     
 var GNS430 = new Instrument("GNS 430", shape);
 

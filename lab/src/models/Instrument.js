@@ -1,8 +1,8 @@
 export default class Instrument {
 
-    constructor(name, shape) {
+    constructor(name, factory) {
         this.name = name;
-        this.shape = shape;
+        this.factory = factory;
     }
 
 }

@@ -1,11 +1,18 @@
 import Instrument from './../models/Instrument.js';
-import { primitives3d, booleanOps } from '@jscad/scad-api';
+import {fabric} from 'fabric';
 
-const {cube, sphere} = primitives3d;
-
-var shape = cube({ size: [ 40, 40, 20 ], center: true});
+var factory = function() {
+    return (new fabric.Rect({
+	top : 0,
+	left : 0,
+	width : 6.30,
+	height : 1.65,
+	hasControls : false,
+	fill : 'blue'
+    }));
+};
                     
-var GTX345 = new Instrument("GTX 345", shape);
+var GTX345 = new Instrument("GTX 345", factory);
 
 module.exports = {
     GTX345 
