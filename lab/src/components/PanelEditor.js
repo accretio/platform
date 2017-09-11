@@ -52,7 +52,10 @@ export default class PanelEditor extends React.Component {
 	var canvas = this.state.canvas
 	canvas.setWidth(this.canvasContainer.clientWidth);
 	canvas.setHeight(this.canvasContainer.clientHeight);
+	canvas.setZoom(canvas.width / this.state.aircraftTemplateWidth);
+	canvas.calcOffset(); 
 	canvas.renderAll();
+	canvas.calcOffset();  
     }
 
     componentDidMount() {
@@ -61,6 +64,7 @@ export default class PanelEditor extends React.Component {
         processor.setCurrentObjects([this.state.layout.shape]);
        this.setState({ processor: processor }); */
 
+	var this_ = this;
 	var parsed = parseString(PA28);
 	console.log(parsed)
 	var svg = toSVG(parsed);
@@ -89,6 +93,7 @@ export default class PanelEditor extends React.Component {
             });
 
             canvas.add(loadedObjects);
+	    this_.setState({ aircraftTemplateWidth: loadedObjects.width});
 	    canvas.setZoom(canvas.width / loadedObjects.width);
             canvas.renderAll();
 
@@ -172,45 +177,133 @@ export default class PanelEditor extends React.Component {
 
     alignSelectedObjectsVertically() {
 
-        var curSelectedObjects = new Array();
-        curSelectedObjects = this.state.canvas.getObjects(this.state.canvas.getActiveGroup);
+        var curSelectedObjects = this.state.canvas.getActiveObjects();
 
-        var averageLeft =
-                curSelectedObjects.map(function(obj){ return obj.left ; }).reduce(function(a,b) { return (a+b);}, 0) / curSelectedObjects.length ;
-        
-        curSelectedObjects.map(function(obj) { obj.top = averageLeft; obj.setCoords(); });
+	if (curSelectedObjects) {
+            var averageLeft =
+		curSelectedObjects.map(function(obj){ return (obj.left + obj.width / 2) ; }).reduce(function(a,b) { return (a+b);}, 0) / curSelectedObjects.length ;
+            
+            curSelectedObjects.map(function(obj) { obj.left = (averageLeft - obj.width / 2); obj.setCoords(); });
+	    
+            this.state.canvas.renderAll();
+	}
+    }
 
-        this.state.canvas.renderAll();
+     alignSelectedObjectsHorizontally() {
+      
+        var curSelectedObjects = this.state.canvas.getActiveObjects();
+
+	 if (curSelectedObjects) {
+             var averageTop =
+                 curSelectedObjects.map(function(obj){ return obj.top ; }).reduce(function(a,b) { return (a+b);}, 0) / curSelectedObjects.length ;
+             
+             curSelectedObjects.map(function(obj) { obj.top = averageTop; obj.setCoords(); });
+	     
+             this.state.canvas.renderAll();
+	 }
+	 
+     }
+
+     centerSelectedObjects() {
+	 
+	 var center = this.state.aircraftTemplateWidth / 2;
+
+	 var obj = this.state.canvas.getActiveObject();
+
+	 if (obj) {
+	     console.log("set left to " + center);
+	     obj.left = center - (obj.width / 2);
+	     obj.setCoords();
+	     this.state.canvas.renderAll();
+	 }
+	 	     
+     }
+
+    spaceSelectedObjectsRegularlyVertically() {
+	var spacing = 1; // inches
+	var curSelectedObjects = this.state.canvas.getActiveObjects();
+	if (curSelectedObjects) {
+	    curSelectedObjects.sort(function(a, b) {
+		return a.top - b.top;
+	    });
+	    var currentTop = curSelectedObjects[0].top; // ok because if curSelectedObject isn't null, it has at least one item. 
+	    curSelectedObjects.map(function(obj) {
+		obj.top = currentTop;
+		currentTop += obj.height + spacing;
+		obj.setCoords();
+	    });
+	    this.state.canvas.renderAll();
+	}
+	
+    }
+
+      spaceSelectedObjectsRegularlyHorizontally() {
+	var spacing = 1; // inches
+	var curSelectedObjects = this.state.canvas.getActiveObjects();
+	if (curSelectedObjects) {
+	    curSelectedObjects.sort(function(a, b) {
+		return a.left - b.left;
+	    });
+	    var currentLeft = curSelectedObjects[0].left; // ok because if curSelectedObject isn't null, it has at least one item. 
+	    curSelectedObjects.map(function(obj) {
+		obj.left = currentLeft;
+		currentLeft += obj.width + spacing;
+		obj.setCoords();
+	    });
+	    this.state.canvas.renderAll();
+	}
+	
     }
     
     render() {
 
-        let renderOptions = null;
-
-	if (this.state.renderMode == DESIGN) {
-            renderOptions =
-                <div className="col-12">
-
-                </div>;
-        } else {
-            renderOptions =
-                <div className="col-12">
-                <button
-            type="button"
-            onClick={ this.alignSelectedObjectsVertically.bind(this) }
-            className="btn btn-primary">
-                Align Vertically
-                </button>
-                </div>;
-        }
+           
         
         return (
 	  
 		<div className="container">
+                     <div className="designControls">
+	          	 <button
+                           type="button"
+            onClick={ this.alignSelectedObjectsVertically.bind(this) }
+            className="btn btn-primary">
+                Align Vertically
+            </button>
 
+	     <button
+             type="button"
+            onClick={ this.alignSelectedObjectsHorizontally.bind(this) }
+            className="btn btn-primary">
+                Align Horizontally
+            </button>
+		 <button
+             type="button"
+            onClick={ this.centerSelectedObjects.bind(this) }
+            className="btn btn-primary">
+                Center Horizontally
+            </button>
+			 <button
+             type="button"
+            onClick={ this.spaceSelectedObjectsRegularlyVertically.bind(this) }
+            className="btn btn-primary">
+                Space Vertically Regularily
+            </button>
+			 <button
+             type="button"
+            onClick={ this.spaceSelectedObjectsRegularlyHorizontally.bind(this) }
+            className="btn btn-primary">
+                Space Horizontally Regularily
+        </button> 
+	             </div>
+
+	    
 		     <div className="row fullPageRow">
 
 		         <div className="col-4">
+
+                          <InstrumentPicker
+                             catalog={this.state.catalog}
+                             addInstrument={this.addInstrument.bind(this)} />
 
 	                 </div>
 		

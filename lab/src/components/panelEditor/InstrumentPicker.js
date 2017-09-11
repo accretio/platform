@@ -23,17 +23,16 @@ export default class InstrumentPicker extends React.Component {
         var that = this;
         var instruments =
                 this.state.catalog.map(function(instrument, i) {
-                    return <button
+                    return <div className="instrument" key={ i }><button
                     type="button"
-                    key={ i }
                     className="btn btn-primary btn-instrument"
                     onClick={ function () { that.props.addInstrument(instrument); } } >
                         { instrument.name }
-                    </button>; 
+                    </button></div>; 
                 });
         
         return (
-            <div> { instruments } </div>
+            <div className="instrumentPicker"> { instruments } </div>
         );
   }
 }
