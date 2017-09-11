@@ -15,7 +15,7 @@ import Purchase from './components/Purchase';
 import AdminOrdersSearch from './components/admin/OrdersSearch';
 
 const routes = (
-   <Route path="/" component={Layout}>
+   <Route path="/">
     <IndexRoute component={PanelEditor}/>
     <Route path="/import/" component={Layout}>
         <Route path="importSingleOpenScadFile" component={ImportSingleOpenScadFile}/>

@@ -1,171 +1,34 @@
-html {
-    position: relative;
-    min-height: 100%;
-    height: 100%;
+$header-height: 56px;
+
+html, body, .main, .container {
+    height: 100%; 
 }
+
 body {
     /* Margin bottom by footer height */
-    margin-bottom: 60px;
-    height: 100%;
-}
-.footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    /* Set the fixed height of the footer here */
-    height: 60px;
-    line-height: 60px; /* Vertically center the text there */
-    background-color: #f5f5f5;
-}
 
-body > .main {
-    padding: 60px 0;
-     height: 100%;
-}
+    background-color: yellow;
 
-.app-content {
-    margin-top: 40px;
-    height: 100%;
-}
-
-.not-found {
-
-    .col-6 {
-        margin-top:40px;
-        text-align: center;        
-    }    
-}
-
-h2 {
-    text-align: center;     
-
-}
-
-
-.landing-page {
-    > h1 {
-        text-align:center;
-        margin-bottom: 40px;
-    }             
-}
-
-
-
-.import-file {
-    margin-top: 40px ;
-    h2 {
-        margin-bottom:40px;
+    .main {
+	padding-top: $header-height;
+	background-color: pink;
     }
-    .dropzone {
-       
-        div {
-            margin:auto;
-        }
+
+    .container {
+	background-color: blue;
+	padding-top: $header-height;
     }
     
 }
 
 
-.recipe{
 
-    .carrousel {
-        max-width: 650px;
-        margin: auto;
-    }
-    
-    h2 {
-        margin-bottom: 40px;
-    }
+/* some helpers for the rows */
 
-    .description {
-        margin-bottom: 40px; 
-    }
-
-    .material {
-        margin-bottom: 40px;
-    }
-    
-    .price {
-        margin-bottom: 40px;
-    }
-    
-    .buy {
-        text-align: left;
-    }
+.fullPageRow, .fullPageCol {
+    height: 100%; 
 }
 
-.purchase {
-    h3 {
-        margin-bottom: 20px;
-    }
-
-    .customize {
-        margin-top: 40px;
-    }
-
-    .shipping {
-        margin-top: 40px;
-    }
-    
-    .payment-box {
-        margin-top: 40px;
-        text-align: center; 
-    }
-}
-
-.thanks{
-
-
-}
-
-
-// Viewer code
-
-.viewer {
-
-    
-    padding: 0px; /* not inherited */
-    
-    background: white;
-    width: 100%;
-    height: 100%;
-    
-    top: 0px;
-    bottom: 0px;
-    
-}
-
-
-canvas { 
-  margin: 0px; /* not inherited */
- 
-  padding: 0px; /* not inherited */
-
-  width: 100%;
-  height: 100%;
- // width: 400px;
- // height: 300px;
-
-  cursor: move; 
-}
-
-.btn-instrument {
-    margin-bottom: 10px;
-}
-
-.row-1 {
-    height: 100%;
-}
-
-.container {
-    height: 100%;
-    padding-bottom: 80px;
-}
-
-.controls {
-    text-align:center; 
-    margin-bottom: 10px; 
-    button {
-        margin: 0 5px;
-    }
+.fullPageCol {
+    padding: 0!important;
 }

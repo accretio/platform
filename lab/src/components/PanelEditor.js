@@ -47,6 +47,14 @@ export default class PanelEditor extends React.Component {
         
     }
 
+    resizeCanvasContainer() {
+	console.log("resizing the canvas");
+	var canvas = this.state.canvas
+	canvas.setWidth(this.canvasContainer.clientWidth);
+	canvas.setHeight(this.canvasContainer.clientHeight);
+	canvas.renderAll();
+    }
+
     componentDidMount() {
         this.context.mixpanel.track('panel editor page loaded');
       /*  var processor = new Processor2(this.refs.viewer, this.opts);
@@ -58,7 +66,10 @@ export default class PanelEditor extends React.Component {
 	var svg = toSVG(parsed);
 	
         var canvas = new fabric.Canvas('canvas');
-
+	
+	canvas.setWidth(this.canvasContainer.clientWidth);
+	canvas.setHeight(this.canvasContainer.clientHeight);
+	
 	var group = [];
 	
 	fabric.loadSVGFromString(svg, function(objects,options) {
@@ -89,10 +100,13 @@ export default class PanelEditor extends React.Component {
 	// set up pan zoom
 
 	this.canvasContainer.addEventListener("mousewheel", this.zoomCanvas.bind(this));
-	
         this.setState({ canvas: canvas });
 
-	// dxf test
+
+	// we need to resize the canvas container
+	
+	this.resizeCanvasContainer.bind(this);
+	window.addEventListener("resize", this.resizeCanvasContainer.bind(this));
 
 	
     }
@@ -100,7 +114,7 @@ export default class PanelEditor extends React.Component {
     zoomCanvas(e) {
 	var evt=window.event || e;
 	var delta = evt.detail? evt.detail*(-120) : evt.wheelDelta;
-	var curZoom = this.state.canvas.getZoom(),  newZoom = curZoom + delta / 4000,
+	var curZoom = this.state.canvas.getZoom(),  newZoom = curZoom + delta / 2000,
 	    x = e.offsetX, y = e.offsetY;
 	//applying zoom values.
 	this.state.canvas.zoomToPoint({ x: x, y: y }, newZoom);
@@ -191,46 +205,30 @@ export default class PanelEditor extends React.Component {
         }
         
         return (
-            <div className="container">
+	  
+		<div className="container">
 
-              <div className="row renderMode controls">
-                <div className="col-12">
-                   <button
-                      type="button"
-                      onClick={ this.viewDesign.bind(this) }
-                      className="btn btn-primary">
-                     Design
-                   </button>
-                     <button
-                      type="button"
-                      onClick={ this.viewRender.bind(this) }
-                      className="btn btn-primary">
-                     Render
-                   </button>
-                </div>
-              </div>
+		     <div className="row fullPageRow">
 
-              <div className="row renderOptions controls">
-                { renderOptions }
-              </div>
-              
-              <div className="row row-1">
-                <div className="col-2">
-                  <InstrumentPicker
-                     catalog={this.state.catalog}
-                     addInstrument={this.addInstrument.bind(this)} />
-                </div>
-                <div ref={elem => this.canvasContainer = elem} className="col">
-                  <canvas id="canvas" width="300" height="300"></canvas>
-                </div>
+		         <div className="col-4">
+
+	                 </div>
+		
+		<div className="col-8 fullPageCol"
+	             ref={elem => this.canvasContainer = elem}>
+                               <canvas id="canvas" className="canvas"></canvas>
+     
+		     </div>
 	
-              </div>
-            </div>
+	    </div>
+		</div>
+	  
         );
 
     }
     
 }
+
 
 PanelEditor.contextTypes = {
     mixpanel: PropTypes.object.isRequired
