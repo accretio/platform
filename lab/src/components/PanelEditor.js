@@ -3,17 +3,12 @@
 import React, { PropTypes} from 'react';
 import { Link } from 'react-router';
 import InstrumentPicker from './panelEditor/InstrumentPicker';
-import PanelRendering from './panelEditor/PanelRendering';
 import Instrument from './../models/Instrument.js';
-import Processor2 from './../../OpenJSCAD.org/src/jscad/processor';
 import { instanceOf } from 'prop-types';
 import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
 
 import {fabric} from 'fabric';
-
-
-import { primitives3d, booleanOps } from '@jscad/scad-api';
 
 import { parseString, toSVG } from 'dxf-to-svg/lib';
 

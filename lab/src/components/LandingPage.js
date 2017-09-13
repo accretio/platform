@@ -2,14 +2,38 @@
 
 import React, { PropTypes} from 'react';
 import { Link } from 'react-router';
+import fetch from 'isomorphic-fetch';
 
 export default class LandingPage extends React.Component {
 
     componentDidMount() {
         this.context.mixpanel.track('landing page loaded');
     }
+
+    gotoPanel(id) {
+	this.context.history.push("/panel/"+id);
+    }
+    
+    createNewPanel() {
+	fetch('/api/savePanel', {
+          method: 'post',
+          headers: new Headers({
+	      'Content-Type': 'application/json'
+          }),
+          body: JSON.stringify({}) 
+        }).then(function(response) { return (response.json()).id ; })
+          .then(this.gotoPanel.bind(this));
+    }
+    
+    retrievePanel() {
+	var id = this.panelIdInput.value;
+	this.gotoPanel.bind(this)(id)
+    }
     
     render() {
+
+	var t = this;
+	
     return (
         <div className="landing-page">
 
@@ -24,12 +48,14 @@ export default class LandingPage extends React.Component {
             <p className="lead">
 
 	    <span className="get-started">
-	        <a className="btn btn-primary btn-lg" href="#" role="button">Create New Panel</a>
+	    <a className="btn btn-primary btn-lg" href="#" role="button"
+	       onClick={t.createNewPanel.bind(t)} >Create New Panel</a>
 	    </span>
 	    <span className="separator" />
 	    <span>
-	      <input type="text" className="panel-id" />
-	      <a className="btn btn-primary btn-lg" href="#" role="button">Retrieve Panel</a>
+	      <input type="text" ref={el => this.panelIdInput = el} className="panel-id" />
+	    <a className="btn btn-primary btn-lg" href="#" role="button"
+	       onClick={t.retrievePanel.bind(t)}>Retrieve Panel</a>
 	    </span>
 	
 	    </p>
@@ -43,5 +69,8 @@ export default class LandingPage extends React.Component {
 }
 
 LandingPage.contextTypes = {
-    mixpanel: PropTypes.object.isRequired
+    mixpanel: PropTypes.object.isRequired,
+    history: React.PropTypes.shape({
+	push: React.PropTypes.func.isRequired
+    })
 };

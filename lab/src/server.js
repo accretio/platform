@@ -1,7 +1,7 @@
 'use strict';
 
+const path = require('path');
 
-import path from 'path';
 
 import { Server } from 'http';
 import Express from 'express';
@@ -91,7 +91,7 @@ app.post('/api/savePanel', function(req, res){
         res.send(error.message);
     });
     
-}
+});
 
 // Old API methods
 
