@@ -6,6 +6,7 @@ import AppRoutes from './components/AppRoutes';
 import mixpanel from 'mixpanel-browser';
 import MixpanelProvider from 'react-mixpanel';
 import {mixpanel_token, bypass_https} from './config';
+import {CookiesProvider} from 'react-cookie';
 
 window.onload = () => {
     if (location.protocol != 'https:' && !bypass_https)
@@ -13,8 +14,9 @@ window.onload = () => {
         location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
     } else {
         mixpanel.init(mixpanel_token);
-        ReactDOM.render(<MixpanelProvider mixpanel={mixpanel}>
+        ReactDOM.render(<CookiesProvider>
+			<MixpanelProvider mixpanel={mixpanel}>
                         <AppRoutes />
-                        </MixpanelProvider>, document.getElementById('main'));
+                        </MixpanelProvider></CookiesProvider>, document.getElementById('main'));
     }
 };

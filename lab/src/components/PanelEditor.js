@@ -6,6 +6,8 @@ import InstrumentPicker from './panelEditor/InstrumentPicker';
 import PanelRendering from './panelEditor/PanelRendering';
 import Instrument from './../models/Instrument.js';
 import Processor2 from './../../OpenJSCAD.org/src/jscad/processor';
+import { instanceOf } from 'prop-types';
+import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
 
 import {fabric} from 'fabric';
@@ -30,7 +32,7 @@ var DESIGN = 0;
 var RENDER = 1;
 
 export default class PanelEditor extends React.Component {
-
+    
     constructor(props) {
 
         super(props);
@@ -61,11 +63,16 @@ export default class PanelEditor extends React.Component {
 
     componentDidMount() {
         this.context.mixpanel.track('panel editor page loaded');
-      /*  var processor = new Processor2(this.refs.viewer, this.opts);
-        processor.setCurrentObjects([this.state.layout.shape]);
-       this.setState({ processor: processor }); */
 
+	// get the current panel from the cookies
+
+	console.log(this.context.cookies.get('name'))
+
+	var n = this.context.cookies.get('name');
+	this.context.cookies.set('name', 'william')
+	
 	var this_ = this;
+	
 	var parsed = parseString(PA28);
 	console.log(parsed)
 	var svg = toSVG(parsed);
@@ -360,7 +367,8 @@ export default class PanelEditor extends React.Component {
 
 
 PanelEditor.contextTypes = {
-    mixpanel: PropTypes.object.isRequired
+    mixpanel: PropTypes.object.isRequired,
+    cookies: PropTypes.object.isRequired
 };
 
 

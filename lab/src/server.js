@@ -9,6 +9,10 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { match, RouterContext } from 'react-router';
 import routes from './routes';
+
+import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
+
+
 import NotFoundPage from './components/NotFoundPage';
 import { Button } from 'reactstrap';
 
@@ -257,7 +261,7 @@ app.get('*', (req, res) => {
             let markup;
             if (renderProps) {
                 // if the current route matched we have renderProps
-                markup = renderToString(<RouterContext {...renderProps}/>);
+                markup = renderToString(<CookiesProvider><RouterContext {...renderProps}/></CookiesProvider>);
             } else { 
                 // otherwise we can render a 404 page
                 markup = renderToString(<NotfoundPage />);
