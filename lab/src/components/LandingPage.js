@@ -13,21 +13,31 @@ export default class LandingPage extends React.Component {
     return (
         <div className="landing-page">
 
-  <div className="row justify-content-center">
-             <div className="col-sm-8">
-          <div className="jumbotron">
-            <h1 className="display-3">Custom panel overlay</h1>
-            <p className="lead">Position your avionics on a virtual panel. Receive a plywood prototype or the real deal milled in aviation aluminium.</p>
-            <hr className="my-4" />
-            <p>Our standard library includes common equipments from leading avionics brands and is easily expandable if needed</p>
-            <p className="lead">
-    <a className="btn btn-primary btn-lg" href="#" role="button">Get started</a>
-  </p>
+            <div className="jumbotron">
 
-          </div>
-             </div>
-          </div>
-      </div>
+	    <h1 className="display-4">Want a new panel?</h1>
+
+	    <p className="lead">Position your avionics on a mock panel. Receive a plywood prototype. Order the final cut to your exact specifications.</p>
+
+	    <hr className="my-4" />
+            
+            <p className="lead">
+
+	    <span className="get-started">
+	        <a className="btn btn-primary btn-lg" href="#" role="button">Create New Panel</a>
+	    </span>
+	    <span className="separator" />
+	    <span>
+	      <input type="text" className="panel-id" />
+	      <a className="btn btn-primary btn-lg" href="#" role="button">Retrieve Panel</a>
+	    </span>
+	
+	    </p>
+
+       </div>
+     </div>
+         
+     
     );
   }
 }

@@ -1,0 +1,40 @@
+.landing-page {
+
+    .jumbotron {
+	margin: 40px 40px;
+	
+    }
+
+    .lead {
+
+	.form-control {
+	    width: 40px;
+	}
+
+	span.get-started {
+	    padding-right: 20px;
+	}
+
+	span.separator {
+	    padding: 12px 5px 15px 0px;
+	    font-size: 1.25rem;
+	    
+	    border-right: 1px solid rgba(0,0,0,.1);
+	    margin-right: 10px;
+	}
+	
+	span {
+	    input.panel-id {
+		width: 55px;
+		height: 51px;
+		margin-right: 10px;
+		border: 1px solid rgba(0,0,0,.1);
+		border-radius: .25rem;
+		line-height: 1.25;
+		padding: 0 5px 1px;
+	    }
+	}
+	
+    }
+    
+}

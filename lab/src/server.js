@@ -71,6 +71,30 @@ var recipeType = "recipe";
 var orderIndex = "order";
 var orderType = "order";
 
+var panelIndex = "panels";
+var panelType = "panel";
+
+// New API methods
+
+app.post('/api/savePanel', function(req, res){
+    
+    ESClient.index({
+        index: panelIndex,
+        type: panelType,
+        body: req
+    }).then(function (body) {
+        res.status(200);
+        res.json({ id: body._id });
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
+    
+}
+
+// Old API methods
+
 app.post('/api/createRecipe', function(req, res){
     
     var recipe = new Recipe(req.body);

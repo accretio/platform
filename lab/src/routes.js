@@ -16,19 +16,23 @@ import AdminOrdersSearch from './components/admin/OrdersSearch';
 
 const routes = (
    <Route path="/">
-    <IndexRoute component={PanelEditor}/>
-    <Route path="/import/" component={Layout}>
-        <Route path="importSingleOpenScadFile" component={ImportSingleOpenScadFile}/>
-    </Route>
-    <Route path="/product/:id/purchase" component={Purchase}/>
-    <Route path="/product/:id/thanks" component={Thanks}/>
-    <Route path="/product/:id" component={Product}/>
-    <Route path="/admin/orders/search(/:q)" component={AdminOrdersSearch}/>  
+
+    	<IndexRoute component={LandingPage}/>
+	<Route path="/panel/:id" component={PanelEditor} />
+	
+	<Route path="/import/" component={Layout}>
+             <Route path="importSingleOpenScadFile" component={ImportSingleOpenScadFile}/>
+	</Route>
+	<Route path="/product/:id/purchase" component={Purchase}/>
+	<Route path="/product/:id/thanks" component={Thanks}/>
+	<Route path="/product/:id" component={Product}/>
+	<Route path="/admin/orders/search(/:q)" component={AdminOrdersSearch}/>  
         
-    <Route path="*" component={NotFoundPage}/> 
+	<Route path="*" component={NotFoundPage}/>
+	
   </Route>
     
 );
-
+ 
 export default routes; 
 
