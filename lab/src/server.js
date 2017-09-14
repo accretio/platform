@@ -1,7 +1,6 @@
 'use strict';
 
-const path = require('path');
-
+import path from 'path';
 
 import { Server } from 'http';
 import Express from 'express';
@@ -77,16 +76,16 @@ var panelType = "panel";
 // New API methods
 
 app.post('/api/savePanel', function(req, res){
-    
     ESClient.index({
         index: panelIndex,
         type: panelType,
-        body: req
+        body: req.body
     }).then(function (body) {
+	console.log(body);
         res.status(200);
         res.json({ id: body._id });
     }, function (error) {
-        console.trace(error.message);
+        console.log(error);
         res.status(500);
         res.send(error.message);
     });

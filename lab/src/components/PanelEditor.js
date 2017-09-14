@@ -10,7 +10,7 @@ import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
 import {fabric} from 'fabric';
 
-import { parseString, toSVG } from 'dxf-to-svg/lib';
+import { parseString, toSVG } from '../dxf/lib/index.js';
 
 // the layouts
 import { PA_23_250_E_Turbo_layout } from './../panels/PA-23-250-E-Turbo.js';

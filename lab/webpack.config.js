@@ -70,7 +70,7 @@ module.exports = [
     {
 	// The configuration for the server-side rendering
 	name: "server-side rendering",
-	entry: "./src/server.js",
+	entry: "./src/entrypoint.js",
 	target: "node",
 	output: {
             path: path.join(__dirname, 'src', 'static'),
@@ -85,13 +85,12 @@ module.exports = [
 		  use: {
 		      loader: 'babel-loader',
 		      options: {
-			  presets: [ "react", "es2015" ],
-			  plugins: [ "transform-es2015-modules-commonjs" ]
+			  presets: [ "react", "es2015", "env" ],
+			  plugins: [ ]
 		      }
 		  }
-	
 		}
-            ] 
+	   ] 
 	    
 	}
     }   
