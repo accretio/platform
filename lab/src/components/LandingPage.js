@@ -4,6 +4,8 @@ import React, { PropTypes} from 'react';
 import { Link } from 'react-router';
 import fetch from 'isomorphic-fetch';
 
+import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
+
 export default class LandingPage extends React.Component {
 
     componentDidMount() {
@@ -30,6 +32,7 @@ export default class LandingPage extends React.Component {
 		throw new Exception("something went wrong")
 	    }
 	}).then(function(response) {
+	    t.context.cookies.set('panelId', response.id)
 	    t.gotoPanel.bind(t)(response.id)
 	})
         
@@ -63,7 +66,7 @@ export default class LandingPage extends React.Component {
 	    </span>
 	    <span className="separator" />
 	    <span>
-	      <input type="text" ref={el => this.panelIdInput = el} className="panel-id" />
+	    <input type="text" value={this.context.cookies.get('panelId')} ref={el => this.panelIdInput = el} className="panel-id" />
 	    <a className="btn btn-primary btn-lg" href="#" role="button"
 	       onClick={t.retrievePanel.bind(t)}>Retrieve Panel</a>
 	    </span>
@@ -80,6 +83,7 @@ export default class LandingPage extends React.Component {
 
 LandingPage.contextTypes = {
     mixpanel: PropTypes.object.isRequired,
+    cookies: PropTypes.object.isRequired,
     history: React.PropTypes.shape({
 	push: React.PropTypes.func.isRequired
     })
