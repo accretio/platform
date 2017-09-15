@@ -53,8 +53,8 @@ export default class PanelEditor extends React.Component {
 	var instruments = panel.instruments
 	console.log(instruments.length)
 	if (instruments) {
-	    for (var i in instruments) {
-		var instrument = instruments[i]
+	    instruments.map(function(instrument) {
+	
 		console.log(instrument)
 		var instr = findInstrument(instrument.name)
 		if (instr) {
@@ -67,7 +67,7 @@ export default class PanelEditor extends React.Component {
 		    // and now it is ready to be injected
 		    t.state.canvas.add(shape);
 		}
-	    }
+	    })
 	}
 	
     }
@@ -335,7 +335,7 @@ export default class PanelEditor extends React.Component {
 	
     }
 
-      spaceSelectedObjectsRegularlyHorizontally() {
+    spaceSelectedObjectsRegularlyHorizontally() {
 	var spacing = 1; // inches
 	var curSelectedObjects = this.state.canvas.getActiveObjects();
 	if (curSelectedObjects) {
@@ -352,6 +352,16 @@ export default class PanelEditor extends React.Component {
 	    this.saveState.bind(this)()
 	}
 	
+    }
+
+    deleteSelectedObjects() {
+	var curSelectedObjects = this.state.canvas.getActiveObjects();
+	if (curSelectedObjects) {
+	    var t = this
+	    curSelectedObjects.map(function(obj) { t.state.canvas.remove(obj) })
+	    this.state.canvas.renderAll();
+	    this.saveState.bind(this)()
+	}
     }
     
     render() {
@@ -385,13 +395,19 @@ export default class PanelEditor extends React.Component {
              type="button"
             onClick={ this.spaceSelectedObjectsRegularlyVertically.bind(this) }
             className="btn btn-primary">
-                Space Vertically Regularily
+                Spread Vertically
             </button>
 			 <button
              type="button"
             onClick={ this.spaceSelectedObjectsRegularlyHorizontally.bind(this) }
             className="btn btn-primary">
-                Space Horizontally Regularily
+                Spread Horizontally
+            </button>
+				 <button
+             type="button"
+            onClick={ this.deleteSelectedObjects.bind(this) }
+            className="btn btn-primary">
+                Delete
         </button> 
 	             </div>
 
