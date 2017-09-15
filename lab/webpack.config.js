@@ -70,7 +70,7 @@ module.exports = [
     {
 	// The configuration for the server-side rendering
 	name: "server-side rendering",
-	entry: "./src/entrypoint.js",
+	entry: "./src/server.js",
 	target: "node",
 	output: {
             path: path.join(__dirname, 'src', 'static'),

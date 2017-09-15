@@ -7,21 +7,19 @@ import Instrument from './../models/Instrument.js';
 import { instanceOf } from 'prop-types';
 import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
-
 import {fabric} from 'fabric';
 
 import { parseString, toSVG } from '../dxf/lib/index.js';
 
-// the layouts
-import { PA_23_250_E_Turbo_layout } from './../panels/PA-23-250-E-Turbo.js';
-
-// the instruments
-import { GTX345 } from './../catalog/GTX345.js';
-import { GNS430 } from './../catalog/GNS430.js';
-import { ROUND3125 } from './../catalog/ROUND3125.js';
+// the catalog
+import { findInstrument, catalog } from './../catalog/Catalog.js'; 
 
 // the panels
-import { PA28 } from './../aircraft/PA40.js'; 
+import { PA28 } from './../aircraft/PA40.js';
+
+// the api client
+
+import { getPanel, savePanel } from './../apiClient.js';
 
 var DESIGN = 0;
 var RENDER = 1;
@@ -33,16 +31,89 @@ export default class PanelEditor extends React.Component {
         super(props);
         
         this.state = {
-            layout: PA_23_250_E_Turbo_layout,
-            catalog: [ GTX345, GNS430, ROUND3125 ],
+	    id: props.params.id,
+            catalog: catalog,
             instruments: [],
             viewer: null,
             canvas: null,
             renderingMode: DESIGN
         };
+	
+    }
 
-        
-        
+    retrieveInitialState() {
+	getPanel(this.state.id).then(this.loadState.bind(this))
+    }
+
+    loadState(panel) {
+	// iterate on the json doc & create all the canvas objects we need
+	console.log("loading state from " + panel)
+	console.log(panel)
+	var t = this
+	var instruments = panel.instruments
+	console.log(instruments.length)
+	if (instruments) {
+	    for (var i in instruments) {
+		var instrument = instruments[i]
+		console.log(instrument)
+		var instr = findInstrument(instrument.name)
+		if (instr) {
+		    var shape = instr.factory()
+		    
+		    // now we position the shap
+		    shape.top = instrument.top ;
+		    shape.left = instrument.left ;
+		    
+		    // and now it is ready to be injected
+		    t.state.canvas.add(shape);
+		}
+	    }
+	}
+	
+    }
+
+    saveState() {
+	var json = this.stateToJson()
+	savePanel(json)
+
+    }
+    
+    stateToJson() {
+
+	var canvas = this.state.canvas
+
+	var allInstruments =
+	    this.state
+	    .canvas.getObjects()
+	    .filter(function(obj) {
+		return (obj.instrument != undefined)
+	    })
+
+	var currentSelection = this.state.canvas.getActiveObjects()
+	
+	var allInstrumentsWithPositions =
+	    allInstruments.map(function(obj){
+	
+		var offsetTop = 0
+		if (obj.group) offsetTop = obj.group.top + obj.group.height/2
+		
+		var offsetLeft = 0
+		if (obj.group) offsetLeft = obj.group.left  + obj.group.width/2
+		
+		return {
+		    name: obj.instrument,
+		    top: obj.top + offsetTop,
+		    left: obj.left + offsetLeft
+		}
+	    })
+
+	return({
+	    id: this.state.id,
+	    aircraft: "PA28",
+	    instruments: allInstrumentsWithPositions
+	})
+	
+	
     }
 
     resizeCanvasContainer() {
@@ -59,13 +130,6 @@ export default class PanelEditor extends React.Component {
     componentDidMount() {
         this.context.mixpanel.track('panel editor page loaded');
 
-	// get the current panel from the cookies
-
-	console.log(this.context.cookies.get('name'))
-
-	var n = this.context.cookies.get('name');
-	this.context.cookies.set('name', 'william')
-	
 	var this_ = this;
 	
 	var parsed = parseString(PA28);
@@ -116,7 +180,7 @@ export default class PanelEditor extends React.Component {
 	this.resizeCanvasContainer.bind(this);
 	window.addEventListener("resize", this.resizeCanvasContainer.bind(this));
 
-	// we number elements by selection order. it comes handy when computing
+	// event handler: we number elements by selection order. it comes handy when computing
 	// the pivot in alignment function
 
 	var counter = 0; 
@@ -124,6 +188,16 @@ export default class PanelEditor extends React.Component {
 	    counter += 1;
 	    options.target.selectionCounter = counter; 
 	});
+
+	// event handler: we save the panel when things move
+//	canvas.on('object:added', this.savePanel)
+	canvas.on('object:modified', this.saveState.bind(this))
+	
+
+	// now we can load the stored panel
+
+	this.retrieveInitialState()
+	
     }
 
     zoomCanvas(e) {
@@ -136,24 +210,6 @@ export default class PanelEditor extends React.Component {
 	if(e != null)e.preventDefault();
 	return false;
 
-    }
-
-    renderPanel() {
-        var objects = this.state.instruments.map(function(instr){ return instr.shape; });
-   
-      /*  const {union, difference} = booleanOps;
-
-        if (this.state.renderingMode == SEE_ALL) {
-            var allinstrs = union(objects);
-            var u = union(this.state.layout.shape, allinstrs);
-            
-            this.state.processor.setCurrentObjects(new Array(u));
-        } else if (this.state.renderingMode == PANEL_CUT) {
-            var allinstrs = union(objects);
-            var diff = difference(this.state.layout.shape, allinstrs);
-            this.state.process.setCurrentObjects(diff);
-        } */
-        
     }
     
     addInstrument(instrument) {
@@ -192,7 +248,7 @@ export default class PanelEditor extends React.Component {
 	} else { */ 
 
 	this.state.canvas.add(s);
-	
+	console.log(this.stateToJson());
     }
 
    
@@ -219,6 +275,7 @@ export default class PanelEditor extends React.Component {
 		obj.setCoords();
 	    });
 	    this.state.canvas.renderAll();
+	    this.saveState.bind(this)()
 	}
     }
 
@@ -236,6 +293,7 @@ export default class PanelEditor extends React.Component {
 		 obj.setCoords();
 	     });
 	     this.state.canvas.renderAll();
+	     this.saveState.bind(this)()
 	 }
 	 
      }
@@ -251,6 +309,7 @@ export default class PanelEditor extends React.Component {
 	     obj.left = center - (obj.width / 2);
 	     obj.setCoords();
 	     this.state.canvas.renderAll();
+	     this.saveState.bind(this)()
 	 }
 	 	     
      }
@@ -271,6 +330,7 @@ export default class PanelEditor extends React.Component {
 		obj.setCoords();
 	    });
 	    this.state.canvas.renderAll();
+	    this.saveState.bind(this)()
 	}
 	
     }
@@ -289,6 +349,7 @@ export default class PanelEditor extends React.Component {
 		obj.setCoords();
 	    });
 	    this.state.canvas.renderAll();
+	    this.saveState.bind(this)()
 	}
 	
     }

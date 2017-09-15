@@ -6,6 +6,8 @@ import fetch from 'isomorphic-fetch';
 
 import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
+import { savePanel } from './../apiClient.js';
+
 export default class LandingPage extends React.Component {
 
     componentDidMount() {
@@ -17,21 +19,8 @@ export default class LandingPage extends React.Component {
     }
     
     createNewPanel() {
-	var t = this; 
-	fetch('/api/savePanel', {
-          method: 'post',
-          headers: new Headers({
-	      'Content-Type': 'application/json'
-          }),
-          body: JSON.stringify({}) 
-        }).then(function(response) {
-	    if (response.status == 200) {
-		return (response.json())
-	    } else {
-		alert("something went wrong")
-		throw new Exception("something went wrong")
-	    }
-	}).then(function(response) {
+	var t = this;
+	savePanel({}).then(function(response) {
 	    t.context.cookies.set('panelId', response.id)
 	    t.gotoPanel.bind(t)(response.id)
 	})

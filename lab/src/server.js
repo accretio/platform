@@ -76,9 +76,11 @@ var panelType = "panel";
 // New API methods
 
 app.post('/api/savePanel', function(req, res){
+ 
     ESClient.index({
         index: panelIndex,
         type: panelType,
+	id : req.body.id,
         body: req.body
     }).then(function (body) {
 	console.log(body);
@@ -91,6 +93,27 @@ app.post('/api/savePanel', function(req, res){
     });
     
 });
+
+app.post('/api/getPanel', function(req, res){
+    var id = req.body.id
+    ESClient.get({
+        index: panelIndex,
+        type: panelType,
+        id: id
+     }).then(function (body) {
+         res.status(200);
+	 console.log(">>> result")
+	 console.log(body)
+         var panel = body._source
+	 panel.id = id
+         res.json(panel)
+     }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
+    
+})
 
 // Old API methods
 
