@@ -54,7 +54,7 @@ export default class PanelEditor extends React.Component {
 	console.log(instruments.length)
 	if (instruments) {
 	    instruments.map(function(instrument) {
-	
+		
 		console.log(instrument)
 		var instr = findInstrument(instrument.name)
 		if (instr) {
@@ -93,7 +93,7 @@ export default class PanelEditor extends React.Component {
 	
 	var allInstrumentsWithPositions =
 	    allInstruments.map(function(obj){
-	
+		
 		var offsetTop = 0
 		if (obj.group) offsetTop = obj.group.top + obj.group.height/2
 		
@@ -165,8 +165,8 @@ export default class PanelEditor extends React.Component {
             canvas.renderAll();
 
         },function(item, object) {
-                object.set('id',item.getAttribute('id'));
-                group.push(object);
+            object.set('id',item.getAttribute('id'));
+            group.push(object);
         });
 
 	// set up pan zoom
@@ -190,14 +190,14 @@ export default class PanelEditor extends React.Component {
 	});
 
 	// event handler: we save the panel when things move
-//	canvas.on('object:added', this.savePanel)
+	//	canvas.on('object:added', this.savePanel)
 	canvas.on('object:modified', this.saveState.bind(this))
 	
 
 	// now we can load the stored panel
 
 	this.retrieveInitialState()
-	
+	this.addDrift()
     }
 
     zoomCanvas(e) {
@@ -211,6 +211,39 @@ export default class PanelEditor extends React.Component {
 	return false;
 
     }
+ 
+    addDrift() {
+
+	!function() {
+	    var t;
+	    if (t = window.driftt = window.drift = window.driftt || [], !t.init)
+		return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0, 
+																								t.methods = [ "identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on" ], 
+																								t.factory = function(e) {
+																								    return function() {
+																									var n;
+																									return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
+																								    };
+																								}, t.methods.forEach(function(e) {
+																								    t[e] = t.factory(e);
+																								}), t.load = function(t) {
+																								    var e, n, o, i;
+																								    e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"), 
+																								    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js", 
+																								    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
+																								});
+	}();
+	drift.SNIPPET_VERSION = '0.3.1';
+	drift.load('sx55mxvnzrdc');
+
+	drift.on('ready', function(api) {
+	    setTimeout(function(){
+		api.openChat();
+	    }, 30000);
+	    
+	});
+
+    }
     
     addInstrument(instrument) {
         var instruments = JSON.parse(JSON.stringify(this.state.instruments));
@@ -221,29 +254,29 @@ export default class PanelEditor extends React.Component {
 
 	/* 
 
-	   // for some unknown reason adding text in the boxes wrecks alignment
-	   
-	   if (instrument.name != 'ROUND 3.125') {
+	// for some unknown reason adding text in the boxes wrecks alignment
+	
+	if (instrument.name != 'ROUND 3.125') {
 	var t = new fabric.Text(instrument.name, {
-            fontFamily: 'sans-serif',
-            fontSize: 1,
-            textAlign: 'center',
-            originX: 'center',
-            originY: 'center',
-            left: s.width/2 + 0.5 ,
-            top: s.height/2 + 0.5,
-	    
+        fontFamily: 'sans-serif',
+        fontSize: 1,
+        textAlign: 'center',
+        originX: 'center',
+        originY: 'center',
+        left: s.width/2 + 0.5 ,
+        top: s.height/2 + 0.5,
+	
 	});
 
 	t.setColor('white');
 
 
-	    var g = new fabric.Group([s, t],{
+	var g = new fabric.Group([s, t],{
         // any group attributes here
 	}); 
-	    g.height = s.height ;
-	    g.width = s.width ; 
-            this.state.canvas.add(s);
+	g.height = s.height ;
+	g.width = s.width ; 
+        this.state.canvas.add(s);
 
 	} else { */ 
 
@@ -251,7 +284,7 @@ export default class PanelEditor extends React.Component {
 	console.log(this.stateToJson());
     }
 
-   
+    
     viewDesign() {
         this.setState({ renderingMode: DESIGN });
         
@@ -279,40 +312,40 @@ export default class PanelEditor extends React.Component {
 	}
     }
 
-     alignSelectedObjectsHorizontally() {
+    alignSelectedObjectsHorizontally() {
 
-	 var curSelectedObjects =
-	     this.state.canvas.getActiveObjects().sort(function(a, b) {
-		 return (b.selectionCounter - a.selectionCounter); 
-	     });
+	var curSelectedObjects =
+	    this.state.canvas.getActiveObjects().sort(function(a, b) {
+		return (b.selectionCounter - a.selectionCounter); 
+	    });
 	
-	 if (curSelectedObjects) {
-             var pivot = curSelectedObjects[0].top + curSelectedObjects[0].height / 2; 
-             curSelectedObjects.map(function(obj) {
-		 obj.top = pivot - obj.height / 2;
-		 obj.setCoords();
-	     });
-	     this.state.canvas.renderAll();
-	     this.saveState.bind(this)()
-	 }
-	 
-     }
+	if (curSelectedObjects) {
+            var pivot = curSelectedObjects[0].top + curSelectedObjects[0].height / 2; 
+            curSelectedObjects.map(function(obj) {
+		obj.top = pivot - obj.height / 2;
+		obj.setCoords();
+	    });
+	    this.state.canvas.renderAll();
+	    this.saveState.bind(this)()
+	}
+	
+    }
 
-     centerSelectedObjects() {
-	 
-	 var center = this.state.aircraftTemplateWidth / 2;
+    centerSelectedObjects() {
+	
+	var center = this.state.aircraftTemplateWidth / 2;
 
-	 var obj = this.state.canvas.getActiveObject();
+	var obj = this.state.canvas.getActiveObject();
 
-	 if (obj) {
-	     console.log("set left to " + center);
-	     obj.left = center - (obj.width / 2);
-	     obj.setCoords();
-	     this.state.canvas.renderAll();
-	     this.saveState.bind(this)()
-	 }
-	 	     
-     }
+	if (obj) {
+	    console.log("set left to " + center);
+	    obj.left = center - (obj.width / 2);
+	    obj.setCoords();
+	    this.state.canvas.renderAll();
+	    this.saveState.bind(this)()
+	}
+	
+    }
 
     spaceSelectedObjectsRegularlyVertically() {
 	var spacing = 1; // inches
@@ -366,71 +399,71 @@ export default class PanelEditor extends React.Component {
     
     render() {
 
-           
+        
         
         return (
-	  
+	    
 		<div className="container">
-                     <div className="designControls">
-	          	 <button
-                           type="button"
+                <div className="designControls">
+	        <button
+            type="button"
             onClick={ this.alignSelectedObjectsVertically.bind(this) }
             className="btn btn-primary">
                 Align Vertically
             </button>
 
-	     <button
-             type="button"
+		<button
+            type="button"
             onClick={ this.alignSelectedObjectsHorizontally.bind(this) }
             className="btn btn-primary">
                 Align Horizontally
             </button>
-		 <button
-             type="button"
+		<button
+            type="button"
             onClick={ this.centerSelectedObjects.bind(this) }
             className="btn btn-primary">
                 Center Horizontally
             </button>
-			 <button
-             type="button"
+		<button
+            type="button"
             onClick={ this.spaceSelectedObjectsRegularlyVertically.bind(this) }
             className="btn btn-primary">
                 Spread Vertically
             </button>
-			 <button
-             type="button"
+		<button
+            type="button"
             onClick={ this.spaceSelectedObjectsRegularlyHorizontally.bind(this) }
             className="btn btn-primary">
                 Spread Horizontally
             </button>
-				 <button
-             type="button"
+		<button
+            type="button"
             onClick={ this.deleteSelectedObjects.bind(this) }
             className="btn btn-primary">
                 Delete
-        </button> 
-	             </div>
+            </button> 
+	        </div>
 
 	    
-		     <div className="row fullPageRow">
+		<div className="row fullPageRow">
 
-		         <div className="col-4">
+		<div className="col-4">
 
-                          <InstrumentPicker
-                             catalog={this.state.catalog}
-                             addInstrument={this.addInstrument.bind(this)} />
+                <InstrumentPicker
+            catalog={this.state.catalog}
+            addInstrument={this.addInstrument.bind(this)} />
 
-	                 </div>
+	    </div>
 		
 		<div className="col-8 fullPageCol"
-	             ref={elem => this.canvasContainer = elem}>
-                               <canvas id="canvas" className="canvas"></canvas>
-     
-		     </div>
-	
+	    ref={elem => this.canvasContainer = elem}>
+                <canvas id="canvas" className="canvas"></canvas>
+		
+	    </div>
+		
 	    </div>
 		</div>
-	  
+		
         );
 
     }
