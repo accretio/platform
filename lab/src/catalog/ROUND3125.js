@@ -8,7 +8,7 @@ var factory = function() {
         left : 0,
 	radius :  (3.125 / 2),
         hasControls : false,
-        fill : 'blue'
+        fill : '#5cb85c'
     }));
 }
                     

@@ -9,7 +9,7 @@ function factory(name, width, height) {
 	    width : width,
 	    height : height,
 	    hasControls : false,
-	    fill : 'blue'
+	    fill : '#5cb85c'
 	}))
     }));
 }
