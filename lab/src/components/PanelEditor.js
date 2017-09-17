@@ -226,6 +226,7 @@ export default class PanelEditor extends React.Component {
  
     addDrift() {
 
+	var this_ = this
 	!function() {
 	    var t;
 	    if (t = window.driftt = window.drift = window.driftt || [], !t.init)
@@ -248,12 +249,13 @@ export default class PanelEditor extends React.Component {
 	drift.SNIPPET_VERSION = '0.3.1';
 	drift.load('sx55mxvnzrdc');
 
-/*	drift.on('ready', function(api) {
-	    setTimeout(function(){
+	drift.on('ready', function(api) {
+	    /* setTimeout(function(){
 		api.openChat();
-	    }, 30000);
+		}, 30000); */
+	    this_.drift = api
 	    
-	}); */
+	}); 
 
     }
     
@@ -417,11 +419,22 @@ export default class PanelEditor extends React.Component {
 	    this.saveState.bind(this)()
 	}
     }
+
+    make() {
+	if (this.drift) {
+	    this.drift.openChat()
+	} else
+	{
+	window.location.href = "mailto:william@accret.io?subject="+this.state.id;
+	}
+    }
     
     render() {
 
-        
-        
+        if (process.title != "browser") {
+            return null
+	}
+	
         return (
 	    
 		<div className="container">
@@ -464,7 +477,7 @@ export default class PanelEditor extends React.Component {
 	    placeholder="Spacing" />
 
 		<span className="input-group-btn">
-		<button className="btn btn-secondary" type="button"
+		<button className="btn btn-primary" type="button"
 	    onClick={ this.spaceSelectedObjectsRegularlyVertically.bind(this) }
 		>Spread Vertically</button>
 		</span>
@@ -478,7 +491,7 @@ export default class PanelEditor extends React.Component {
 	    placeholder="Spacing" />
 
 		<span className="input-group-btn">
-		<button className="btn btn-secondary" type="button"
+		<button className="btn btn-primary" type="button"
 	    onClick={ this.spaceSelectedObjectsRegularlyHorizontally.bind(this) }>
 		Spread Horizontally</button>
 		</span>
@@ -494,6 +507,18 @@ export default class PanelEditor extends React.Component {
             onClick={ this.deleteSelectedObjects.bind(this) }
             className="btn btn-primary">
                 Delete
+            </button>
+
+	    </div>
+
+	    
+	      <div className="tool">
+	
+		<button
+            type="button"
+            onClick={ this.make.bind(this) }
+            className="btn btn-success">
+                Make
             </button>
 
 	    </div>
