@@ -14,7 +14,7 @@ function factory(name, width, height) {
     }));
 }
 
-
+var GMA340 = factory("GMA 340", 6.30, 1.3)
 var GTX345 = factory("GTX 345", 6.30, 1.65)
 var GTX335 = factory("GTX 335", 6.30, 1.68)
 var GNS430 = factory("GNS 430", 6.25, 2.65)
@@ -24,5 +24,5 @@ var GTN750 = factory("GTN 750", 6.25, 6.00)
 var G500 = factory("G500/G600", 10.00, 6.70)
 
 module.exports = {
-    GTX345, GTX335, GNS430, GNS530, GTN650, GTN750, G500
+    GMA340, GTX345, GTX335, GNS430, GNS530, GTN650, GTN750, G500
 }

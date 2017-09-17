@@ -51,7 +51,6 @@ export default class PanelEditor extends React.Component {
 	console.log(panel)
 	var t = this
 	var instruments = panel.instruments
-	console.log(instruments.length)
 	if (instruments) {
 	    instruments.map(function(instrument) {
 		
@@ -249,12 +248,12 @@ export default class PanelEditor extends React.Component {
 	drift.SNIPPET_VERSION = '0.3.1';
 	drift.load('sx55mxvnzrdc');
 
-	drift.on('ready', function(api) {
+/*	drift.on('ready', function(api) {
 	    setTimeout(function(){
 		api.openChat();
 	    }, 30000);
 	    
-	});
+	}); */
 
     }
     
@@ -361,41 +360,50 @@ export default class PanelEditor extends React.Component {
     }
 
     spaceSelectedObjectsRegularlyVertically() {
-	var spacing = 1; // inches
-	var curSelectedObjects = this.state.canvas.getActiveObjects();
-	console.log(curSelectedObjects);
-	if (curSelectedObjects) {
-	    curSelectedObjects.sort(function(a, b) {
-		return a.top - b.top;
-	    });
-	    var currentTop = curSelectedObjects[0].top; // ok because if curSelectedObject isn't null, it has at least one item. 
-	    curSelectedObjects.map(function(obj) {
-		obj.top = currentTop;
-		console.log("height is " + obj.height);
-		currentTop += obj.height + spacing;
-		obj.setCoords();
-	    });
-	    this.state.canvas.renderAll();
-	    this.saveState.bind(this)()
+	var spacing = Number(this.verticalSpacing.value); // inches
+	if (spacing == NaN)  {
+	    alert("please enter a valid spacing in inches")
+	} else {
+	    
+	    var curSelectedObjects = this.state.canvas.getActiveObjects();
+	    console.log(curSelectedObjects);
+	    if (curSelectedObjects) {
+		curSelectedObjects.sort(function(a, b) {
+		    return a.top - b.top;
+		});
+		var currentTop = curSelectedObjects[0].top; // ok because if curSelectedObject isn't null, it has at least one item. 
+		curSelectedObjects.map(function(obj) {
+		    obj.top = currentTop;
+		    console.log("height is " + obj.height);
+		    currentTop += obj.height + spacing;
+		    obj.setCoords();
+		});
+		this.state.canvas.renderAll();
+		this.saveState.bind(this)()
+	    }
 	}
-	
     }
 
     spaceSelectedObjectsRegularlyHorizontally() {
-	var spacing = 1; // inches
-	var curSelectedObjects = this.state.canvas.getActiveObjects();
-	if (curSelectedObjects) {
-	    curSelectedObjects.sort(function(a, b) {
-		return a.left - b.left;
-	    });
-	    var currentLeft = curSelectedObjects[0].left; // ok because if curSelectedObject isn't null, it has at least one item. 
-	    curSelectedObjects.map(function(obj) {
-		obj.left = currentLeft;
-		currentLeft += obj.width + spacing;
-		obj.setCoords();
-	    });
-	    this.state.canvas.renderAll();
-	    this.saveState.bind(this)()
+	var spacing = Number(this.horizontalSpacing.value); // inches
+	if (spacing == NaN)  {
+	    alert("please enter a valid spacing in inches")
+	} else {
+
+	    var curSelectedObjects = this.state.canvas.getActiveObjects();
+	    if (curSelectedObjects) {
+		curSelectedObjects.sort(function(a, b) {
+		    return a.left - b.left;
+		});
+		var currentLeft = curSelectedObjects[0].left; // ok because if curSelectedObject isn't null, it has at least one item. 
+		curSelectedObjects.map(function(obj) {
+		    obj.left = currentLeft;
+		    currentLeft += obj.width + spacing;
+		    obj.setCoords();
+		});
+		this.state.canvas.renderAll();
+		this.saveState.bind(this)()
+	    }
 	}
 	
     }
@@ -417,45 +425,81 @@ export default class PanelEditor extends React.Component {
         return (
 	    
 		<div className="container">
-                <div className="designControls">
+		<div className="row toolBox">
+		
+                <div className="tool">
 	        <button
             type="button"
             onClick={ this.alignSelectedObjectsVertically.bind(this) }
             className="btn btn-primary">
                 Align Vertically
             </button>
+		</div>
 
+	     <div className="tool">
 		<button
             type="button"
             onClick={ this.alignSelectedObjectsHorizontally.bind(this) }
             className="btn btn-primary">
                 Align Horizontally
             </button>
+		</div>
+		
+  <div className="tool">
+	
+	    
 		<button
             type="button"
             onClick={ this.centerSelectedObjects.bind(this) }
             className="btn btn-primary">
-                Center Horizontally
+                Center in Panel
             </button>
-		<button
-            type="button"
-            onClick={ this.spaceSelectedObjectsRegularlyVertically.bind(this) }
-            className="btn btn-primary">
-                Spread Vertically
-            </button>
-		<button
-            type="button"
-            onClick={ this.spaceSelectedObjectsRegularlyHorizontally.bind(this) }
-            className="btn btn-primary">
-                Spread Horizontally
-            </button>
+		</div>
+
+	   
+	<div className="tool tool-spacing-vertically input-group">
+  
+		<input type="text" className="form-control"
+	     ref={elem => this.verticalSpacing = elem}
+	    placeholder="Spacing" />
+
+		<span className="input-group-btn">
+		<button className="btn btn-secondary" type="button"
+	    onClick={ this.spaceSelectedObjectsRegularlyVertically.bind(this) }
+		>Spread Vertically</button>
+		</span>
+	
+	    </div>
+		
+		<div className="tool tool-spacing-horizontally input-group">
+  
+		<input type="text" className="form-control"
+	     ref={elem => this.horizontalSpacing = elem}
+	    placeholder="Spacing" />
+
+		<span className="input-group-btn">
+		<button className="btn btn-secondary" type="button"
+	    onClick={ this.spaceSelectedObjectsRegularlyHorizontally.bind(this) }>
+		Spread Horizontally</button>
+		</span>
+	
+	    </div>
+
+	     
+
+	      <div className="tool">
+	
 		<button
             type="button"
             onClick={ this.deleteSelectedObjects.bind(this) }
             className="btn btn-primary">
                 Delete
-            </button> 
+            </button>
+
+	    </div>
+		
 	        </div>
+		
 
 	    
 		<div className="row fullPageRow">
