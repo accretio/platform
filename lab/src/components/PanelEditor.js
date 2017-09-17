@@ -75,7 +75,16 @@ export default class PanelEditor extends React.Component {
     saveState() {
 	var json = this.stateToJson()
 	savePanel(json)
+    }
 
+    fork() {
+	var t = this
+	var json = this.stateToJson()
+	delete json["id"];
+	savePanel(json).then(function(response) {
+	    t.context.cookies.set('panelId', response.id)
+	    t.context.history.push("/panel/"+response.id);
+	})
     }
     
     stateToJson() {
@@ -198,6 +207,10 @@ export default class PanelEditor extends React.Component {
 
 	this.retrieveInitialState()
 	this.addDrift()
+
+	// and we define some global hidden helpers
+
+	window.fork = this.fork.bind(this);
     }
 
     zoomCanvas(e) {
@@ -473,7 +486,10 @@ export default class PanelEditor extends React.Component {
 
 PanelEditor.contextTypes = {
     mixpanel: PropTypes.object.isRequired,
-    cookies: PropTypes.object.isRequired
+    cookies: PropTypes.object.isRequired,
+    history: React.PropTypes.shape({
+	push: React.PropTypes.func.isRequired
+    })
 };
 
 
