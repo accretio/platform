@@ -11,6 +11,10 @@ import setDevConfig from '../config_dev.js';
 
 let config = {}; 
 
+if (typeof window !== 'undefined') {
+    setDevConfig(config)
+}
+
 if (typeof window !== 'undefined' && window.CONFIG) {
     config = window.CONFIG
 }
