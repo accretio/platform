@@ -1,0 +1,27 @@
+.designControls {
+    text-align: center;
+    button {
+	margin: 0 10px;
+	display: inline!important;
+    }
+}
+ 
+    
+
+
+.toolBox {
+
+    margin: 40px auto;
+    .tool {
+	margin: 0 10px 10px 0;
+	input {
+	    
+	}
+    }
+    .tool-spacing-horizontally {
+	width: 256px;
+    }
+     .tool-spacing-vertically {
+	width: 236px;
+    }
+}

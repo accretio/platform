@@ -7,7 +7,7 @@
     }
 */
 
-import setDevConfig from '../config_dev.js';
+// import setDevConfig from '../config_dev.js';
 
 let config = {};
 
@@ -26,7 +26,7 @@ config.aws_credentials = {
 }
 config.s3_bucket_name = 'accretio-lab-files';
 
-setDevConfig(config);
+//setDevConfig(config);
 
 export const stripe_pk = config.stripe_pk;
 export const stripe_sk = config.stripe_sk;

@@ -1,0 +1,3 @@
+[submodule "lab/src/dxf"]
+	path = lab/src/dxf
+	url = git@github.com:accretio/dxf.git

@@ -1,115 +1,40 @@
-html {
-    position: relative;
-    min-height: 100%;
+@import "instrumentPicker.scss";
+@import "panelEditor.scss";
+@import "landingPage.scss"; 
+
+$header-height: 56px;
+
+html, body, .main, .container {
+    height: 100%; 
 }
+
 body {
     /* Margin bottom by footer height */
-    margin-bottom: 60px;
-}
-.footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    /* Set the fixed height of the footer here */
-    height: 60px;
-    line-height: 60px; /* Vertically center the text there */
-    background-color: #f5f5f5;
-}
 
-body > .main {
-    padding: 60px 0;
-}
+   // background-color: yellow;
 
-.app-content {
-    margin-top: 40px;       
-}
-
-.not-found {
-
-    .col-6 {
-        margin-top:40px;
-        text-align: center;        
-    }    
-}
-
-h2 {
-    text-align: center;     
-
-}
-
-
-.landing-page {
-    > h1 {
-        text-align:center;
-        margin-bottom: 40px;
-    }             
-}
-
-
-
-.import-file {
-    margin-top: 40px ;
-    h2 {
-        margin-bottom:40px;
+    .main {
+	padding-top: $header-height;
+//	background-color: pink;
     }
-    .dropzone {
-       
-        div {
-            margin:auto;
-        }
+
+    .container {
+	// background-color: green;
+
     }
     
 }
 
 
-.recipe{
 
-    .carrousel {
-        max-width: 650px;
-        margin: auto;
-    }
-    
-    h2 {
-        margin-bottom: 40px;
-    }
+/* some helpers for the rows */
 
-    .description {
-        margin-bottom: 40px; 
-    }
-
-    .material {
-        margin-bottom: 40px;
-    }
-    
-    .price {
-        margin-bottom: 40px;
-    }
-    
-    .buy {
-        text-align: left;
-    }
+.fullPageRow, .fullPageCol {
+    height: 100%; 
 }
 
-.purchase {
-    h3 {
-        margin-bottom: 20px;
-    }
-
-    .customize {
-        margin-top: 40px;
-    }
-
-    .shipping {
-        margin-top: 40px;
-    }
-    
-    .payment-box {
-        margin-top: 40px;
-        text-align: center; 
-    }
+.fullPageCol {
+    padding: 0!important;
 }
 
-.thanks{
 
-
-}  

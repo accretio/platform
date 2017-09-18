@@ -15,7 +15,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.mi
 
 <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+   <script
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+    integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+    crossorigin="anonymous"></script> 
 
     <link rel="stylesheet" href="/css/style.css">
 
@@ -30,26 +33,29 @@ href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.mi
               <span class="navbar-toggler-icon"></span>
           </button>
           <a class="navbar-brand" href="/">accret.io</a>
-          <div class="navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav">
+          <div class="collapse navbar-collapse" id="navbarNav">
+              <div class="navbar-nav">
 
-                  <a class="nav-item nav-link" href="http://slackin.accret.io">Slack</a>
-                  <a class="nav-item nav-link" href="http://workshop.accret.io">Workshop</a>
-                  <a class="nav-item nav-link" href="https://github.com/accretio">Github</a>
-                  <a class="nav-item nav-link" href="mailto:team@accret.io">Contact</a>
-              </ul>
+                 <!-- <a class="nav-item nav-link"
+                href="http://slackin.accret.io">Slack</a> -->
+                <a class="nav-item nav-link"
+                href="https://github.com/accretio/platform">Github</a> 
+                  <a class="nav-item nav-link" href="mailto:william@accret.io">Contact</a>
+              </div>
           </div>
       </nav>
       
-      <div id="main" class="main"><%- markup -%></div>
+	  <div id="main" class="main">
+	    <%- markup -%>
+	  </div>
       
-      <footer class="footer">
+   <!--   <footer class="footer">
       <div class="container">
         <span class="text-muted">(c) 2017 Autonomous Industrial Tools
         Incorporated</span>
        
       </div>
-      </footer>
+      </footer> -->
 
     <script src="/js/bundle.js"></script>
   </body>

@@ -1,6 +1,5 @@
 'use strict';
 
-
 import path from 'path';
 
 import { Server } from 'http';
@@ -9,6 +8,10 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { match, RouterContext } from 'react-router';
 import routes from './routes';
+
+import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
+
+
 import NotFoundPage from './components/NotFoundPage';
 import { Button } from 'reactstrap';
 
@@ -66,6 +69,53 @@ var recipeType = "recipe";
 
 var orderIndex = "order";
 var orderType = "order";
+
+var panelIndex = "panels";
+var panelType = "panel";
+
+// New API methods
+
+app.post('/api/savePanel', function(req, res){
+ 
+    ESClient.index({
+        index: panelIndex,
+        type: panelType,
+	id : req.body.id,
+        body: req.body
+    }).then(function (body) {
+	console.log(body);
+        res.status(200);
+        res.json({ id: body._id });
+    }, function (error) {
+        console.log(error);
+        res.status(500);
+        res.send(error.message);
+    });
+    
+});
+
+app.post('/api/getPanel', function(req, res){
+    var id = req.body.id
+    ESClient.get({
+        index: panelIndex,
+        type: panelType,
+        id: id
+     }).then(function (body) {
+         res.status(200);
+	 console.log(">>> result")
+	 console.log(body)
+         var panel = body._source
+	 panel.id = id
+         res.json(panel)
+     }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
+    
+})
+
+// Old API methods
 
 app.post('/api/createRecipe', function(req, res){
     
@@ -257,7 +307,7 @@ app.get('*', (req, res) => {
             let markup;
             if (renderProps) {
                 // if the current route matched we have renderProps
-                markup = renderToString(<RouterContext {...renderProps}/>);
+                markup = renderToString(<CookiesProvider><RouterContext {...renderProps}/></CookiesProvider>);
             } else { 
                 // otherwise we can render a 404 page
                 markup = renderToString(<NotfoundPage />);
