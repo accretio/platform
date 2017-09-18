@@ -28,6 +28,8 @@ import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
 
+var config = require('./config');
+
 // initialize the server and configure support for ejs templates
 const app = new Express();
 const server = new Server(app);
@@ -315,7 +317,7 @@ app.get('*', (req, res) => {
             }
 
             // render the index template with the embedded React markup
-            return res.render('index', { markup });
+            return res.render('index', { markup, config: JSON.stringify(config)});
         }
     );
 });

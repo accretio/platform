@@ -11,7 +11,7 @@ import {CookiesProvider} from 'react-cookie';
 window.onload = () => {
     if (location.protocol != 'https:' && !bypass_https)
     {
-        location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+	location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
     } else {
         mixpanel.init(mixpanel_token);
         ReactDOM.render(<CookiesProvider>
