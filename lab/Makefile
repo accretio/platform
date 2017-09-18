@@ -7,6 +7,7 @@ export MIXPANEL_TOKEN
 export URL
 
 publish:
+	npm run build
 	docker build -t gcr.io/accretio-180222/lab:$(LAB_VERSION) .
 	gcloud docker -- push gcr.io/accretio-180222/lab:$(LAB_VERSION)
 

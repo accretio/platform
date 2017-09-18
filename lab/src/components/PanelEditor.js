@@ -42,6 +42,7 @@ export default class PanelEditor extends React.Component {
     }
 
     retrieveInitialState() {
+	this.context.mixpanel.track('retrieving panel', { 'id': this.state.id });
 	getPanel(this.state.id).then(this.loadState.bind(this))
     }
 
@@ -78,10 +79,12 @@ export default class PanelEditor extends React.Component {
 
     fork() {
 	var t = this
+	var oldId = this.state.id
 	var json = this.stateToJson()
 	delete json["id"];
 	savePanel(json).then(function(response) {
 	    t.context.cookies.set('panelId', response.id)
+	    t.context.mixpanel.track('forking panel', { 'id': response.id, 'old_id': oldId });
 	    t.context.history.push("/panel/"+response.id);
 	})
     }
@@ -293,6 +296,8 @@ export default class PanelEditor extends React.Component {
         this.state.canvas.add(s);
 
 	} else { */ 
+	this.context.mixpanel.track('adding instrument', { 'id': this.state.id,
+							   'instrument': instrument.name });
 
 	this.state.canvas.add(s);
 	console.log(this.stateToJson());
@@ -321,6 +326,7 @@ export default class PanelEditor extends React.Component {
 		obj.left = (pivot - obj.width / 2);
 		obj.setCoords();
 	    });
+	    this.context.mixpanel.track('align vertically', { 'id': this.state.id });
 	    this.state.canvas.renderAll();
 	    this.saveState.bind(this)()
 	}
@@ -339,6 +345,7 @@ export default class PanelEditor extends React.Component {
 		obj.top = pivot - obj.height / 2;
 		obj.setCoords();
 	    });
+	    this.context.mixpanel.track('align horizontally', { 'id': this.state.id });
 	    this.state.canvas.renderAll();
 	    this.saveState.bind(this)()
 	}
@@ -352,9 +359,9 @@ export default class PanelEditor extends React.Component {
 	var obj = this.state.canvas.getActiveObject();
 
 	if (obj) {
-	    console.log("set left to " + center);
 	    obj.left = center - (obj.width / 2);
 	    obj.setCoords();
+	    this.context.mixpanel.track('center objects', { 'id': this.state.id });
 	    this.state.canvas.renderAll();
 	    this.saveState.bind(this)()
 	}
@@ -380,7 +387,8 @@ export default class PanelEditor extends React.Component {
 		    currentTop += obj.height + spacing;
 		    obj.setCoords();
 		});
-		this.state.canvas.renderAll();
+		this.context.mixpanel.track('space vertically', { 'id': this.state.id, 'spacing': spacing });
+	 	this.state.canvas.renderAll();
 		this.saveState.bind(this)()
 	    }
 	}
@@ -403,6 +411,7 @@ export default class PanelEditor extends React.Component {
 		    currentLeft += obj.width + spacing;
 		    obj.setCoords();
 		});
+		this.context.mixpanel.track('space horizontally', { 'id': this.state.id, 'spacing': spacing });
 		this.state.canvas.renderAll();
 		this.saveState.bind(this)()
 	    }
@@ -415,12 +424,14 @@ export default class PanelEditor extends React.Component {
 	if (curSelectedObjects) {
 	    var t = this
 	    curSelectedObjects.map(function(obj) { t.state.canvas.remove(obj) })
+	    this.context.mixpanel.track('delete instrument', { 'id': this.state.id });
 	    this.state.canvas.renderAll();
 	    this.saveState.bind(this)()
 	}
     }
 
     make() {
+	this.context.mixpanel.track('make', { 'id': this.state.id });
 	if (this.drift) {
 	    this.drift.openChat()
 	} else
