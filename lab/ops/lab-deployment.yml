@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: lab
-        image:  gcr.io/accretio-180222/lab:0.4
+        image:  gcr.io/accretio-180222/lab:$LAB_VERSION
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
@@ -21,5 +21,5 @@ spec:
           - name: ELASTICSEARCH_ENDPOINT
             value: "elasticsearch"
           - name: MIXPANEL_TOKEN
-            value: "6221bafa38007f6f95fb31da88456141"
+            value: $MIXPANEL_TOKEN
   
