@@ -128,7 +128,7 @@ export default class PanelEditor extends React.Component {
     }
 
     resizeCanvasContainer() {
-	console.log("resizing the canvas");
+	console.log("resizing the canvas, " + this.canvasContainer.clientHeight + " px");
 	var canvas = this.state.canvas
 	canvas.setWidth(this.canvasContainer.clientWidth);
 	canvas.setHeight(this.canvasContainer.clientHeight);
@@ -185,7 +185,6 @@ export default class PanelEditor extends React.Component {
 	this.canvasContainer.addEventListener("mousewheel", this.zoomCanvas.bind(this));
         this.setState({ canvas: canvas });
 
-
 	// we need to resize the canvas container
 	
 	this.resizeCanvasContainer.bind(this);
@@ -204,7 +203,6 @@ export default class PanelEditor extends React.Component {
 	//	canvas.on('object:added', this.savePanel)
 	canvas.on('object:modified', this.saveState.bind(this))
 	
-
 	// now we can load the stored panel
 
 	this.retrieveInitialState()
@@ -259,7 +257,8 @@ export default class PanelEditor extends React.Component {
 	g.width = s.width ; 
         this.state.canvas.add(s);
 
-	} else { */ 
+	} else { */
+	
 	this.context.mixpanel.track('adding instrument', { 'id': this.state.id,
 							   'instrument': instrument.name });
 
