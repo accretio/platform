@@ -15,15 +15,15 @@ var layouts = [
       dxf: PA28,
       breakpoints: [] },
 
-    { name: "C441_Center_Panel",
+    { name: "C421/425/441_Center_Panel",
       dxf: C441_center,
       breakpoints: [] },
 
-    { name: "C441_Left_Panel",
+    { name: "C421/425/441_Left_Panel",
       dxf: C441_left,
       breakpoints: [] },
      
-    { name: "C441_Right_Panel",
+    { name: "C421/425/441_Right_Panel",
       dxf: C441_right,
       breakpoints: [] }
     
