@@ -28,12 +28,17 @@ body {
 
 
 .app-content {
-    height: 100%;
+    height: calc(100% - 36px);
 }
 /* some helpers for the rows */
 
 .fullPageRow, .fullPageCol {
-    height: 100%; 
+    height: calc(100% - 176px) 
+}
+
+
+.fullPageCol {
+    height: 100%;
 }
 
 .fullPageCol {

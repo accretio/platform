@@ -83,8 +83,14 @@ export default class PanelEditor extends React.Component {
             });
 
             canvas.add(loadedObjects);
-	    this_.setState({ aircraftTemplateWidth: loadedObjects.width});
-	    canvas.setZoom(canvas.width / loadedObjects.width);
+	    this_.setState({ aircraftTemplateWidth: loadedObjects.width,
+			     aircraftTemplateHeight: loadedObjects.height });
+
+	    var zoom = Math.min(canvas.width / loadedObjects.width,
+			        canvas.height / loadedObjects.height)
+	    console.log("width: " + canvas.width + " height: " + canvas.height+ " zoom: " + zoom);
+
+	    canvas.setZoom(zoom);
             canvas.renderAll()
 	    
         },function(item, object) {
@@ -185,7 +191,10 @@ export default class PanelEditor extends React.Component {
 	var canvas = this.state.canvas
 	canvas.setWidth(this.canvasContainer.clientWidth);
 	canvas.setHeight(this.canvasContainer.clientHeight);
-	canvas.setZoom(canvas.width / this.state.aircraftTemplateWidth);
+	canvas.setZoom(Math.min(
+	    canvas.width / this.state.aircraftTemplateWidth,
+	    canvas.height / this.state.aircraftTemplateHeight
+	));
 	canvas.calcOffset(); 
 	canvas.renderAll();
 	canvas.calcOffset();  
@@ -201,34 +210,6 @@ export default class PanelEditor extends React.Component {
 	canvas.setWidth(this.canvasContainer.clientWidth);
 	canvas.setHeight(this.canvasContainer.clientHeight);
 	
-/*	var group = [];
-	
-	fabric.loadSVGFromString(svg, function(objects,options) {
-
-            var loadedObjects = new fabric.Group(group);
-
-            loadedObjects.set({
-		top: 0,
-		left: 0,
-		scaleX: 1,
-                scaleY: 1,
-          	lockMovementX: true,
-		lockMovementY: true,
-		lockScalingX: true,
-		lockScalingY: true,
-		selectable: false
-            });
-
-            canvas.add(loadedObjects);
-	    this_.setState({ aircraftTemplateWidth: loadedObjects.width});
-	    canvas.setZoom(canvas.width / loadedObjects.width);
-            canvas.renderAll();
-
-        },function(item, object) {
-            object.set('id',item.getAttribute('id'));
-            group.push(object);
-        }); */
-
 	// set up pan zoom
 
 	this.canvasContainer.addEventListener("mousewheel", this.zoomCanvas.bind(this));
