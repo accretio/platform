@@ -43,7 +43,7 @@ AWS.config.credentials = credentials;
 // initialize the ES client
 const ESClient = new elasticsearch.Client({
     host: `${elasticsearch_endpoint}:9200`,
-    log: 'trace',
+    log: 'info',
     httpAuth: 'elastic:changeme'
 });
 
@@ -67,7 +67,6 @@ app.post('/api/savePanel', function(req, res){
 	id : req.body.id,
         body: req.body
     }).then(function (body) {
-	console.log(body);
         res.status(200);
         res.json({ id: body._id });
     }, function (error) {
@@ -93,11 +92,8 @@ function getESEntity(index, type) {
             type: type,
             id: id
 	}).then(function (body) {
-	    console.log("got a reply")
-            res.status(200);
-	    console.log(">>> result")
-	    console.log(body)
-            var entity = body._source
+	    res.status(200);
+	    var entity = body._source
 	    entity.id = id
             res.json(entity)
 	}, function (error) {
