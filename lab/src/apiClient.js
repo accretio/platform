@@ -37,4 +37,21 @@ function savePanel(panel) {
     }))
 }
 
-export { getPanel, savePanel };
+function listLayouts(query) {
+    return(fetch('/api/listLayouts', {
+	method: 'post',
+	headers: new Headers({
+	    'Content-Type': 'application/json'
+       	}),
+	body: JSON.stringify({ query: query })
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    alert("something went wrong")
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
+export { getPanel, savePanel, listLayouts };

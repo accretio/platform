@@ -27,6 +27,7 @@ import elasticsearch from 'elasticsearch';
 import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
+import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType } from './store/es.js';
 
 var config = require('./config');
 
@@ -57,26 +58,6 @@ app.use(bodyParser.json({ type: 'application/json' }));
 
 // api methods
 
-app.use('/api/s3', require('react-s3-uploader/s3router')({
-    bucket: s3_bucket_name,
-    region: 'us-west-1',
-    headers: {'Access-Control-Allow-Origin': '*'}, // optional
-    uploadRequestHeaders: {},
-    ACL: 'private', // this is default
-    uniquePrefix: true// (4.0.2 and above) default is true, setting the attribute to false preserves the original filename in S3
-}));
-
-var recipeIndex = "recipes";
-var recipeType = "recipe";
-
-var orderIndex = "order";
-var orderType = "order";
-
-var panelIndex = "panels";
-var panelType = "panel";
-
-// New API methods
-
 app.post('/api/savePanel', function(req, res){
  
     ESClient.index({
@@ -96,11 +77,43 @@ app.post('/api/savePanel', function(req, res){
     
 });
 
-app.post('/api/getPanel', function(req, res){
+
+function getESEntity(index, type) {
+
+    function jsUcfirst(string) {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    
+    app.post('/api/get' + jsUcfirst(type), function(req, res){
+	var id = req.body.id
+	console.log(">>> getting " + type + " id " + id)
+	ESClient.get({
+            index: index,
+            type: type,
+            id: id
+	}).then(function (body) {
+	    console.log("got a reply")
+            res.status(200);
+	    console.log(">>> result")
+	    console.log(body)
+            var entity = body._source
+	    entity.id = id
+            res.json(entity)
+	}, function (error) {
+	    console.trace(error.message);
+            res.status(500);
+            res.send(error.message);
+	});	
+    })
+    
+}
+
+
+app.post('/api/getLayout2', function(req, res){
     var id = req.body.id
     ESClient.get({
-        index: panelIndex,
-        type: panelType,
+        index: layoutIndex,
+        type: layoutType,
         id: id
      }).then(function (body) {
          res.status(200);
@@ -115,6 +128,25 @@ app.post('/api/getPanel', function(req, res){
         res.send(error.message);
     });
     
+})
+
+getESEntity(panelIndex, panelType);
+getESEntity(layoutIndex, layoutType);
+
+app.post('/api/listLayouts', function(req, res){
+    console.log("query is " + req.body.query)
+    ESClient.search({
+        index: layoutIndex,
+        type: layoutType,
+	q: req.body.query
+    }).then(function (body) {
+        res.status(200)
+	res.json(body.hits.hits.map(function(hit) { return { name: hit._source.name, id: hit._source.id }}))
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
 })
 
 // Old API methods

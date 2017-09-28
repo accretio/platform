@@ -208,7 +208,6 @@ export default class PanelEditor extends React.Component {
 	// now we can load the stored panel
 
 	this.retrieveInitialState()
-	this.addDrift()
 
 	// and we define some global hidden helpers
 
@@ -224,41 +223,6 @@ export default class PanelEditor extends React.Component {
 	this.state.canvas.zoomToPoint({ x: x, y: y }, newZoom);
 	if(e != null)e.preventDefault();
 	return false;
-
-    }
- 
-    addDrift() {
-
-	var this_ = this
-	!function() {
-	    var t;
-	    if (t = window.driftt = window.drift = window.driftt || [], !t.init)
-		return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0, 
-																								t.methods = [ "identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on" ], 
-																								t.factory = function(e) {
-																								    return function() {
-																									var n;
-																									return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-																								    };
-																								}, t.methods.forEach(function(e) {
-																								    t[e] = t.factory(e);
-																								}), t.load = function(t) {
-																								    var e, n, o, i;
-																								    e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"), 
-																								    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js", 
-																								    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-																								});
-	}();
-	drift.SNIPPET_VERSION = '0.3.1';
-	drift.load('sx55mxvnzrdc');
-
-	drift.on('ready', function(api) {
-	    /* setTimeout(function(){
-		api.openChat();
-		}, 30000); */
-	    this_.drift = api
-	    
-	}); 
 
     }
     
@@ -432,12 +396,7 @@ export default class PanelEditor extends React.Component {
 
     make() {
 	this.context.mixpanel.track('make', { 'id': this.state.id });
-	if (this.drift) {
-	    this.drift.openChat()
-	} else
-	{
-	window.location.href = "mailto:william@accret.io?subject="+this.state.id;
-	}
+	this.props.messageTeam("make" + this.state.id)
     }
     
     render() {
