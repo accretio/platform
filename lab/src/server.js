@@ -28,6 +28,7 @@ import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
 import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType } from './store/es.js';
+import { loadLayouts } from './layouts/loadLayouts.js';
 
 var config = require('./config');
 
@@ -101,34 +102,12 @@ function getESEntity(index, type) {
             res.json(entity)
 	}, function (error) {
 	    console.trace(error.message);
-            res.status(500);
+            res.status(404);
             res.send(error.message);
 	});	
     })
     
 }
-
-
-app.post('/api/getLayout2', function(req, res){
-    var id = req.body.id
-    ESClient.get({
-        index: layoutIndex,
-        type: layoutType,
-        id: id
-     }).then(function (body) {
-         res.status(200);
-	 console.log(">>> result")
-	 console.log(body)
-         var panel = body._source
-	 panel.id = id
-         res.json(panel)
-     }, function (error) {
-        console.trace(error.message);
-        res.status(500);
-        res.send(error.message);
-    });
-    
-})
 
 getESEntity(panelIndex, panelType);
 getESEntity(layoutIndex, layoutType);
@@ -141,7 +120,7 @@ app.post('/api/listLayouts', function(req, res){
 	q: req.body.query
     }).then(function (body) {
         res.status(200)
-	res.json(body.hits.hits.map(function(hit) { return { name: hit._source.name, id: hit._source.id }}))
+	res.json(body.hits.hits.map(function(hit) { return { name: hit._source.name, id: hit._id }}))
     }, function (error) {
         console.trace(error.message);
         res.status(500);
@@ -354,10 +333,16 @@ app.get('*', (req, res) => {
     );
 });
 
+
+// load all the layouts
+
+loadLayouts(ESClient);
+
 // start the server
 server.listen(port, err => {
     if (err) {
         return console.error(err);
     }
+   
     console.info(`Server running on http://localhost:${port} [${env}]`);
 });

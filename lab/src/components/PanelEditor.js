@@ -14,12 +14,9 @@ import { parseString, toSVG } from '../dxf/lib/index.js';
 // the catalog
 import { findInstrument, catalog } from './../catalog/Catalog.js'; 
 
-// the panels
-import { PA28 } from './../aircraft/PA40.js';
-
 // the api client
 
-import { getPanel, savePanel } from './../apiClient.js';
+import { getPanel, getLayout, savePanel } from './../apiClient.js';
 
 var DESIGN = 0;
 var RENDER = 1;
@@ -43,14 +40,60 @@ export default class PanelEditor extends React.Component {
 
     retrieveInitialState() {
 	this.context.mixpanel.track('retrieving panel', { 'id': this.state.id });
-	getPanel(this.state.id).then(this.loadState.bind(this))
+	getPanel(this.state.id).then(this.getLayout.bind(this))
     }
 
-    loadState(panel) {
+    getLayout(panel) {
+
+	if (panel.layout == null) {
+	    panel.layout = 1 // not correct
+	}
+
+	getLayout(panel.layout).then((layout) => this.loadState.bind(this)(panel, layout))
+	
+    }
+
+    loadState(panel, layout) {
 	// iterate on the json doc & create all the canvas objects we need
-	console.log("loading state from " + panel)
-	console.log(panel)
-	var t = this
+	var this_ = this
+
+	var canvas = this.state.canvas
+
+	// inject the layout
+
+	var parsed = parseString(layout.dxf);
+	var svg = toSVG(parsed);
+
+	var group = [];
+	
+	fabric.loadSVGFromString(svg, function(objects,options) {
+
+            var loadedObjects = new fabric.Group(group);
+
+            loadedObjects.set({
+		top: 0,
+		left: 0,
+		scaleX: 1,
+                scaleY: 1,
+          	lockMovementX: true,
+		lockMovementY: true,
+		lockScalingX: true,
+		lockScalingY: true,
+		selectable: false
+            });
+
+            canvas.add(loadedObjects);
+	    this_.setState({ aircraftTemplateWidth: loadedObjects.width});
+	    canvas.setZoom(canvas.width / loadedObjects.width);
+            canvas.renderAll()
+	    
+        },function(item, object) {
+            object.set('id',item.getAttribute('id'));
+            group.push(object);
+        });
+	
+	// inject the instruments
+	
 	var instruments = panel.instruments
 	if (instruments) {
 	    instruments.map(function(instrument) {
@@ -65,10 +108,20 @@ export default class PanelEditor extends React.Component {
 		    shape.left = instrument.left ;
 		    
 		    // and now it is ready to be injected
-		    t.state.canvas.add(shape);
+		    canvas.add(shape);
 		}
 	    })
 	}
+
+//this.resizeCanvasContainer.bind(this);
+	
+
+	// render the canvas
+
+	canvas.renderAll()
+	
+	this.setState({ layout : layout })
+	
 	
     }
 
@@ -120,7 +173,7 @@ export default class PanelEditor extends React.Component {
 
 	return({
 	    id: this.state.id,
-	    aircraft: "PA28",
+	    layout: this.state.layout.id,
 	    instruments: allInstrumentsWithPositions
 	})
 	
@@ -143,16 +196,12 @@ export default class PanelEditor extends React.Component {
 
 	var this_ = this;
 	
-	var parsed = parseString(PA28);
-	console.log(parsed)
-	var svg = toSVG(parsed);
-	
-        var canvas = new fabric.Canvas('canvas');
+	var canvas = new fabric.Canvas('canvas');
 	
 	canvas.setWidth(this.canvasContainer.clientWidth);
 	canvas.setHeight(this.canvasContainer.clientHeight);
 	
-	var group = [];
+/*	var group = [];
 	
 	fabric.loadSVGFromString(svg, function(objects,options) {
 
@@ -178,7 +227,7 @@ export default class PanelEditor extends React.Component {
         },function(item, object) {
             object.set('id',item.getAttribute('id'));
             group.push(object);
-        });
+        }); */
 
 	// set up pan zoom
 

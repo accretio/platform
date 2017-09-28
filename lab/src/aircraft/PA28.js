@@ -1,4 +1,4 @@
-var PA28 = `0
+var PA28 = `  0
 SECTION
   2
 HEADER
@@ -13529,6 +13529,10 @@ CELLSTYLE_END
   0
 ENDSEC
   0
-EOF`; 
+EOF
+` ;
 
+module.exports = {
+    PA28
 
+}
