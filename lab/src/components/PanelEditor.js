@@ -14,12 +14,9 @@ import { parseString, toSVG } from '../dxf/lib/index.js';
 // the catalog
 import { findInstrument, catalog } from './../catalog/Catalog.js'; 
 
-// the panels
-import { PA28 } from './../aircraft/PA40.js';
-
 // the api client
 
-import { getPanel, savePanel } from './../apiClient.js';
+import { getPanel, getLayout, savePanel } from './../apiClient.js';
 
 var DESIGN = 0;
 var RENDER = 1;
@@ -43,14 +40,66 @@ export default class PanelEditor extends React.Component {
 
     retrieveInitialState() {
 	this.context.mixpanel.track('retrieving panel', { 'id': this.state.id });
-	getPanel(this.state.id).then(this.loadState.bind(this))
+	getPanel(this.state.id).then(this.getLayout.bind(this))
     }
 
-    loadState(panel) {
+    getLayout(panel) {
+
+	if (panel.layout == null) {
+	    panel.layout = 1 // not correct
+	}
+
+	getLayout(panel.layout).then((layout) => this.loadState.bind(this)(panel, layout))
+	
+    }
+
+    loadState(panel, layout) {
 	// iterate on the json doc & create all the canvas objects we need
-	console.log("loading state from " + panel)
-	console.log(panel)
-	var t = this
+	var this_ = this
+
+	var canvas = this.state.canvas
+
+	// inject the layout
+
+	var parsed = parseString(layout.dxf);
+	var svg = toSVG(parsed);
+
+	var group = [];
+	
+	fabric.loadSVGFromString(svg, function(objects,options) {
+
+            var loadedObjects = new fabric.Group(group);
+
+            loadedObjects.set({
+		top: 0,
+		left: 0,
+		scaleX: 1,
+                scaleY: 1,
+          	lockMovementX: true,
+		lockMovementY: true,
+		lockScalingX: true,
+		lockScalingY: true,
+		selectable: false
+            });
+
+            canvas.add(loadedObjects);
+	    this_.setState({ aircraftTemplateWidth: loadedObjects.width,
+			     aircraftTemplateHeight: loadedObjects.height });
+
+	    var zoom = Math.min(canvas.width / loadedObjects.width,
+			        canvas.height / loadedObjects.height)
+	    console.log("width: " + canvas.width + " height: " + canvas.height+ " zoom: " + zoom);
+
+	    canvas.setZoom(zoom);
+            canvas.renderAll()
+	    
+        },function(item, object) {
+            object.set('id',item.getAttribute('id'));
+            group.push(object);
+        });
+	
+	// inject the instruments
+	
 	var instruments = panel.instruments
 	if (instruments) {
 	    instruments.map(function(instrument) {
@@ -65,10 +114,20 @@ export default class PanelEditor extends React.Component {
 		    shape.left = instrument.left ;
 		    
 		    // and now it is ready to be injected
-		    t.state.canvas.add(shape);
+		    canvas.add(shape);
 		}
 	    })
 	}
+
+//this.resizeCanvasContainer.bind(this);
+	
+
+	// render the canvas
+
+	canvas.renderAll()
+	
+	this.setState({ layout : layout })
+	
 	
     }
 
@@ -120,7 +179,7 @@ export default class PanelEditor extends React.Component {
 
 	return({
 	    id: this.state.id,
-	    aircraft: "PA28",
+	    layout: this.state.layout.id,
 	    instruments: allInstrumentsWithPositions
 	})
 	
@@ -128,11 +187,14 @@ export default class PanelEditor extends React.Component {
     }
 
     resizeCanvasContainer() {
-	console.log("resizing the canvas");
+	console.log("resizing the canvas, " + this.canvasContainer.clientHeight + " px");
 	var canvas = this.state.canvas
 	canvas.setWidth(this.canvasContainer.clientWidth);
 	canvas.setHeight(this.canvasContainer.clientHeight);
-	canvas.setZoom(canvas.width / this.state.aircraftTemplateWidth);
+	canvas.setZoom(Math.min(
+	    canvas.width / this.state.aircraftTemplateWidth,
+	    canvas.height / this.state.aircraftTemplateHeight
+	));
 	canvas.calcOffset(); 
 	canvas.renderAll();
 	canvas.calcOffset();  
@@ -143,48 +205,15 @@ export default class PanelEditor extends React.Component {
 
 	var this_ = this;
 	
-	var parsed = parseString(PA28);
-	console.log(parsed)
-	var svg = toSVG(parsed);
-	
-        var canvas = new fabric.Canvas('canvas');
+	var canvas = new fabric.Canvas('canvas');
 	
 	canvas.setWidth(this.canvasContainer.clientWidth);
 	canvas.setHeight(this.canvasContainer.clientHeight);
 	
-	var group = [];
-	
-	fabric.loadSVGFromString(svg, function(objects,options) {
-
-            var loadedObjects = new fabric.Group(group);
-
-            loadedObjects.set({
-		top: 0,
-		left: 0,
-		scaleX: 1,
-                scaleY: 1,
-          	lockMovementX: true,
-		lockMovementY: true,
-		lockScalingX: true,
-		lockScalingY: true,
-		selectable: false
-            });
-
-            canvas.add(loadedObjects);
-	    this_.setState({ aircraftTemplateWidth: loadedObjects.width});
-	    canvas.setZoom(canvas.width / loadedObjects.width);
-            canvas.renderAll();
-
-        },function(item, object) {
-            object.set('id',item.getAttribute('id'));
-            group.push(object);
-        });
-
 	// set up pan zoom
 
 	this.canvasContainer.addEventListener("mousewheel", this.zoomCanvas.bind(this));
         this.setState({ canvas: canvas });
-
 
 	// we need to resize the canvas container
 	
@@ -204,11 +233,9 @@ export default class PanelEditor extends React.Component {
 	//	canvas.on('object:added', this.savePanel)
 	canvas.on('object:modified', this.saveState.bind(this))
 	
-
 	// now we can load the stored panel
 
 	this.retrieveInitialState()
-	this.addDrift()
 
 	// and we define some global hidden helpers
 
@@ -224,41 +251,6 @@ export default class PanelEditor extends React.Component {
 	this.state.canvas.zoomToPoint({ x: x, y: y }, newZoom);
 	if(e != null)e.preventDefault();
 	return false;
-
-    }
- 
-    addDrift() {
-
-	var this_ = this
-	!function() {
-	    var t;
-	    if (t = window.driftt = window.drift = window.driftt || [], !t.init)
-		return t.invoked ? void (window.console && console.error && console.error("Drift snippet included twice.")) : (t.invoked = !0, 
-																								t.methods = [ "identify", "config", "track", "reset", "debug", "show", "ping", "page", "hide", "off", "on" ], 
-																								t.factory = function(e) {
-																								    return function() {
-																									var n;
-																									return n = Array.prototype.slice.call(arguments), n.unshift(e), t.push(n), t;
-																								    };
-																								}, t.methods.forEach(function(e) {
-																								    t[e] = t.factory(e);
-																								}), t.load = function(t) {
-																								    var e, n, o, i;
-																								    e = 3e5, i = Math.ceil(new Date() / e) * e, o = document.createElement("script"), 
-																								    o.type = "text/javascript", o.async = !0, o.crossorigin = "anonymous", o.src = "https://js.driftt.com/include/" + i + "/" + t + ".js", 
-																								    n = document.getElementsByTagName("script")[0], n.parentNode.insertBefore(o, n);
-																								});
-	}();
-	drift.SNIPPET_VERSION = '0.3.1';
-	drift.load('sx55mxvnzrdc');
-
-	drift.on('ready', function(api) {
-	    /* setTimeout(function(){
-		api.openChat();
-		}, 30000); */
-	    this_.drift = api
-	    
-	}); 
 
     }
     
@@ -295,7 +287,8 @@ export default class PanelEditor extends React.Component {
 	g.width = s.width ; 
         this.state.canvas.add(s);
 
-	} else { */ 
+	} else { */
+	
 	this.context.mixpanel.track('adding instrument', { 'id': this.state.id,
 							   'instrument': instrument.name });
 
@@ -432,12 +425,7 @@ export default class PanelEditor extends React.Component {
 
     make() {
 	this.context.mixpanel.track('make', { 'id': this.state.id });
-	if (this.drift) {
-	    this.drift.openChat()
-	} else
-	{
-	window.location.href = "mailto:william@accret.io?subject="+this.state.id;
-	}
+	this.props.messageTeam("make" + this.state.id)
     }
     
     render() {

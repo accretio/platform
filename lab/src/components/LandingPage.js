@@ -19,12 +19,7 @@ export default class LandingPage extends React.Component {
     }
     
     createNewPanel() {
-	var t = this;
-	savePanel({}).then(function(response) {
-	    t.context.cookies.set('panelId', response.id)
-	    t.gotoPanel.bind(t)(response.id)
-	})
-        
+	this.context.history.push("/layout");
     }
     
     retrievePanel() {
@@ -50,6 +45,7 @@ export default class LandingPage extends React.Component {
             <p className="lead">
 
 	    <span className="get-started">
+	    
 	    <a className="btn btn-primary btn-lg" href="#" role="button"
 	       onClick={t.createNewPanel.bind(t)} >Create New Panel</a>
 	    </span>
