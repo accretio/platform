@@ -46,13 +46,13 @@ int main(int argc, char** argv)
   cout << "Image " << imageName << " loaded" << "\n";
 
   // select the area
-  area = src(Rect(refInstrTopLeftX, refInstrTopLeftY, refInstrWidth, refInstrHeight));
+  area = src; // src(Rect(refInstrTopLeftX, refInstrTopLeftY, refInstrWidth, refInstrHeight));
 
   
   // Turn the image to gray and blur it
   
   cvtColor( area, area_gray, COLOR_BGR2GRAY );
-  GaussianBlur( area_gray, area_gray, Size(11, 11), 2, 2 );
+  GaussianBlur( area_gray, area_gray, Size(13, 13), 2, 2 );
 
   
   
@@ -63,8 +63,7 @@ int main(int argc, char** argv)
   vector<vector<Point> > contours;
   vector<Vec4i> hierarchy;
 
-  findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(refInstrTopLeftX, refInstrTopLeftY) );
-
+  findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_NONE, Point(refInstrTopLeftX, refInstrTopLeftY) );
 
   Mat drawing = src; // Mat::zeros( canny_output.size(), CV_8UC3 );
   for( int i = 0; i< contours.size(); i++ )
@@ -73,12 +72,37 @@ int main(int argc, char** argv)
       drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
     }
 
+
+  // we select a curve and we make it fit an ellipsis?
+   for( int i = 0; i< contours.size(); i++ )
+    {
+      size_t count = contours[i].size();
+      if( count < 6 )
+	continue;
+      Mat pointsf;
+      Mat(contours[i]).convertTo(pointsf, CV_32F);
+      RotatedRect box = fitEllipse(pointsf);
+      
+      ellipse(drawing, box, Scalar(0,0,255), 1, LINE_AA);
+      
+      } 
+
+
+   // ok so now the user picks up the 3.125 tool.
+
+   
   imshow( "Contours", drawing );
+
+
   // imshow( "test", src);
   while(key != 'q' && key != 'Q')
     {
       key = (char)waitKey(-1);
     }
+
+
+ 
+
   
   return 0;
 }
