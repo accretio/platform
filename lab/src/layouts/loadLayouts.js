@@ -11,7 +11,7 @@ import { RV14_left, RV14_center, RV14_right } from './../aircraft/RV14.js';
 import { RV10 } from './../aircraft/RV10.js';
 import { RV8 } from './../aircraft/RV8.js';
 
-
+import { Commander114TC } from './../aircraft/Commander114TC.js'; 
 
 var layouts = [
 
@@ -49,6 +49,10 @@ var layouts = [
     
     { name: "RV14_Right_Panel",
       dxf: RV14_right,
+      breakpoints: [] },
+
+    { name: "Commander 114B/TC",
+      dxf: Commander114TC,
       breakpoints: [] }
     
 ];
@@ -63,7 +67,9 @@ function loadLayouts(ESClient) {
 		    index: layoutIndex,
 		    type: layoutType,
 		    body: layout
-	   }) 
+	    }).then(function(body){
+		console.log(body)
+	    })
 	}
 	
 	ESClient.search({
