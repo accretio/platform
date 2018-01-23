@@ -42,7 +42,7 @@ export default class LandingPage extends React.Component {
 
 	    <h1 className="display-4">Where are you having lunch today?</h1>
 
-	    <p className="lead">Position your avionics on a mock panel. Receive a plywood prototype. Order the final cut to your exact specifications.</p>
+	    <p className="lead">Locate on-airfield restaurants within reach. Read reviews. Go fly!</p>
 
 	    <hr className="my-4" />
             

@@ -28,7 +28,8 @@ import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
 import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType } from './store/es.js';
-import { loadLayouts } from './layouts/loadLayouts.js';
+import { loadAirfields } from './store/loadAirfields.js';
+
 
 var config = require('./config');
 
@@ -370,9 +371,9 @@ app.get('*', (req, res) => {
 });
 
 
-// load all the layouts
+// load all the airfields
 
-loadLayouts(ESClient);
+loadAirfields(ESClient);
 
 // start the server
 server.listen(port, err => {
