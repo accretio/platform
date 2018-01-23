@@ -27,7 +27,7 @@ import elasticsearch from 'elasticsearch';
 import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
-import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType } from './store/es.js';
+import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType } from './store/es.js';
 import { loadLayouts } from './layouts/loadLayouts.js';
 
 var config = require('./config');
@@ -56,6 +56,46 @@ app.set('views', path.join(__dirname, 'views'));
 // define the folder that will be used for static assets
 app.use(Express.static(path.join(__dirname, 'static')));
 app.use(bodyParser.json({ type: 'application/json' }));
+
+
+
+// new api methods for GA lunches
+
+/* this methods inserts the suggestion in the destination db
+   but doesn't make it available for search yet. it also triggers
+   a notification to the admin for manual review */
+
+app.post('/api/saveSuggestion', function(req, res){
+
+    console.log("saving suggestion " + req)
+
+    var destination = {	
+	status: "submitted",
+	airfield: req.airfield,
+	type: "restaurant",
+	reviewers: [
+	    {
+		email: req.reviewerEmail,
+		review: req.review
+	    }
+	],
+	name: req.restaurantName	
+    }
+    
+    ESClient.index({
+	index: destinationIndex,
+	type: destinationType,
+	body: destination
+    }).then(function (body) {
+	    res.status(200);
+            res.json({ id: body._id });
+	}, function (error) {
+            console.log(error);
+            res.status(500);
+            res.send(error.message);
+    });
+   
+})
 
 // api methods
 

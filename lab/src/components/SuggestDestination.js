@@ -6,32 +6,118 @@ import fetch from 'isomorphic-fetch';
 
 import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
-import { savePanel } from './../apiClient.js';
+import { saveSuggestion } from './../apiClient.js';
+
+import Modal from 'react-modal';
 
 export default class SuggestDestination extends React.Component {
+
+    constructor(props) {
+	super(props);
+	this.state = {  thankYou: false };
+    }
 
     componentDidMount() {
         this.context.mixpanel.track('suggest destination page loaded');
     }
 
+    quit() {
+	this.context.history.push("/");
+    }
+
+    reset() {
+	this.airfieldInput.value="";
+	this.restaurantNameInput.value="";
+	this.reviewInput.value="";
+	this.reviewerEmailInput.value="";
+	this.setState({ thankYou: false });
+    }
+    
     suggestRestaurant() {
 
+	var t = this
 	var airfield = this.airfieldInput.value;
 	var restaurantName = this.restaurantNameInput.value;
 	var review = this.reviewInput.value;
 	var reviewerEmail = this.reviewerEmailInput.value
 
-	alert(airfield + " " + restaurantName + " " + review + " " + reviewerEmail);
+	var suggestion = {
+	    airfield: airfield,
+	    restaurantName: restaurantName,
+	    review: review,
+	    reviewerEmail: reviewerEmail
+	}
+
+	console.log("suggestion is " + suggestion)
 	
+	saveSuggestion(suggestion).then(function(response) {
+	    t.setState({ thankYou: true }); 
+	}, function(error) {
+	    t.context.mixpanel.track('error in suggestion page', { 'error': error });
+	    alert("Sorry, something went wrong");
+	})
+
     }
 
     render() {
 
 	var t = this;
+
+	 const thankYouModalCustomStyles = {
+            overlay : {
+                position          : 'fixed',
+                top               : 0,
+                left              : 0,
+                right             : 0,
+                bottom            : 0,
+                backgroundColor   : 'rgba(255, 255, 255, 0.75)'
+            },
+            content : {
+                position                   : 'absolute',
+                top                        : '40px',
+                left                       : '40px',
+                right                      : '40px',
+                bottom                     : '40px',
+                border                     : 'none',
+                background                 : '',
+                overflow                   : 'auto',
+                WebkitOverflowScrolling    : 'touch',
+                borderRadius               : '4px',
+                outline                    : 'none',
+                padding                    : '20px'
+
+            }
+           } ;
+	let thankYouModal =
+            <Modal isOpen={this.state.thankYou}
+	className=""
+	style={thankYouModalCustomStyles}
+        contentLabel="Thank You">
+
+            <div className="modal-dialog" role="document">
+            <div className="modal-content">
+            <div className="modal-header">
+            <h5 className="modal-title">Thank you</h5>
+           
+             </div>
+            <div className="modal-body">
+            <p>Your suggestion will be reviewed shortly. Would you like to make another one?</p>
+            </div>
+            <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.quit.bind(this)}>No</button>
+	    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.reset.bind(this)}>Yes</button>
+      
+	</div>
+            </div>
+            </div>
+
+            </Modal> ;
+
 	
+       
     return (
         <div className="suggest-destination-page">
-
+	{ thankYouModal }
 	<div className="container">
 
 	    <div className="title row text-center">
@@ -40,7 +126,7 @@ export default class SuggestDestination extends React.Component {
 	    </div>
 	    </div>
 	    
-	<form>
+	<div>
 
 	    <div className="form-group row">
 	    <label htmlFor="airfield-input" className="col-2 col-form-label">Airfield identifier</label>
@@ -75,7 +161,7 @@ export default class SuggestDestination extends React.Component {
 	    <button type="submit" className="btn btn-primary" onClick={t.suggestRestaurant.bind(t)}>Submit</button>
 </div>
 	</div>
-	</form>
+	</div>
 	</div>
 	</div>
          

@@ -66,4 +66,23 @@ function listLayouts(query) {
     }))
 }
 
-export { getPanel, getLayout, savePanel, listLayouts };
+// new methods for GA Adventures
+
+function saveSuggestion(obj) {
+    return(fetch('/api/saveSuggestion', {
+        method: 'post',
+        headers: new Headers({
+	    'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(obj) 
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    alert("something went wrong")
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion };

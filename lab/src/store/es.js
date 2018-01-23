@@ -12,6 +12,12 @@ var panelType = "panel";
 var layoutIndex = "layouts";
 var layoutType = "layout"; 
 
+var destinationIndex = "destinations";
+var destinationType = "destination";
+
+var airfieldIndex = "airfields";
+var airfieldType = "airfield";
+
 module.exports = {
-    recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType
+    recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType
 }
