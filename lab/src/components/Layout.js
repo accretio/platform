@@ -48,15 +48,52 @@ export default class Layout extends React.Component {
 	    window.location.href = ("mailto:william@accret.io?subject="+subject);
 	}
     }
+
+    addDestination() {
+	this.context.history.push("/suggestDestination")
+    }
     
     render() {
 
+	var t = this;
 	var child =
 	    React.cloneElement(this.props.children, { messageTeam: this.messageTeam.bind(this) }) ;
 
+	var suggestDestinationBtn = null;
+	console.log(this.props.location);
+
+	if (this.props.location.pathname != "/suggestDestination") {
+		suggestDestinationBtn = <a className="btn btn-primary" href="#" role="button"
+		onClick={t.addDestination.bind(t)}>Suggest a restaurant</a>
+	}
+
 	return (
+	    	<div id="wrapper" className="wrapper">
+		<nav className="navbar navbar-toggleable-md navbar-light fixed-top bg-faded" >
+		<button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span className="navbar-toggler-icon"></span>
+		</button>
+		<a className="navbar-brand" href="/">General Aviation Lunches</a>
+		<div className="collapse navbar-collapse" id="navbarNav">
+		<div className="navbar-nav">
+
+	    { suggestDestinationBtn }
+	     
+	 
+              	  
+	    </div>
+		</div>
+		</nav>
+	
 		<div className="app-content">{child}</div>
+		</div>
 	);
     }
 
+}
+
+Layout.contextTypes = {
+    history: React.PropTypes.shape({
+	push: React.PropTypes.func.isRequired
+    })
 }

@@ -8,11 +8,14 @@ import LandingPage from './components/LandingPage';
 import PanelEditor from './components/PanelEditor';
 import NotFoundPage from './components/NotFoundPage';
 import SelectLayout from './components/SelectLayout';
+import SuggestDestination from './components/SuggestDestination';
+
 
 const routes = (
 	<Route path="/" component={Layout}>
 
-        	<IndexRoute component={LandingPage}/>
+        <IndexRoute component={LandingPage}/>
+	<Route path="/suggestDestination" component={SuggestDestination} />
 	        <Route path="/layout" component={SelectLayout} />
 	        <Route path="/panel/:id" component={PanelEditor} />
         	<Route path="*" component={NotFoundPage}/>
