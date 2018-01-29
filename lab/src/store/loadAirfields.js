@@ -1,4 +1,6 @@
 var csv = require('fast-csv');
+var request = require('request');
+
 import * as fs from 'fs';
 
 import { airfieldIndex, airfieldType } from '../store/es.js'
@@ -10,45 +12,54 @@ import { airfieldIndex, airfieldType } from '../store/es.js'
 // so we have no idea if the writes actually succeded
 
 function loadAirfields(ESClient) {
-    console.log("loading all airfields in ES");
 
-    // TODO: move that file out
-    var stream = fs.createReadStream("/Users/wleferrand/Downloads/airports.csv");
-    var c = 10
-    var csvStream = csv()
-	.on("data", function(data){
-	    c = c - 1
+    try {
+	console.log("loading all airfields in ES");
+		
+	request('http://ourairports.com/data/airports.csv').pipe(fs.createWriteStream('/tmp/airports.csv')).on('finish', function () {
 	    
-	var airport = {
-	    id: data[0],
-	    identifier: data[1],
-	    name: data[3],
-	    suggest: {
-		input: data[3],
-		weight: 1
-	    },
-	    location: { 
-         	lat: data[4],
-		lon: data[5]
-	    }
-	}
+	    var stream = fs.createReadStream("/tmp/airports.csv");
+	    
+	    var csvStream = csv()
+		.transform(function(data, next){
+		    var airport = {
+			id: data[0],
+			identifier: data[1],
+			name: data[3],
+			suggest: {
+			    input: data[3],
+			    weight: 1
+			},
+			location: { 
+         		    lat: data[4],
+			    lon: data[5]
+			}
+		    }
+		    if (airport.id == 'id') {
+			next()
+		    } else {
+			ESClient.index({
+			    index: airfieldIndex,
+			    type: airfieldType,
+			    id : airport.id,
+			    body: airport
+			}).then(function(){
+			    next()
+			})
+		    }
+		    
+		})
+		.on("end", function(){
+		    console.log("all airfields are loaded");
+		});
+	    
+	    stream.pipe(csvStream);
+	    
+	})
 
-	    if (c > 0) {
-		ESClient.index({
-            index: airfieldIndex,
-            type: airfieldType,
-	    id : airport.id,
-            body: airport
-	})	
-		console.log(airport);
-	    }
-    })
-	.on("end", function(){
-            console.log("all airfields are loaded");
-	});
-    
-    stream.pipe(csvStream);
-
+    } catch(err) {
+	console.error(err)
+    }
 }
 
 

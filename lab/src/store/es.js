@@ -15,7 +15,7 @@ var layoutType = "layout";
 var destinationIndex = "destinations";
 var destinationType = "destination";
 
-var airfieldIndex = "airfields";
+var airfieldIndex = "airfields28";
 var airfieldType = "airfield";
 
 module.exports = {

@@ -73,6 +73,7 @@ app.post('/api/saveSuggestion', function(req, res){
     var destination = {	
 	status: "submitted",
 	airfield: req.airfield,
+	airfield_name: req.airfield_name, // a bit useless
 	type: "restaurant",
 	reviewers: [
 	    {
@@ -436,14 +437,6 @@ function createAirfieldIndex() {
     }).then(function (body) {
 	console.log("we can load all airfields")
 	loadAirfields(ESClient);
-	ESClient.indices.getMapping({index: airfieldIndex }, function(error, response) {
-	    if (error) {
-		console.log(error);
-	    } else {
-		console.log(response);
-		console.log(response.airfields.mappings.airfield);
-	    }
-	});
     }, function (error) {
 	console.log(error)
 	console.trace(error.message);

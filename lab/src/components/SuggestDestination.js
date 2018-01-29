@@ -20,6 +20,7 @@ export default class SuggestDestination extends React.Component {
 	super(props);
 	this.state = {
 	    thankYou: false,
+	    error: null,
 	    allowNew: false,
 	    isLoading: false,
 	    multiple: false,
@@ -35,20 +36,44 @@ export default class SuggestDestination extends React.Component {
 	this.context.history.push("/");
     }
 
+    resetError() {
+	this.setState({ thankYou: false, error: null });
+    }
+    
     reset() {
-	this.airfieldInput.value="";
+
 	this.restaurantNameInput.value="";
 	this.reviewInput.value="";
 	this.reviewerEmailInput.value="";
-	this.setState({ thankYou: false });
+	this.setState({ thankYou: false, error: null,  });
     }
     
     suggestRestaurant() {
 
 	var t = this
-	var airfield = this.airfieldInput.value;
+
+	if (this.state.airfield == null) {
+	    this.setState({ error: 'Please select an airfield' });
+	    return;
+	}
+	
+	var airfield = this.state.airfield.id
+	var airfield_name = this.state.airfield.name
+
 	var restaurantName = this.restaurantNameInput.value;
+
+	if (restaurantName == '') {
+	    this.setState({ error: 'Please enter the name of the restaurant' })
+	    return;
+	}
+	
 	var review = this.reviewInput.value;
+
+	if (review == '') {
+	    this.setState({ error: 'Please enter a review' })
+	    return; 
+	}
+	
 	var reviewerEmail = this.reviewerEmailInput.value
 
 	var suggestion = {
@@ -82,11 +107,18 @@ export default class SuggestDestination extends React.Component {
 	})
     }
 
+    _handleChange(e) {
+	console.log(e);
+	this.setState({
+	    airfield: e[0]
+	})
+    }
+    
     render() {
 
 	var t = this;
 
-	 const thankYouModalCustomStyles = {
+	 const modalCustomStyles = {
             overlay : {
                 position          : 'fixed',
                 top               : 0,
@@ -115,7 +147,7 @@ export default class SuggestDestination extends React.Component {
 	let thankYouModal =
             <Modal isOpen={this.state.thankYou}
 	className=""
-	style={thankYouModalCustomStyles}
+	style={modalCustomStyles}
         contentLabel="Thank You">
 
             <div className="modal-dialog" role="document">
@@ -137,17 +169,44 @@ export default class SuggestDestination extends React.Component {
 
         </Modal> ;
 
+		let errorModal =
+            <Modal isOpen={this.state.error != null }
+	className=""
+	style={modalCustomStyles}
+        contentLabel="Thank You">
+
+            <div className="modal-dialog" role="document">
+            <div className="modal-content">
+            <div className="modal-header">
+            <h5 className="modal-title">Error</h5>
+           
+             </div>
+            <div className="modal-body">
+            <p>{ this.state.error } </p>
+            </div>
+            <div className="modal-footer">
+         
+	    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.resetError.bind(this)}>Ok</button>
+      
+	</div>
+            </div>
+            </div>
+
+        </Modal> ;
+
 	let airfieldTypeahead = <AsyncTypeahead
 	labelKey="name"
 	isLoading={this.state.isLoading}
 	onSearch={this.searchAirfields.bind(this)}
 	options={this.state.options}
+	onChange={this._handleChange.bind(this)}
 />;
 	
        
     return (
         <div className="suggest-destination-page">
 	{ thankYouModal }
+	{ errorModal }
 	<div className="container">
 
 	    <div className="title row text-center">
@@ -158,11 +217,11 @@ export default class SuggestDestination extends React.Component {
 	    
 	<div>
 
-	{	airfieldTypeahead }
-	    <div className="form-group row">
+    <div className="form-group row">
 	    <label htmlFor="airfield-input" className="col-2 col-form-label">Airfield identifier</label>
 	    <div className="col-10">
-	    <input className="form-control" type="text" id="airfield-input" ref={el => this.airfieldInput = el} />
+	    	{ airfieldTypeahead }
+	
 	    </div>
 	    </div>
 	    
