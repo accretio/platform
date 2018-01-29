@@ -4,9 +4,13 @@ import React, { PropTypes} from 'react';
 import { Link } from 'react-router';
 import fetch from 'isomorphic-fetch';
 
+import {asyncContainer, Typeahead} from 'react-bootstrap-typeahead';
+
+const AsyncTypeahead = asyncContainer(Typeahead);
+
 import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
-import { saveSuggestion } from './../apiClient.js';
+import { saveSuggestion, autocompleteAirfields } from './../apiClient.js';
 
 import Modal from 'react-modal';
 
@@ -14,7 +18,13 @@ export default class SuggestDestination extends React.Component {
 
     constructor(props) {
 	super(props);
-	this.state = {  thankYou: false };
+	this.state = {
+	    thankYou: false,
+	    allowNew: false,
+	    isLoading: false,
+	    multiple: false,
+	    options: [],
+	};
     }
 
     componentDidMount() {
@@ -59,6 +69,19 @@ export default class SuggestDestination extends React.Component {
 
     }
 
+    searchAirfields(query) {
+	var t = this
+	this.setState({isLoading: true});
+   
+	console.log("running typeahead search for query " + query)
+	autocompleteAirfields(query).then(function(hits) {
+	    t.setState({
+		isLoading: false,
+		options: hits,
+	    })
+	})
+    }
+
     render() {
 
 	var t = this;
@@ -87,7 +110,8 @@ export default class SuggestDestination extends React.Component {
                 padding                    : '20px'
 
             }
-           } ;
+         } ;
+	
 	let thankYouModal =
             <Modal isOpen={this.state.thankYou}
 	className=""
@@ -111,8 +135,14 @@ export default class SuggestDestination extends React.Component {
             </div>
             </div>
 
-            </Modal> ;
+        </Modal> ;
 
+	let airfieldTypeahead = <AsyncTypeahead
+	labelKey="name"
+	isLoading={this.state.isLoading}
+	onSearch={this.searchAirfields.bind(this)}
+	options={this.state.options}
+/>;
 	
        
     return (
@@ -128,6 +158,7 @@ export default class SuggestDestination extends React.Component {
 	    
 	<div>
 
+	{	airfieldTypeahead }
 	    <div className="form-group row">
 	    <label htmlFor="airfield-input" className="col-2 col-form-label">Airfield identifier</label>
 	    <div className="col-10">

@@ -27,7 +27,7 @@ import elasticsearch from 'elasticsearch';
 import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
-import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType } from './store/es.js';
+import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType } from './store/es.js';
 import { loadAirfields } from './store/loadAirfields.js';
 
 
@@ -44,7 +44,7 @@ AWS.config.credentials = credentials;
 // initialize the ES client
 const ESClient = new elasticsearch.Client({
     host: `${elasticsearch_endpoint}:9200`,
-    log: 'info',
+    log: 'trace',
     httpAuth: 'elastic:changeme'
 });
 
@@ -164,6 +164,7 @@ app.post('/api/listLayouts', function(req, res){
         res.send(error.message);
     });
 })
+
 
 // Old API methods
 
@@ -336,6 +337,38 @@ app.post('/api/admin/search', function(req, res){
 });
 
 
+app.get('/api/autocompleteAirfields', function(req, res){
+    console.log("autocomplete request for " + req.query.prefix)
+    ESClient.search(
+	{
+	    index: airfieldIndex,
+
+	    
+	    body: {
+		"suggest": {
+		    "airfields" : {
+			"prefix" : req.query.prefix, 
+			"completion" : { 
+			    "field" : "suggest" 
+			}
+		    }
+		}
+	    }
+	}
+    ).then(function (body) {
+	res.status(200)
+	res.json(body.suggest.airfields[0].options.map(function(res) {
+	    return { name: res._source.name, id: res._id }
+
+	}))
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    }); 
+    
+})
+
 // universal routing and rendering
 
 app.get('*', (req, res) => {
@@ -371,9 +404,52 @@ app.get('*', (req, res) => {
 });
 
 
-// load all the airfields
+// load all the airfields & add the mapping
 
-loadAirfields(ESClient);
+
+
+ESClient.indices.exists({
+    index: airfieldIndex
+}).then(function(body){
+    if (!body) {
+	createAirfieldIndex()
+    } 
+})
+
+function createAirfieldIndex() {
+    ESClient.indices.create({
+	index: airfieldIndex,
+	body: {
+	    mappings: {
+		airfield: {
+		    properties : {
+			id: { "type": "text" },
+			identifier: { "type": "text" },
+  			location: { "type": "geo_point" },
+			name : { "type": "text" },
+			suggest : { "type" : "completion" },
+		    }
+		}
+		
+	    }
+	} 
+    }).then(function (body) {
+	console.log("we can load all airfields")
+	loadAirfields(ESClient);
+	ESClient.indices.getMapping({index: airfieldIndex }, function(error, response) {
+	    if (error) {
+		console.log(error);
+	    } else {
+		console.log(response);
+		console.log(response.airfields.mappings.airfield);
+	    }
+	});
+    }, function (error) {
+	console.log(error)
+	console.trace(error.message);
+    });
+    
+}
 
 // start the server
 server.listen(port, err => {

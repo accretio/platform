@@ -85,4 +85,18 @@ function saveSuggestion(obj) {
     }))
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion };
+function autocompleteAirfields(query) {
+    return(fetch('/api/autocompleteAirfields?prefix=' + encodeURIComponent(query), {
+	method: 'get'
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    alert("something went wrong")
+	    throw new Exception("something went wrong")
+	}
+    }))
+
+}
+
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields };
