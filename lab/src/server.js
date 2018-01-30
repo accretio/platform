@@ -70,19 +70,33 @@ app.post('/api/saveSuggestion', function(req, res){
 
     console.log("saving suggestion " + req)
 
+ ESClient.get({
+	index: airfieldIndex,
+        type: airfieldType,
+	id: req.body.airfield
+    }).then(function(doc) {
+	console.log(doc)
+
+	var location = doc._source.location
+
+    
     var destination = {	
 	status: "submitted",
-	airfield: req.airfield,
-	airfield_name: req.airfield_name, // a bit useless
+	airfield: req.body.airfield,
+	airfield_name: req.body.airfield_name, // a bit useless, used for redundancy in case the ids are reshuffled in the csv
+	airfield_location: location, // needed for the search
 	type: "restaurant",
+	opinion: "", 
 	reviewers: [
 	    {
-		email: req.reviewerEmail,
-		review: req.review
+		email: req.body.reviewerEmail,
+		review: req.body.review
 	    }
 	],
-	name: req.restaurantName	
+	name: req.body.restaurantName	
     }
+
+    console.log(destination)
     
     ESClient.index({
 	index: destinationIndex,
@@ -95,7 +109,104 @@ app.post('/api/saveSuggestion', function(req, res){
             console.log(error);
             res.status(500);
             res.send(error.message);
+	});
+
+    }, function(error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    })
+   
+})
+
+app.post('/api/updateDestination', function(req, res) {
+
+    ESClient.update({
+	index: destinationIndex,
+	type: destinationType,
+	id: req.body.id,
+	body: {
+	    doc: req.body.doc 
+	}
+    }).then(function (body) {
+	res.status(200);
+        res.json({ id: body._id });
+    }, function (error) {
+            console.log(error);
+            res.status(500);
+        res.send(error.message);
+    })
+   
+})
+
+app.get('/api/getAllDestinations', function(req, res){
+
+    ESClient.search({
+	index: destinationIndex,
+        type: destinationType,
+	body: {
+	    query: {
+		match_all: {}
+	    }
+	}
+    }).then(function (body) {
+        res.status(200)
+	res.json(body.hits.hits.map(function(hit) { return { id: hit._id, result: hit._source } }))
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
     });
+
+})
+
+
+app.get('/api/runSearchAroundAirfield', function(req, res){
+    console.log("running search around " + req.query.id)
+    ESClient.get({
+	index: airfieldIndex,
+        type: airfieldType,
+	id: req.query.id
+    }).then(function(doc) {
+	console.log(doc)
+
+	var location = doc._source.location
+
+	ESClient.search({
+	    index: destinationIndex,
+            type: destinationType,
+	    body: {
+		query: {
+		    match_all: {}
+		},
+		sort: [
+		    {
+			"_geo_distance": {
+			    "airfield_location": location,
+			    "order":         "asc",
+			    "unit":          "km", 
+			    "distance_type": "plane" 
+			}
+		    }
+		]
+	    }
+
+	}).then(function(body) {
+	    res.status(200)
+	    res.json(body.hits.hits.map(function(hit) { return { id: hit._id, result: hit._source } }))
+ 
+	}, function(error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+	})
+	
+    }, function(error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    })
+	
    
 })
 
@@ -417,6 +528,17 @@ ESClient.indices.exists({
     } 
 })
 
+
+
+
+ESClient.indices.exists({
+    index: destinationIndex
+}).then(function(body){
+    if (!body) {
+	createDestinationIndex()
+    } 
+})
+
 function createAirfieldIndex() {
     ESClient.indices.create({
 	index: airfieldIndex,
@@ -437,6 +559,47 @@ function createAirfieldIndex() {
     }).then(function (body) {
 	console.log("we can load all airfields")
 	loadAirfields(ESClient);
+    }, function (error) {
+	console.log(error)
+	console.trace(error.message);
+    });
+    
+}
+
+
+function createDestinationIndex() {
+    ESClient.indices.create({
+	index: destinationIndex,
+	body: {
+	    mappings: {
+		destination12: {
+		    properties : {
+			
+			status: { type: "text" },
+			"airfield": { type: "text" },
+			"airfield_name": { type: "text" },
+			"airfield_location": { type: "geo_point" },
+			
+			"type": { type: "text" },
+			"opinion": { type: "text" },
+			"reviewers" : {
+			    properties: {
+				email: { type: "text" },
+				review: { type: "text" }
+			    }
+
+			},
+
+			
+			"name": { type: "text" }
+		    }
+		    
+		}
+		
+	    }
+	} 
+    }).then(function (body) {
+	
     }, function (error) {
 	console.log(error)
 	console.trace(error.message);

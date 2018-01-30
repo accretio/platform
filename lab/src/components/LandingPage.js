@@ -6,9 +6,26 @@ import fetch from 'isomorphic-fetch';
 
 import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
-import { savePanel } from './../apiClient.js';
+import { autocompleteAirfields, runSearchAroundAirfield } from './../apiClient.js';
+
+import {asyncContainer, Typeahead} from 'react-bootstrap-typeahead';
+
+const AsyncTypeahead = asyncContainer(Typeahead);
+
 
 export default class LandingPage extends React.Component {
+
+
+    
+    constructor(props) {
+	super(props);
+	this.state = {
+	    allowNew: false,
+	    isLoading: false,
+	    multiple: false,
+	    options: [],
+	};
+    }
 
     componentDidMount() {
         this.context.mixpanel.track('landing page loaded');
@@ -30,37 +47,78 @@ export default class LandingPage extends React.Component {
     runSearchAroundHomebase() {
 	var homebase = this.homebaseInput.value; 
     }
+
+
+     searchAirfields(query) {
+	var t = this
+	this.setState({isLoading: true});
+   
+	console.log("running typeahead search for query " + query)
+	autocompleteAirfields(query).then(function(hits) {
+	    t.setState({
+		isLoading: false,
+		options: hits,
+	    })
+	})
+     }
+    
+    _handleChange(e) {
+	var t = this
+	runSearchAroundAirfield(e[0].id).then(function(results) {
+	    this.setState({ results: results });
+	})
+    }
     
     render() {
 
 	var t = this;
-	
-    return (
-        <div className="landing-page">
 
-            <div className="jumbotron">
+		let airfieldTypeahead = <AsyncTypeahead
+	labelKey="name"
+	isLoading={this.state.isLoading}
+	onSearch={this.searchAirfields.bind(this)}
+	options={this.state.options}
+	onChange={this._handleChange.bind(this)}
+/>;
 
-	    <h1 className="display-4">Where are you having lunch today?</h1>
+    var searchBox =  <div className="search-box row">
+              <div className="col-auto label">
+ 	        <label className="" htmlFor="inlineFormInputName2">Where are you based?</label>
+	      </div>
+	    <div className="col-3">
+	    { airfieldTypeahead }
+	      </div>
+	    
+	      <div className="col-3">
+	       <button type="submit" className="btn btn-primary mb-2">Search</button>
+	     </div>
+
+            </div> ; 
+
+	var header;
+
+	if (this.state.options.length ==0) {
+		header = <div><h1 className="display-4">Where are you having lunch today?</h1>
 
 	    <p className="lead">Locate on-airfield restaurants within reach. Read reviews. Go fly!</p>
 
 	    <hr className="my-4" />
-            
-            <p className="lead">
-
-	     <span className="search-homebase">
-	    <input type="text" value={this.context.cookies.get('homebase')} ref={el => this.homebaseInput = el} className="homebase" />
-	    <a className="btn btn-primary btn-lg" href="#" role="button"
-	       onClick={t.runSearchAroundHomebase.bind(t)}>Search</a>
-	    </span>
+		</div>;
+	}
 	
-	    </p>
-
-       </div>
+	return (
+		<div className="landing-page">
+		
+		<div className="jumbotron">
+		{ header }
+	        { searchBox }
+            </div>
+		
      </div>
          
      
     );
+
   }
 }
 

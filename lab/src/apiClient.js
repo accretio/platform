@@ -85,6 +85,19 @@ function saveSuggestion(obj) {
     }))
 }
 
+function getAllDestinations() {
+    return(fetch('/api/getAllDestinations', {
+	method: 'get'
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    alert("something went wrong")
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
 function autocompleteAirfields(query) {
     return(fetch('/api/autocompleteAirfields?prefix=' + encodeURIComponent(query), {
 	method: 'get'
@@ -99,4 +112,36 @@ function autocompleteAirfields(query) {
 
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields };
+function updateDestination(id, doc) {
+    return(fetch('/api/updateDestination', {
+        method: 'post',
+        headers: new Headers({
+	    'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({id: id, doc: doc}) 
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    alert("something went wrong")
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
+function runSearchAroundAirfield(id) {
+    console.log(id);
+  return(fetch('/api/runSearchAroundAirfield?id=' + encodeURIComponent(id), {
+	method: 'get'
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    alert("something went wrong")
+	    throw new Exception("something went wrong")
+	}
+    }))
+
+}
+
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield };

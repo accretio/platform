@@ -2,7 +2,8 @@
 
     .jumbotron {
 	margin: 40px 40px;
-	
+
+
     }
 
     .lead {
@@ -35,6 +36,13 @@
 	    }
 	}
 	
+    }
+
+    .search-box {
+	padding-left: 15px;
+	.label {
+	    line-height: 36px;
+	}
     }
     
 }

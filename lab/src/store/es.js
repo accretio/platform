@@ -12,10 +12,10 @@ var panelType = "panel";
 var layoutIndex = "layouts";
 var layoutType = "layout"; 
 
-var destinationIndex = "destinations";
-var destinationType = "destination";
+var destinationIndex = "destinations12";
+var destinationType = "destination12";
 
-var airfieldIndex = "airfields28";
+var airfieldIndex = "airfields";
 var airfieldType = "airfield";
 
 module.exports = {

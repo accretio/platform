@@ -78,6 +78,7 @@ export default class SuggestDestination extends React.Component {
 
 	var suggestion = {
 	    airfield: airfield,
+	    airfield_name: airfield_name,
 	    restaurantName: restaurantName,
 	    review: review,
 	    reviewerEmail: reviewerEmail
