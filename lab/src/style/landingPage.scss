@@ -2,47 +2,13 @@
 
     .jumbotron {
 	margin: 40px 40px;
-
-
-    }
-
-    .lead {
-
-	.form-control {
-	    width: 40px;
-	}
-
-	span.get-started {
-	    padding-right: 20px;
-	}
-
-	span.separator {
-	    padding: 12px 5px 15px 0px;
-	    font-size: 1.25rem;
-	    
-	    border-right: 1px solid rgba(0,0,0,.1);
-	    margin-right: 10px;
-	}
-	
-	span {
-	    input.panel-id {
-		width: 300px;
-		height: 51px;
-		margin-right: 10px;
-		border: 1px solid rgba(0,0,0,.1);
-		border-radius: .25rem;
-		line-height: 1.25;
-		padding: 0 5px 1px;
-	    }
-	}
-	
-    }
-
-    .search-box {
-	padding-left: 15px;
-	.label {
-	    line-height: 36px;
-	}
+	padding: 30px 30px!important;
     }
     
+    .card-columns {
+	padding: 0 40px;
+	orphans: 1 !important;
+	widows:1 !important;
+    }
+
 }

@@ -14,8 +14,6 @@ const AsyncTypeahead = asyncContainer(Typeahead);
 
 
 export default class LandingPage extends React.Component {
-
-
     
     constructor(props) {
 	super(props);
@@ -24,11 +22,14 @@ export default class LandingPage extends React.Component {
 	    isLoading: false,
 	    multiple: false,
 	    options: [],
+	    results: [],
+	    fullJumbotron: true
 	};
     }
 
     componentDidMount() {
         this.context.mixpanel.track('landing page loaded');
+	 window.scrollTo(0, 0)
     }
 
     gotoPanel(id) {
@@ -65,7 +66,7 @@ export default class LandingPage extends React.Component {
     _handleChange(e) {
 	var t = this
 	runSearchAroundAirfield(e[0].id).then(function(results) {
-	    this.setState({ results: results });
+	    t.setState({ fullJumbotron: false, results: results });
 	})
     }
     
@@ -78,26 +79,22 @@ export default class LandingPage extends React.Component {
 	isLoading={this.state.isLoading}
 	onSearch={this.searchAirfields.bind(this)}
 	options={this.state.options}
+	placeholder="Your homebase?"
 	onChange={this._handleChange.bind(this)}
 />;
 
     var searchBox =  <div className="search-box row">
-              <div className="col-auto label">
- 	        <label className="" htmlFor="inlineFormInputName2">Where are you based?</label>
-	      </div>
-	    <div className="col-3">
+             
+	    <div className="col">
 	    { airfieldTypeahead }
 	      </div>
 	    
-	      <div className="col-3">
-	       <button type="submit" className="btn btn-primary mb-2">Search</button>
-	     </div>
-
+	   
             </div> ; 
 
 	var header;
 
-	if (this.state.options.length ==0) {
+	if (this.state.fullJumbotron) {
 		header = <div><h1 className="display-4">Where are you having lunch today?</h1>
 
 	    <p className="lead">Locate on-airfield restaurants within reach. Read reviews. Go fly!</p>
@@ -105,6 +102,25 @@ export default class LandingPage extends React.Component {
 	    <hr className="my-4" />
 		</div>;
 	}
+
+
+	var results = this.state.results.map(function(r, i){
+	    var result = r.result
+	    console.log(result)
+	    return (<div className="card bg-light" key = { i }>
+		    <div className="card-header">
+		    { result.airfield_name }, { r.distance } miles away
+		    </div>
+  <div className="card-body">
+		    <h5 className="card-title"> { result.name } </h5>
+		    <p className="card-text">{ result.opinion } </p>
+
+		    </div>
+
+		   
+</div>);
+	    
+	})
 	
 	return (
 		<div className="landing-page">
@@ -113,6 +129,11 @@ export default class LandingPage extends React.Component {
 		{ header }
 	        { searchBox }
             </div>
+	
+	        <div className="card-columns">
+		{ results }
+	    </div>
+	
 		
      </div>
          

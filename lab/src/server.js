@@ -184,7 +184,7 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 			"_geo_distance": {
 			    "airfield_location": location,
 			    "order":         "asc",
-			    "unit":          "km", 
+			    "unit":          "nauticalmiles", 
 			    "distance_type": "plane" 
 			}
 		    }
@@ -193,7 +193,11 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 
 	}).then(function(body) {
 	    res.status(200)
-	    res.json(body.hits.hits.map(function(hit) { return { id: hit._id, result: hit._source } }))
+	    res.json(body.hits.hits.map(function(hit) { return {
+		id: hit._id,
+		result: hit._source,
+		distance: Math.round(hit.sort[0])
+	    } }))
  
 	}, function(error) {
         console.trace(error.message);

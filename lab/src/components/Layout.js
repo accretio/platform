@@ -60,33 +60,40 @@ export default class Layout extends React.Component {
 	    React.cloneElement(this.props.children, { messageTeam: this.messageTeam.bind(this) }) ;
 
 	var suggestDestinationBtn = null;
+	var togglerBtn = null; 
 	console.log(this.props.location);
 
 	if (this.props.location.pathname != "/suggestDestination") {
-		suggestDestinationBtn = <a className="btn btn-primary" href="#" role="button"
-		onClick={t.addDestination.bind(t)}>Suggest a restaurant</a>
+		suggestDestinationBtn =  <li className="nav-item">
+        <a className="nav-link" href="/suggestDestination">Suggest a restaurant</a>
+		</li>;
+	    togglerBtn = <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span className="navbar-toggler-icon"></span>
+		</button>;
 	}
 
 	return (
 	    	<div id="wrapper" className="wrapper">
-		<nav className="navbar navbar-toggleable-md navbar-light fixed-top bg-faded" >
-		<button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-		<span className="navbar-toggler-icon"></span>
-		</button>
-		<a className="navbar-brand" href="/">General Aviation Lunches</a>
-		<div className="collapse navbar-collapse" id="navbarNav">
-		<div className="navbar-nav">
 
-	    { suggestDestinationBtn }
-	     
+		<nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
 	 
-              	  
+		       <a className="navbar-brand" href="/">GALunches</a>
+	         
+	    { togglerBtn }
+
+
+
+	     <div className="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul className="navbar-nav mr-auto">
+		{ suggestDestinationBtn }
+    </ul>
+
 	    </div>
-		</div>
-		</nav>
-	
+	        </nav>
+
 		<div className="app-content">{child}</div>
-		</div>
+		
+	        </div>
 	);
     }
 
