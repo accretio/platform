@@ -177,7 +177,7 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
             type: destinationType,
 	    body: {
 		query: {
-		    match_all: {}
+		    term : { status : "published" } 
 		},
 		sort: [
 		    {
