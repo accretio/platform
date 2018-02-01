@@ -85,6 +85,23 @@ function saveSuggestion(obj) {
     }))
 }
 
+function saveAirfield(obj) {
+    return(fetch('/api/saveAirfield', {
+        method: 'post',
+        headers: new Headers({
+	    'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(obj) 
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    alert("something went wrong")
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
 function getAllDestinations() {
     return(fetch('/api/getAllDestinations', {
 	method: 'get'
@@ -144,4 +161,4 @@ function runSearchAroundAirfield(id) {
 
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield };
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield };

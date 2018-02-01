@@ -8,6 +8,7 @@ import LandingPage from './components/LandingPage';
 import NotFoundPage from './components/NotFoundPage';
 import SuggestDestination from './components/SuggestDestination';
 import ReviewDestinations from './components/ReviewDestinations';
+import ManageAirfields from './components/ManageAirfields';
 
 
 const routes = (
@@ -16,6 +17,7 @@ const routes = (
         <IndexRoute component={LandingPage}/>
 	<Route path="/suggestDestination" component={SuggestDestination} />
 	<Route path="/reviewDestinations" component={ReviewDestinations} />
+	<Route path="/manageAirfields" component={ManageAirfields} />
 	<Route path="*" component={NotFoundPage}/>
 	
         </Route>

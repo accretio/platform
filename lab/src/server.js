@@ -119,6 +119,65 @@ app.post('/api/saveSuggestion', function(req, res){
    
 })
 
+
+
+app.post('/api/saveAirfield', function(req, res){
+
+    console.log("saving airfield " + req)
+
+    
+
+    
+ ESClient.search({
+     index: airfieldIndex,
+     type: airfieldType,
+     body: {
+	 query: {
+	     term : { identifier : req.body.identifier }
+	 },
+     }}).then(function(body) {
+
+	 if (body.hits.hits.length > 0) {
+	     console.log("there is already an airfield with identifier "  + req.body.identifier);
+	     res.status(500);
+             res.send("airfield already exists");
+	 } else {
+
+	     var airfield =
+		 {
+		     identifier: req.body.identifier,
+		     name: req.body.name,
+		     suggest: [ {
+			 input: req.body.identifier,
+			    weight: 1
+		     }, {
+			 input: req.body.name,
+			 weight: 1
+		     }],
+		     location: { 
+         		 lat: req.body.location.lat,
+			 lon: req.body.location.lon
+		     }
+		 }
+
+	     	ESClient.index({
+		    index: airfieldIndex,
+		    type: airfieldType,
+		    body: airfield
+		}).then(function(){
+		    res.status(200);
+		    res.json(airfield);
+		}, function(error) {
+		    console.trace(error.message);
+		    res.status(500);
+		    res.send(error.message);
+		})
+	 }
+
+     })
+	
+})
+
 app.post('/api/updateDestination', function(req, res) {
 
     ESClient.update({
