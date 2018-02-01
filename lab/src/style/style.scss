@@ -2,10 +2,13 @@
 @import "panelEditor.scss";
 @import "landingPage.scss"; 
 @import "selectLayout.scss";
+@import "suggestDestination.scss";
 
-$header-height: 56px;
+@import "reviewDestinations.scss"; 
 
-html, body, .main, .container {
+$header-height: 54px; 
+
+html, body, .main, .wrapper, .container {
     height: 100%; 
 }
 
@@ -14,7 +17,7 @@ body {
 
    // background-color: yellow;
 
-    .main {
+    .wrapper {
 	padding-top: $header-height;
 //	background-color: pink;
     }
