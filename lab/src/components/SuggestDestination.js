@@ -219,7 +219,7 @@ export default class SuggestDestination extends React.Component {
 	<div>
 
     <div className="form-group row">
-	    <label htmlFor="airfield-input" className="col-sm-2 col-form-label hidden-xs">Airfield identifier</label>
+	    <label htmlFor="airfield-input" className="col-sm-2 col-form-label hidden-xs">Airfield name</label>
 	    <div className="col-10">
 	    	{ airfieldTypeahead }
 	
@@ -227,7 +227,7 @@ export default class SuggestDestination extends React.Component {
 	    </div>
 	    
 	    <div className="form-group row">
-	    <label htmlFor="restaurant-name-input" className="col-sm-2 col-form-label hidden-xs">Name of the restaurant</label>
+	    <label htmlFor="restaurant-name-input" className="col-sm-2 col-form-label hidden-xs">Restaurant name</label>
 	    <div className="col-10">
 	    <input className="form-control" type="text" id="restaurant-name-input" ref={el => this.restaurantNameInput = el} />
 	    </div>

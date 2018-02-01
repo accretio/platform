@@ -42,6 +42,8 @@ if (typeof window == 'undefined') {
 	setDevConfig(config);
 	console.log("loading dev config, current value is " + config.bypass_https)
     }
+
+    config.max_distance = 300.0; 
     
 }
 
@@ -56,3 +58,4 @@ export const s3_bucket_name = config.s3_bucket_name;
 export const elasticsearch_endpoint = config.elasticsearch_endpoint;
 export const mixpanel_token = config.mixpanel_token ;
 export const bypass_https = config.bypass_https || false;
+export const max_distance = config.max_distance

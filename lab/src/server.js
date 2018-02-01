@@ -177,8 +177,19 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
             type: destinationType,
 	    body: {
 		query: {
-		    term : { status : "published" } 
+		    bool: {
+			"must" : {
+			    term : { status : "published" }
+			}, 
+			"filter" : {
+			    "geo_distance" : {
+				"distance" : config.max_distance+"mi",
+				"airfield_location" : location
+			    }
+			}
+		    }
 		},
+		
 		sort: [
 		    {
 			"_geo_distance": {
