@@ -485,7 +485,7 @@ app.get('/api/autocompleteAirfields', function(req, res){
     ).then(function (body) {
 	res.status(200)
 	res.json(body.suggest.airfields[0].options.map(function(res) {
-	    return { name: res._source.name, id: res._id }
+	    return { name: res._source.name + ' - ' + res._source.identifier, id: res._id }
 
 	}))
     }, function (error) {
@@ -587,7 +587,7 @@ function createDestinationIndex() {
 	index: destinationIndex,
 	body: {
 	    mappings: {
-		destination12: {
+		destination: {
 		    properties : {
 			
 			status: { type: "text" },

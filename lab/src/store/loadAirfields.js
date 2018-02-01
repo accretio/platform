@@ -26,10 +26,13 @@ function loadAirfields(ESClient) {
 			id: data[0],
 			identifier: data[1],
 			name: data[3],
-			suggest: {
+			suggest: [ {
 			    input: data[3],
 			    weight: 1
-			},
+			}, {
+			    input: data[1],
+			    weight: 1
+			}],
 			location: { 
          		    lat: data[4],
 			    lon: data[5]

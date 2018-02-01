@@ -65,9 +65,13 @@ export default class LandingPage extends React.Component {
     
     _handleChange(e) {
 	var t = this
-	runSearchAroundAirfield(e[0].id).then(function(results) {
-	    t.setState({ fullJumbotron: false, results: results });
-	})
+	if (e.length > 0) {
+	    runSearchAroundAirfield(e[0].id).then(function(results) {
+		t.setState({ fullJumbotron: false, results: results });
+	    })
+	} else {
+	    t.setState({ fullJumbotron: false, results: [] });
+	}
     }
     
     render() {

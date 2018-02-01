@@ -12,8 +12,8 @@ var panelType = "panel";
 var layoutIndex = "layouts";
 var layoutType = "layout"; 
 
-var destinationIndex = "destinations12";
-var destinationType = "destination12";
+var destinationIndex = "destinations";
+var destinationType = "destination";
 
 var airfieldIndex = "airfields";
 var airfieldType = "airfield";
