@@ -1,6 +1,8 @@
-# Lab
+# GA destinations
 
+This app collects and distributes ideas for local GA trips, starting
+with restaurants.
 
-## Requirements
+## Contact
 
-You need to create an ops/lab-secret.yml with the private/public SSL certificate
+william@accret.io

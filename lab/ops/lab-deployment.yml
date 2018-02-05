@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: lab
-        image:  gcr.io/accretio-180222/lab:$LAB_VERSION
+        image:  gcr.io/galunches-193923/lab:$LAB_VERSION
         imagePullPolicy: Always
         ports:
         - containerPort: 3000

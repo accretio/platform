@@ -27,8 +27,9 @@ import elasticsearch from 'elasticsearch';
 import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
-import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType } from './store/es.js';
-import { loadLayouts } from './layouts/loadLayouts.js';
+import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType } from './store/es.js';
+import { loadAirfields } from './store/loadAirfields.js';
+
 
 var config = require('./config');
 
@@ -43,7 +44,7 @@ AWS.config.credentials = credentials;
 // initialize the ES client
 const ESClient = new elasticsearch.Client({
     host: `${elasticsearch_endpoint}:9200`,
-    log: 'info',
+    log: 'trace',
     httpAuth: 'elastic:changeme'
 });
 
@@ -56,6 +57,232 @@ app.set('views', path.join(__dirname, 'views'));
 // define the folder that will be used for static assets
 app.use(Express.static(path.join(__dirname, 'static')));
 app.use(bodyParser.json({ type: 'application/json' }));
+
+
+
+// new api methods for GA lunches
+
+/* this methods inserts the suggestion in the destination db
+   but doesn't make it available for search yet. it also triggers
+   a notification to the admin for manual review */
+
+app.post('/api/saveSuggestion', function(req, res){
+
+    console.log("saving suggestion " + req)
+
+ ESClient.get({
+	index: airfieldIndex,
+        type: airfieldType,
+	id: req.body.airfield
+    }).then(function(doc) {
+	console.log(doc)
+
+	var location = doc._source.location
+
+    
+    var destination = {	
+	status: "submitted",
+	airfield: req.body.airfield,
+	airfield_name: req.body.airfield_name, // a bit useless, used for redundancy in case the ids are reshuffled in the csv
+	airfield_location: location, // needed for the search
+	type: "restaurant",
+	opinion: "", 
+	reviewers: [
+	    {
+		email: req.body.reviewerEmail,
+		review: req.body.review
+	    }
+	],
+	name: req.body.restaurantName	
+    }
+
+    console.log(destination)
+    
+    ESClient.index({
+	index: destinationIndex,
+	type: destinationType,
+	body: destination
+    }).then(function (body) {
+	    res.status(200);
+            res.json({ id: body._id });
+	}, function (error) {
+            console.log(error);
+            res.status(500);
+            res.send(error.message);
+	});
+
+    }, function(error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    })
+   
+})
+
+
+
+app.post('/api/saveAirfield', function(req, res){
+
+    console.log("saving airfield " + req)
+
+    
+
+    
+ ESClient.search({
+     index: airfieldIndex,
+     type: airfieldType,
+     body: {
+	 query: {
+	     term : { identifier : req.body.identifier }
+	 },
+     }}).then(function(body) {
+
+	 if (body.hits.hits.length > 0) {
+	     console.log("there is already an airfield with identifier "  + req.body.identifier);
+	     res.status(500);
+             res.send("airfield already exists");
+	 } else {
+
+	     var airfield =
+		 {
+		     identifier: req.body.identifier,
+		     name: req.body.name,
+		     suggest: [ {
+			 input: req.body.identifier,
+			    weight: 1
+		     }, {
+			 input: req.body.name,
+			 weight: 1
+		     }],
+		     location: { 
+         		 lat: req.body.location.lat,
+			 lon: req.body.location.lon
+		     }
+		 }
+
+	     	ESClient.index({
+		    index: airfieldIndex,
+		    type: airfieldType,
+		    body: airfield
+		}).then(function(){
+		    res.status(200);
+		    res.json(airfield);
+		}, function(error) {
+		    console.trace(error.message);
+		    res.status(500);
+		    res.send(error.message);
+		})
+	 }
+
+     })
+	
+})
+
+app.post('/api/updateDestination', function(req, res) {
+
+    ESClient.update({
+	index: destinationIndex,
+	type: destinationType,
+	id: req.body.id,
+	body: {
+	    doc: req.body.doc 
+	}
+    }).then(function (body) {
+	res.status(200);
+        res.json({ id: body._id });
+    }, function (error) {
+            console.log(error);
+            res.status(500);
+        res.send(error.message);
+    })
+   
+})
+
+app.get('/api/getAllDestinations', function(req, res){
+
+    ESClient.search({
+	index: destinationIndex,
+        type: destinationType,
+	body: {
+	    query: {
+		match_all: {}
+	    }
+	}
+    }).then(function (body) {
+        res.status(200)
+	res.json(body.hits.hits.map(function(hit) { return { id: hit._id, result: hit._source } }))
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
+
+})
+
+
+app.get('/api/runSearchAroundAirfield', function(req, res){
+    console.log("running search around " + req.query.id)
+    ESClient.get({
+	index: airfieldIndex,
+        type: airfieldType,
+	id: req.query.id
+    }).then(function(doc) {
+	console.log(doc)
+
+	var location = doc._source.location
+
+	ESClient.search({
+	    index: destinationIndex,
+            type: destinationType,
+	    body: {
+		query: {
+		    bool: {
+			"must" : {
+			    term : { status : "published" }
+			}, 
+			"filter" : {
+			    "geo_distance" : {
+				"distance" : config.max_distance+"mi",
+				"airfield_location" : location
+			    }
+			}
+		    }
+		},
+		
+		sort: [
+		    {
+			"_geo_distance": {
+			    "airfield_location": location,
+			    "order":         "asc",
+			    "unit":          "nauticalmiles", 
+			    "distance_type": "plane" 
+			}
+		    }
+		]
+	    }
+
+	}).then(function(body) {
+	    res.status(200)
+	    res.json(body.hits.hits.map(function(hit) { return {
+		id: hit._id,
+		result: hit._source,
+		distance: Math.round(hit.sort[0])
+	    } }))
+ 
+	}, function(error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+	})
+	
+    }, function(error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    })
+	
+   
+})
 
 // api methods
 
@@ -123,6 +350,7 @@ app.post('/api/listLayouts', function(req, res){
         res.send(error.message);
     });
 })
+
 
 // Old API methods
 
@@ -295,6 +523,38 @@ app.post('/api/admin/search', function(req, res){
 });
 
 
+app.get('/api/autocompleteAirfields', function(req, res){
+    console.log("autocomplete request for " + req.query.prefix)
+    ESClient.search(
+	{
+	    index: airfieldIndex,
+
+	    
+	    body: {
+		"suggest": {
+		    "airfields" : {
+			"prefix" : req.query.prefix, 
+			"completion" : { 
+			    "field" : "suggest" 
+			}
+		    }
+		}
+	    }
+	}
+    ).then(function (body) {
+	res.status(200)
+	res.json(body.suggest.airfields[0].options.map(function(res) {
+	    return { name: res._source.name + ' - ' + res._source.identifier, id: res._id }
+
+	}))
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    }); 
+    
+})
+
 // universal routing and rendering
 
 app.get('*', (req, res) => {
@@ -330,9 +590,96 @@ app.get('*', (req, res) => {
 });
 
 
-// load all the layouts
+// load all the airfields & add the mapping
 
-loadLayouts(ESClient);
+
+
+ESClient.indices.exists({
+    index: airfieldIndex
+}).then(function(body){
+    if (!body) {
+	createAirfieldIndex()
+    } 
+})
+
+
+
+
+ESClient.indices.exists({
+    index: destinationIndex
+}).then(function(body){
+    if (!body) {
+	createDestinationIndex()
+    } 
+})
+
+function createAirfieldIndex() {
+    ESClient.indices.create({
+	index: airfieldIndex,
+	body: {
+	    mappings: {
+		airfield: {
+		    properties : {
+			id: { "type": "text" },
+			identifier: { "type": "text" },
+  			location: { "type": "geo_point" },
+			name : { "type": "text" },
+			suggest : { "type" : "completion" },
+		    }
+		}
+		
+	    }
+	} 
+    }).then(function (body) {
+	console.log("we can load all airfields")
+	loadAirfields(ESClient);
+    }, function (error) {
+	console.log(error)
+	console.trace(error.message);
+    });
+    
+}
+
+
+function createDestinationIndex() {
+    ESClient.indices.create({
+	index: destinationIndex,
+	body: {
+	    mappings: {
+		destination: {
+		    properties : {
+			
+			status: { type: "text" },
+			"airfield": { type: "text" },
+			"airfield_name": { type: "text" },
+			"airfield_location": { type: "geo_point" },
+			
+			"type": { type: "text" },
+			"opinion": { type: "text" },
+			"reviewers" : {
+			    properties: {
+				email: { type: "text" },
+				review: { type: "text" }
+			    }
+
+			},
+
+			
+			"name": { type: "text" }
+		    }
+		    
+		}
+		
+	    }
+	} 
+    }).then(function (body) {
+	
+    }, function (error) {
+	console.log(error)
+	console.trace(error.message);
+    });
+    
+}
 
 // start the server
 server.listen(port, err => {
