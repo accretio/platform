@@ -28,7 +28,8 @@ import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
 import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType } from './store/es.js';
-import { loadAirfields } from './store/loadAirfields.js';
+
+import { prepES } from './store/createIndices.js';
 
 
 var config = require('./config');
@@ -593,93 +594,9 @@ app.get('*', (req, res) => {
 // load all the airfields & add the mapping
 
 
-
-ESClient.indices.exists({
-    index: airfieldIndex
-}).then(function(body){
-    if (!body) {
-	createAirfieldIndex()
-    } 
-})
+prepES(ESClient);
 
 
-
-
-ESClient.indices.exists({
-    index: destinationIndex
-}).then(function(body){
-    if (!body) {
-	createDestinationIndex()
-    } 
-})
-
-function createAirfieldIndex() {
-    ESClient.indices.create({
-	index: airfieldIndex,
-	body: {
-	    mappings: {
-		airfield: {
-		    properties : {
-			id: { "type": "text" },
-			identifier: { "type": "text" },
-  			location: { "type": "geo_point" },
-			name : { "type": "text" },
-			suggest : { "type" : "completion" },
-		    }
-		}
-		
-	    }
-	} 
-    }).then(function (body) {
-	console.log("we can load all airfields")
-	loadAirfields(ESClient);
-    }, function (error) {
-	console.log(error)
-	console.trace(error.message);
-    });
-    
-}
-
-
-function createDestinationIndex() {
-    ESClient.indices.create({
-	index: destinationIndex,
-	body: {
-	    mappings: {
-		destination: {
-		    properties : {
-			
-			status: { type: "text" },
-			"airfield": { type: "text" },
-			"airfield_name": { type: "text" },
-			"airfield_location": { type: "geo_point" },
-			
-			"type": { type: "text" },
-			"opinion": { type: "text" },
-			"reviewers" : {
-			    properties: {
-				email: { type: "text" },
-				review: { type: "text" }
-			    }
-
-			},
-
-			
-			"name": { type: "text" }
-		    }
-		    
-		}
-		
-	    }
-	} 
-    }).then(function (body) {
-	
-    }, function (error) {
-	console.log(error)
-	console.trace(error.message);
-    });
-    
-}
 
 // start the server
 server.listen(port, err => {

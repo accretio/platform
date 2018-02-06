@@ -1,7 +1,7 @@
 "use strict";
 
 const production = process.env.NODE_ENV === "production";
-const debug = process.env.NODE_ENV !== "production";
+const debug = false; // process.env.NODE_ENV !== "production";
 
 const webpack = require('webpack');
 const path = require('path');
@@ -53,6 +53,10 @@ module.exports = [
                       presets: debug ? ['react', 'es2015', 'react-hmre'] : ['react', 'es2015']
 		  }
 		},
+		{
+		    test: /\.css$/,
+		    use: [ 'style-loader', 'css-loader' ]
+		},
 		{ // sass / scss loader for webpack
 		    test: /\.(sass|scss)$/,
 		    use: ExtractTextPlugin.extract(['css-loader', 'sass-loader'])
@@ -63,7 +67,8 @@ module.exports = [
             new webpack.DefinePlugin({
 		'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
             }),
-            extractSass
+            extractSass,
+	    new ExtractTextPlugin("styles.css"),
 	]
     },
         
@@ -89,10 +94,17 @@ module.exports = [
 			  plugins: [ ]
 		      }
 		  }
+		},
+	       	{
+		    test: /\.css$/,
+		    use: ExtractTextPlugin.extract([ 'css-loader' ])
 		}
 	   ] 
 	    
-	}
+	},
+	plugins: [
+            new ExtractTextPlugin("styles.css")
+	]
     }   
     
 ];
