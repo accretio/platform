@@ -74,16 +74,12 @@ export default class SearchBox extends React.Component {
 	    })
 	})
 
-	console.log("active tags");
-	console.log(activeTags);
-
 	this.props.handleResults(null, this.state.results.filter(function(result)  {
 	    // return true if at least one tag is in the activeTag array
 	    var keep = false
 	    result.tags.map(function(tag) {
 		keep = keep || (activeTags.indexOf(tag) > -1)
 	    })
-	    console.log("for result: " + result.title + " the verdict is " + keep);
 	    return keep ;
 	}))	
 
