@@ -166,34 +166,54 @@ export default class ShareExperience extends React.Component {
 	var descriptionPlainText = descriptionContent.getPlainText()
 	
 	if (!this.state[this._departureAirfield]) {
+	    this.context.mixpanel.track('share experience validation warning', { message: 'missing departure airfield' });
 	    this._sendError("Where did you depart from?")
 	    return;
 	}
 
 	if (!this.state[this._destinationAirfield]) {
+	     this.context.mixpanel.track('share experience validation warning', { message: 'missing destination airfield' });
 	    this._sendError("Where did you go?")
 	    return;
 	}
 
 	if (this.inputs[this._tripDate].value == '') {
+	    this.context.mixpanel.track('share experience validation warning', { message: 'missing trip date' });
 	    this._sendError("When did you take this trip?")
 	    return;
 	}
 
 	if (this.inputs[this._experienceTitle].value == '') {
+	    this.context.mixpanel.track('share experience validation warning', { message: 'missing experience title' });
 	    this._sendError("What is the name of your experience?")
 	    return;
 	}
 	
 	if (this.state.tags.length == 0) {
+	    this.context.mixpanel.track('share experience validation warning', { message: 'no tags' });
 	    this._sendError("Please add at least one tag so that others can find your writeup")
 	    return;
 	}
 	
 	if (this.inputs[this._contributorEmail].value == '') {
 	    this._sendError("Please leave your email so that we can get in touch. It won't be displayed")
+	    this.context.mixpanel.track('share experience validation warning', { message: 'no email' });
 	    return;
 	}
+
+	// this is best effort 
+	this.context.mixpanel.register({
+	    'Email': this.inputs[this._contributorEmail].value,
+	    'Name': this.inputs[this._contributorName].value
+	});
+
+	// this should be done behind a login, but for now it is enough
+	this.context.mixpanel.identify(this.inputs[this._contributorEmail].value);
+	this.context.mixpanel.people.set({
+	    "$email":  this.inputs[this._contributorEmail].value,   
+            "$last_login": new Date(),         
+    	    "$name" : this.inputs[this._contributorName].value
+	});
 
 	var trip = {
 	    departureAirfield: this.state[this._departureAirfield],
@@ -220,11 +240,14 @@ export default class ShareExperience extends React.Component {
 	}
 
 	console.log(experience)
-
-	saveExperience(experience).then(function() {
+	this.context.mixpanel.track('saving new experience', { title: this.inputs[this._experienceTitle].value });
+	 
+	saveExperience(experience).then(function(body) {
+	    t.context.mixpanel.track('new experience saved', { id: body.id });
 	    t.props.setYesNo("Thank You", "Do you want to share another experience?",
 			     function() {
-				 t._reset().bind(t)
+				 t.context.mixpanel.track('sharing another experience');
+	   			 t._reset().bind(t)
 			     },
 			     function() {
 				 t.context.history.push("/")

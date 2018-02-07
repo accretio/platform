@@ -44,6 +44,7 @@ export default class DisplayResultsMap extends React.Component {
 	if (nextProps.centerOn && nextProps.centerOn != this.currenCenter && nextState.map) {
 	    this.currentCenter = nextProps.centerOn;
 	    console.log("new center is ");
+	    this.context.mixpanel.track('updating center', { center: this.currentCenter });
 	    console.log(this.currentCenter);
 	    nextState.map.panTo(this.currentCenter);
 	}
@@ -59,6 +60,7 @@ export default class DisplayResultsMap extends React.Component {
 	    console.log(results)
 	    console.log(">>> rendering " + results.length + " results");
 	    this.state.markers.clearLayers();
+	    this.context.mixpanel.track('rendering results', { count: results.length });
 	    results.map(function(result){
 		console.log(result);
 
@@ -84,3 +86,14 @@ export default class DisplayResultsMap extends React.Component {
     }
     
 }
+
+
+
+
+DisplayResultsMap.contextTypes = {
+    mixpanel: PropTypes.object.isRequired,
+    cookies: PropTypes.object.isRequired,
+    history: React.PropTypes.shape({
+	push: React.PropTypes.func.isRequired
+    })
+};

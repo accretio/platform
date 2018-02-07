@@ -26,6 +26,7 @@ export default class SearchBox extends React.Component {
 	var t = this
 	this.setState({isLoading: true});
 	console.log("running typeahead search for query " + query)
+	this.context.mixpanel.track('autocomplete airfield search', { query: query });
 	autocompleteAirfields(query).then(function(hits) {
 	    t.setState({
 		isLoading: false,
@@ -50,22 +51,23 @@ export default class SearchBox extends React.Component {
     _handleChange(e) {
 	var t = this
 	if (e.length > 0) {
-	     runSearchAroundAirfield(e[0].id).then(function(results) {
+	    this.context.mixpanel.track('searching for experiences around airfield', { airfield: e[0] });
+	    runSearchAroundAirfield(e[0].id).then(function(results) {
 		 t._updateStateWithResults.bind(t)(results.results)
 		 t.props.handleResults(results.location, results.results);
 	    })
 	} else {
 	    t.props.handleResults(null, []);
 	    t._updateStateWithResults.bind(t)([])
-	 
 	}
     }
 
     _toggleTag(tag) {
+	
 
 	if (this.state.toggledOff.indexOf(tag) == -1) {
 	    // it is currently toggled on
-
+	    this.context.mixpanel.track('toggling tag', { tag: tag, newState: false });
 	    var nToggledOff = this.state.toggledOff
 	    nToggledOff.push(tag)
 	    this.setState({ toggledOff: nToggledOff })
@@ -74,7 +76,8 @@ export default class SearchBox extends React.Component {
 	    }))
 
 	} else {
-	    // it is currently toggled on
+	    // it is currently toggled off
+	    this.context.mixpanel.track('toggling tag', { tag: tag, newState: true });
 	    var nToggledOff = this.state.toggledOff
 	    nToggledOff.splice(nToggledOff.indexOf(tag), 1)
 	    this.setState({ toggledOff: nToggledOff })
@@ -133,3 +136,13 @@ export default class SearchBox extends React.Component {
     }
 
 }
+
+
+
+SearchBox.contextTypes = {
+    mixpanel: PropTypes.object.isRequired,
+    cookies: PropTypes.object.isRequired,
+    history: React.PropTypes.shape({
+	push: React.PropTypes.func.isRequired
+    })
+};
