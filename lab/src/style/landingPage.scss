@@ -1,8 +1,19 @@
 .landing-page {
 
+    .jumbotron-wrapper {
+	top: 54px;
+	
+	z-index:1;
+	width: 800px;
+	max-width: 100%;
+	position: absolute;
+    }
+    
     .jumbotron {
 	margin: 40px 40px;
 	padding: 30px 30px!important;
+	
+
     }
     
     .card-columns {

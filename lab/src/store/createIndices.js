@@ -1,4 +1,4 @@
-import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType } from './es.js';
+import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType, experienceIndex, experienceType, tripIndex, tripType } from './es.js';
 
 import { loadAirfields } from './loadAirfields.js';
 
@@ -14,6 +14,17 @@ function prepES(ESClient) {
 	    } else {
 		console.log("index " + indexName + " already exists")
 	    }
+	})
+	
+    }
+
+
+     function deleteThenRun(indexName, callback) {
+	
+	ESClient.indices.delete({
+	    index: indexName
+	}).then(function(body){
+	    callback() 
 	})
 	
     }
@@ -86,10 +97,89 @@ function prepES(ESClient) {
 	});
 	
     }
+
+     function createTripIndex() {
+	ESClient.indices.create({
+	    index: tripIndex,
+	    body: {
+		mappings: {
+		    trip: {
+			properties : {
+			    
+			    date: { type: "date" },
+			    name: { type: "text" },
+			    "departureAirfield": { type: "text" },
+			    "destinationAirfield": { type: "text" },
+
+			    "departureLocation": { type: "geo_point" },
+			    "destinationLocation": { type: "geo_point" },
+			   
+			    "crew" : {
+				properties: {
+				    name: { type: "text" },
+				    email: { type: "text" }
+				}	
+			    }
+			    
+			}
+			
+		    }
+		    
+		}
+	    } 
+	}).then(function (body) {
+	    
+	}, function (error) {
+	    console.log(error)
+	    console.trace(error.message);
+	});
+	
+     }
+
+     function createExperienceIndex() {
+	ESClient.indices.create({
+	    index: experienceIndex,
+	    body: {
+		mappings: {
+		    experience: {
+			properties : {
+			    
+			    title: { type: "text" },
+			    status: { type: "keyword" },
+			    location: { type: "geo_point" },
+			    descriptionDraftJs: {
+				enabled: false
+			    },
+			    descriptionPlainText: { type: "text" },
+			    tags : { type: "keyword" },
+			    authors: {
+				properties: {
+				    name: { type: "text" },
+				    email: { type: "text" }
+				}
+			    },
+			    trips: { type: "keyword" }
+			}
+			
+		    }
+		    
+		}
+	    } 
+	}).then(function (body) {
+	    
+	}, function (error) {
+	    console.log(error)
+	    console.trace(error.message);
+	});
+	
+    }
     
     runIfIndexDoesNotExist(airfieldIndex, createAirfieldIndex)
     runIfIndexDoesNotExist(destinationIndex, createDestinationIndex)
-    
+    runIfIndexDoesNotExist(tripIndex, createTripIndex)
+    // deleteThenRun(experienceIndex, createExperienceIndex)
+    runIfIndexDoesNotExist(experienceIndex, createExperienceIndex)
+  
     
 }
 

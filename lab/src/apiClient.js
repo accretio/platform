@@ -68,39 +68,30 @@ function listLayouts(query) {
 
 // new methods for GA Adventures
 
-function saveSuggestion(obj) {
-    return(fetch('/api/saveSuggestion', {
-        method: 'post',
-        headers: new Headers({
-	    'Content-Type': 'application/json'
-        }),
-        body: JSON.stringify(obj) 
-    }).then(function(response) {
-	if (response.status == 200) {
-	    return (response.json())
-	} else {
-	    alert("something went wrong")
-	    throw new Exception("something went wrong")
-	}
-    }))
+function save(path){
+
+    return function(obj){
+	return(fetch('/api/'+path, {
+            method: 'post',
+            headers: new Headers({
+		'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify(obj) 
+	}).then(function(response) {
+	    if (response.status == 200) {
+		return (response.json())
+	    } else {
+		alert("something went wrong")
+		throw new Exception("something went wrong")
+	    }
+	}))
+	
+    }
 }
 
-function saveAirfield(obj) {
-    return(fetch('/api/saveAirfield', {
-        method: 'post',
-        headers: new Headers({
-	    'Content-Type': 'application/json'
-        }),
-        body: JSON.stringify(obj) 
-    }).then(function(response) {
-	if (response.status == 200) {
-	    return (response.json())
-	} else {
-	    alert("something went wrong")
-	    throw new Exception("something went wrong")
-	}
-    }))
-}
+const saveSuggestion = save('saveSuggestion')
+const saveAirfield = save('saveAirfield')
+const saveExperience = save('saveExperience')
 
 function getAllDestinations() {
     return(fetch('/api/getAllDestinations', {
@@ -154,11 +145,10 @@ function runSearchAroundAirfield(id) {
 	if (response.status == 200) {
 	    return (response.json())
 	} else {
-	    alert("something went wrong")
 	    throw new Exception("something went wrong")
 	}
     }))
 
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield };
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience };

@@ -27,10 +27,9 @@ import elasticsearch from 'elasticsearch';
 import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
-import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType } from './store/es.js';
+import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType, experienceIndex, experienceType, tripIndex, tripType } from './store/es.js';
 
 import { prepES } from './store/createIndices.js';
-
 
 var config = require('./config');
 
@@ -120,6 +119,91 @@ app.post('/api/saveSuggestion', function(req, res){
    
 })
 
+
+function withAirfield(res, id) {
+    return (ESClient.get({
+	index: airfieldIndex,
+        type: airfieldType,
+	id: id
+    }).then(function(doc) {
+	return(doc._source)
+    }, function(error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    }))
+}
+
+
+function store(index, type) {
+    return function (res, obj) {
+	return (ESClient.index({
+	    index: index,
+	    type: type,
+	    body: obj
+	}).then(function (body) {
+	    return body._id;
+	}, function (error) {
+            console.log(error);
+            res.status(500);
+            res.send(error.message);
+	}));
+    }
+}
+
+const storeTrip = store(tripIndex, tripType);
+const storeExperience = store(experienceIndex, experienceType);
+
+app.post('/api/saveExperience', function(req, res){
+
+    console.log("saving experience " + req)
+
+    withAirfield(res, req.body.trip.departureAirfield.id).then(function(departureAirfield){
+	
+	withAirfield(res, req.body.trip.destinationAirfield.id).then(function(destinationAirfield){
+
+	    var experienceLocation = departureAirfield.location;
+	    
+	    var trip = req.body.trip;
+
+	    var tripPersisted =
+		{
+		    date: trip.date,
+		    departureAirfield: departureAirfield.id,
+		    destinationAirfield: destinationAirfield.id,
+		    departureLocation: departureAirfield.location,
+		    destinationLocation: destinationAirfield.location,
+		    crew: trip.crew,
+		    name: ''
+		}
+	    
+	    storeTrip(res, tripPersisted).then(function(tripId){
+		console.log("TRIP ID is " + tripId)
+		var experience = req.body
+	
+		var experiencePersisted = {
+		    title: experience.title,
+		    status: "published",
+		    location: destinationAirfield.location,
+		    descriptionDraftJs: experience.descriptionDraftJs,
+		    descriptionPlainText: experience.descriptionPlainText,
+		    tags: experience.tags,
+		    authors: [ experience.author ],
+		    trips: [ tripId ]
+		}
+		
+		// now we can store the whole experience
+		storeExperience(res, experiencePersisted).then(function(experienceId) {
+		    
+		    res.status(200);
+		    res.json({ id: experienceId });
+		    
+		})
+	    })
+	})
+    })
+
+})
 
 
 app.post('/api/saveAirfield', function(req, res){
@@ -233,8 +317,8 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 	var location = doc._source.location
 
 	ESClient.search({
-	    index: destinationIndex,
-            type: destinationType,
+	    index: experienceIndex,
+            type: experienceType,
 	    body: {
 		query: {
 		    bool: {
@@ -244,7 +328,7 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 			"filter" : {
 			    "geo_distance" : {
 				"distance" : config.max_distance+"mi",
-				"airfield_location" : location
+				"location" : location
 			    }
 			}
 		    }
@@ -253,7 +337,7 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 		sort: [
 		    {
 			"_geo_distance": {
-			    "airfield_location": location,
+			    "location": location,
 			    "order":         "asc",
 			    "unit":          "nauticalmiles", 
 			    "distance_type": "plane" 
@@ -264,11 +348,18 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 
 	}).then(function(body) {
 	    res.status(200)
-	    res.json(body.hits.hits.map(function(hit) { return {
-		id: hit._id,
-		result: hit._source,
-		distance: Math.round(hit.sort[0])
-	    } }))
+	    res.json({
+		location: location,
+		results: body.hits.hits.map(function(hit) { return {
+		    id: hit._id,
+		    location: hit._source.location,
+		    title: hit._source.title,
+		    tags: hit._source.tags,
+		    distance: Math.round(hit.sort[0])
+		}
+							  
+							  })
+	    })
  
 	}, function(error) {
         console.trace(error.message);

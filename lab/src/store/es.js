@@ -21,7 +21,9 @@ var airfieldType = "airfield";
 var experienceIndex = "experiences";
 var experienceType = "experience";
 
+var tripIndex = "trips";
+var tripType = "trip";
 
 module.exports = {
-    recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType, experienceIndex, experienceType
+    recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType, experienceIndex, experienceType, tripIndex, tripType
 }

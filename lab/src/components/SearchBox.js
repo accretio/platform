@@ -1,0 +1,135 @@
+'use strict';
+
+import React, { PropTypes} from 'react';
+
+import { autocompleteAirfields, runSearchAroundAirfield } from './../apiClient.js';
+import { asyncContainer, Typeahead } from 'react-bootstrap-typeahead';
+
+const AsyncTypeahead = asyncContainer(Typeahead);
+
+export default class SearchBox extends React.Component {
+
+    constructor(props) {
+	super(props);
+	this.state = {
+	    allowNew: false,
+	    isLoading: false,
+	    multiple: false,
+	    options: [],
+	    results: [],
+	    tagsWithCounts: {},
+	    toggledOff: []
+	};
+    }
+
+    _searchAirfields(query) {
+	var t = this
+	this.setState({isLoading: true});
+	console.log("running typeahead search for query " + query)
+	autocompleteAirfields(query).then(function(hits) {
+	    t.setState({
+		isLoading: false,
+		options: hits,
+	    })
+	})
+     }
+
+    _updateStateWithResults(results) {
+
+	var tagsWithCounts = {};
+
+	results.map(function(result) {
+	    result.tags.map(function(tag){
+		tagsWithCounts[tag] = 1 + (tagsWithCounts[tag] || 0);
+	    })
+	})
+	
+	this.setState({ results, tagsWithCounts, toggledOff: [] })
+    }
+    
+    _handleChange(e) {
+	var t = this
+	if (e.length > 0) {
+	     runSearchAroundAirfield(e[0].id).then(function(results) {
+		 t._updateStateWithResults.bind(t)(results.results)
+		 t.props.handleResults(results.location, results.results);
+	    })
+	} else {
+	    t.props.handleResults(null, []);
+	    t._updateStateWithResults.bind(t)([])
+	 
+	}
+    }
+
+    _toggleTag(tag) {
+
+	if (this.state.toggledOff.indexOf(tag) == -1) {
+	    // it is currently toggled on
+
+	    var nToggledOff = this.state.toggledOff
+	    nToggledOff.push(tag)
+	    this.setState({ toggledOff: nToggledOff })
+	    this.props.handleResults(null, this.state.results.filter(function(result)  {
+		return (result.tags.indexOf(tag) == -1);
+	    }))
+
+	} else {
+	    // it is currently toggled on
+	    var nToggledOff = this.state.toggledOff
+	    nToggledOff.splice(nToggledOff.indexOf(tag), 1)
+	    this.setState({ toggledOff: nToggledOff })
+	    this.props.handleResults(null, this.state.results.filter(function(result)  {
+		return (result.tags.indexOf(tag) != -1);
+	    }))
+
+	}
+	
+     }
+    
+    render() {
+	
+	var t = this;
+
+	let airfieldTypeahead = <AsyncTypeahead
+	labelKey="name"
+	isLoading={this.state.isLoading}
+	onSearch={this._searchAirfields.bind(this)}
+	options={this.state.options}
+	placeholder="Your homebase?"
+	onChange={this._handleChange.bind(this)}
+/>;
+	var airfieldSearch =
+	    <div className="col">
+	    { airfieldTypeahead }
+            </div>
+
+	var tagsWithCounts = this.state.tagsWithCounts;
+
+	var tags = Object.keys(tagsWithCounts).map(function(tag, i) {
+	    var count = tagsWithCounts[tag]
+	    var className; 
+		if (t.state.toggledOff.indexOf(tag) > -1) {
+		    className = "btn btn-light" 
+		} else {
+		    className = "btn btn-info"
+		}
+	    return (<button key = { i } className= { className } onClick = { t._toggleTag.bind(t, tag) } >
+		    { tag + " (" + count + ")" } 
+	            </button>) 
+    
+	})
+
+	return (<div className="searchBox">
+
+		<div className="row">
+		{ airfieldSearch }
+		</div>
+
+		<div className="row tags">
+		{ tags }
+		</div>
+
+		</div>); 
+    }
+
+}

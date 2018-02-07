@@ -10,14 +10,14 @@ import { WithContext as ReactTags } from 'react-tag-input';
 const AsyncTypeahead = asyncContainer(Typeahead);
 
 // see: https://github.com/AlastairTaft/draft-js-editor/
-import {EditorState, convertToRaw} from 'draft-js';
+import { EditorState, ContentState, convertToRaw} from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 
 
 //require('react-draft-wysiwyg/dist/react-draft-wysiwyg.css');
 
 
-import { autocompleteAirfields } from './../apiClient.js';
+import { autocompleteAirfields, saveExperience } from './../apiClient.js';
 
 export default class ShareExperience extends React.Component {
 
@@ -42,7 +42,6 @@ export default class ShareExperience extends React.Component {
         this.handleDrag = this.handleDrag.bind(this);
 
 	// couple of constants
-
 	this._departureAirfield = "departureAirfield"
 	this._destinationAirfield = "destinationAirfield"
 	this._tripDate = "tripDate"
@@ -161,8 +160,11 @@ export default class ShareExperience extends React.Component {
  
     _shareExperience() {
 
-	var description = convertToRaw(this.state.editorState.getCurrentContent())
-
+	var t = this
+	var descriptionContent = this.state.editorState.getCurrentContent()
+	var descriptionDraftJs = convertToRaw(descriptionContent)
+	var descriptionPlainText = descriptionContent.getPlainText()
+	
 	if (!this.state[this._departureAirfield]) {
 	    this._sendError("Where did you depart from?")
 	    return;
@@ -207,17 +209,30 @@ export default class ShareExperience extends React.Component {
 	
 	var experience = {
 	    title: this.inputs[this._experienceTitle].value,
-	    description: description,
+	    descriptionDraftJs: descriptionDraftJs,
+	    descriptionPlainText: descriptionPlainText, 
 	    tags: this.state.tags.map(function(t){ return t.text }),
 	    author: {
 		name: this.inputs[this._contributorName].value,
 		email: this.inputs[this._contributorEmail].value,
 	    },
-	    airfields: [ this.state[this._destinationAirfield] ],
-	    trips: [ trip ]
+	    trip: trip
 	}
 
 	console.log(experience)
+
+	saveExperience(experience).then(function() {
+	    t.props.setYesNo("Thank You", "Do you want to share another experience?",
+			     function() {
+				 t._reset().bind(t)
+			     },
+			     function() {
+				 t.context.history.push("/")
+			     })
+	}, function(error) {
+	    t.context.mixpanel.track('error in share experience page', { 'error': error });
+	    t._sendError("Sorry, something went wrong");
+	})
 
     }
 
@@ -225,6 +240,13 @@ export default class ShareExperience extends React.Component {
 	this.setState({
 	    editorState,
 	});
+    }
+
+    _reset() {
+	const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''));
+	this.inputs[this._tripDate].value = ''
+	this.inputs[this._experienceTitle].value = ''
+	this.setState({ editorState, tags: [] });
     }
     
     render() {

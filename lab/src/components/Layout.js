@@ -69,6 +69,19 @@ export default class Layout extends React.Component {
     addDestination() {
 	this.context.history.push("/suggestDestination")
     }
+
+    _setYesNo(title, message, yesCallback, noCallback) {
+	var t = this
+	var yesNoParams = {
+	    title: title,
+	    message: message,
+	}
+	yesNoParams.yes = function(){ t.setState({ yesno: null }) ; yesCallback() };
+	yesNoParams.no = function(){ t.setState({ yesno: null }) ; noCallback() };
+
+	t.setState({ yesno: yesNoParams })
+
+    }
     
     render() {
 
@@ -126,9 +139,38 @@ export default class Layout extends React.Component {
             </div>
 
         </Modal> ;
+
+		let yesNoModal =
+            <Modal isOpen={this.state.yesno != null }
+	className=""
+	style={modalCustomStyles}
+	contentLabel="yesno"
+        >
+
+            <div className="modal-dialog" role="document">
+            <div className="modal-content">
+            <div className="modal-header">
+            <h5 className="modal-title">{ this.state.yesno ?  this.state.yesno.title : '' }</h5>
+           
+             </div>
+            <div className="modal-body">
+            <p>{ this.state.yesno ? this.state.yesno.message : '' } </p>
+            </div>
+            <div className="modal-footer">
+
+	    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ this.state.yesno ? this.state.yesno.no : function(){} } >No</button>
+	    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ this.state.yesno ? this.state.yesno.yes : function(){} }>Yes</button>
+      
+	</div>
+            </div>
+            </div>
+
+        </Modal> ;
+
+	
 	
 	var child =
-	    React.cloneElement(this.props.children, { messageTeam: this.messageTeam.bind(this), sendError: this._sendError.bind(this) }) ;
+	    React.cloneElement(this.props.children, { messageTeam: this.messageTeam.bind(this), sendError: this._sendError.bind(this), setYesNo: this._setYesNo.bind(this) }) ;
 
 	var suggestDestinationBtn = null;
 	var togglerBtn = null;
@@ -146,7 +188,8 @@ export default class Layout extends React.Component {
 	return (
 	   
 	    	<div id="wrapper" className="wrapper">
-		 { errorModal }
+		{ errorModal }
+	    { yesNoModal }
 		<nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
 	 
 		       <a className="navbar-brand" href="/">GA Adventures</a>
