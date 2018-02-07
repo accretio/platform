@@ -58,12 +58,9 @@ export default class Layout extends React.Component {
 	}
     }
 
-    _sendError(error) {
-	this.setState({ error })
-    }
-
-    _resetError(error) {
-	this.setState({ error: null })
+    _sendError(message, callback = function(){}) {
+	var t = this
+	this.setState({ error: { message, callback: function(){ t.setState({ error: null }); callback() } } })
     }
 
     addDestination() {
@@ -128,11 +125,13 @@ export default class Layout extends React.Component {
            
              </div>
             <div className="modal-body">
-            <p>{ this.state.error } </p>
+            <p>{ this.state.error ? this.state.error.message : '' } </p>
             </div>
             <div className="modal-footer">
          
-	    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this._resetError.bind(this)}>Ok</button>
+	    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={
+		this.state.error ? this.state.error.callback : function(){}
+	    }>Ok</button>
       
 	</div>
             </div>

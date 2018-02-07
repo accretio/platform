@@ -305,6 +305,49 @@ app.get('/api/getAllDestinations', function(req, res){
 })
 
 
+app.get('/api/getAllExperiences', function(req, res){
+
+    ESClient.search({
+	index: experienceIndex,
+        type: experienceType,
+	body: {
+	    query: {
+		match_all: {}
+	    }
+	}
+    }).then(function (body) {
+        res.status(200)
+	res.json(body.hits.hits.map(function(hit) { return { id: hit._id, result: hit._source } }))
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    });
+
+})
+
+
+// TODO: ACL
+app.post('/api/updateExperience', function(req, res) {
+
+    ESClient.update({
+	index: experienceIndex,
+	type: experienceType,
+	id: req.body.id,
+	body: {
+	    doc: req.body.doc 
+	}
+    }).then(function (body) {
+	res.status(200);
+        res.json({ id: body._id });
+    }, function (error) {
+        console.log(error);
+        res.status(500);
+        res.send(error.message);
+    })
+   
+})
+
 app.get('/api/runSearchAroundAirfield', function(req, res){
     console.log("running search around " + req.query.id)
     ESClient.get({
@@ -426,6 +469,8 @@ function getESEntity(index, type) {
 
 getESEntity(panelIndex, panelType);
 getESEntity(layoutIndex, layoutType);
+getESEntity(experienceIndex, experienceType);
+getESEntity(tripIndex, tripType);
 
 app.post('/api/listLayouts', function(req, res){
     console.log("query is " + req.body.query)

@@ -20,7 +20,6 @@ function getEntity(type) {
 	    if (response.status == 200) {
 		return (response.json())
 	    } else {
-		alert("something went wrong")
 		throw new Exception("something went wrong")
 	    }
 	}))
@@ -31,6 +30,8 @@ function getEntity(type) {
 
 var getPanel = getEntity("panel")
 var getLayout = getEntity("layout")
+var getTrip = getEntity("trip")
+var getExperience = getEntity("experience")
 
 function savePanel(panel) {
     return(fetch('/api/savePanel', {
@@ -106,6 +107,18 @@ function getAllDestinations() {
     }))
 }
 
+function getAllExperiences() {
+    return(fetch('/api/getAllExperiences', {
+	method: 'get'
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
 function autocompleteAirfields(query) {
     return(fetch('/api/autocompleteAirfields?prefix=' + encodeURIComponent(query), {
 	method: 'get'
@@ -137,6 +150,23 @@ function updateDestination(id, doc) {
     }))
 }
 
+
+function updateExperience(id, doc) {
+    return(fetch('/api/updateExperience', {
+        method: 'post',
+        headers: new Headers({
+	    'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify({id: id, doc: doc}) 
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
 function runSearchAroundAirfield(id) {
     console.log(id);
   return(fetch('/api/runSearchAroundAirfield?id=' + encodeURIComponent(id), {
@@ -151,4 +181,4 @@ function runSearchAroundAirfield(id) {
 
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience };
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience };
