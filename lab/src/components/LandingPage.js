@@ -46,7 +46,7 @@ export default class LandingPage extends React.Component {
 	if (this.state.fullJumbotron) {
 		header = <div><h1 className="display-4">Where are you flying next?</h1>
 
-	    <p className="lead">Browse aviation adventures. Plan you trip. Go fly!</p>
+	    <p className="lead">Browse aviation adventures. Plan your trip. Go fly!</p>
 
 	    <hr className="my-4" />
 		</div>;
