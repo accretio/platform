@@ -62,18 +62,42 @@ export default class SearchBox extends React.Component {
 	}
     }
 
+
+    _updateResultsBasedOnTags(){
+	var toggledOff = this.state.toggledOff
+	var activeTags = new Array()
+	this.state.results.map(function(result) {
+	    result.tags.map(function(tag){
+		if (toggledOff.indexOf(tag) == -1) {
+		    activeTags.push(tag)
+		}
+	    })
+	})
+
+	console.log("active tags");
+	console.log(activeTags);
+
+	this.props.handleResults(null, this.state.results.filter(function(result)  {
+	    // return true if at least one tag is in the activeTag array
+	    var keep = false
+	    result.tags.map(function(tag) {
+		keep = keep || (activeTags.indexOf(tag) > -1)
+	    })
+	    console.log("for result: " + result.title + " the verdict is " + keep);
+	    return keep ;
+	}))	
+
+    }
+    
     _toggleTag(tag) {
 	
-
 	if (this.state.toggledOff.indexOf(tag) == -1) {
 	    // it is currently toggled on
 	    this.context.mixpanel.track('toggling tag', { tag: tag, newState: false });
 	    var nToggledOff = this.state.toggledOff
 	    nToggledOff.push(tag)
 	    this.setState({ toggledOff: nToggledOff })
-	    this.props.handleResults(null, this.state.results.filter(function(result)  {
-		return (result.tags.indexOf(tag) == -1);
-	    }))
+	    this._updateResultsBasedOnTags.bind(this)()
 
 	} else {
 	    // it is currently toggled off
@@ -81,10 +105,7 @@ export default class SearchBox extends React.Component {
 	    var nToggledOff = this.state.toggledOff
 	    nToggledOff.splice(nToggledOff.indexOf(tag), 1)
 	    this.setState({ toggledOff: nToggledOff })
-	    this.props.handleResults(null, this.state.results.filter(function(result)  {
-		return (result.tags.indexOf(tag) != -1);
-	    }))
-
+	    this._updateResultsBasedOnTags.bind(this)()
 	}
 	
      }
