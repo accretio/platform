@@ -86,12 +86,10 @@ export default class ListExperiences extends React.Component {
 	         <div className="col-2">
 	          { experience.result.status }
 	       </div>
-
 	       
 	       <div className="col-2">
 	       { statusBtn }
 	       </div>
-
 
 	       <div className="col-2">
 	       <button className="btn btn-primary" onClick = { this._gotoExperience.bind(this, experience.id) }>

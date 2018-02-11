@@ -17,7 +17,7 @@ const routes = (
 	<Route path="/" component={Layout}>
 
         <IndexRoute component={LandingPage}/>
-	<Route path="/experience/:id" component={Experience} />
+	<Route path="/experience/:id(/:edit)" component={Experience} />
 	<Route path="/shareExperience" component={ShareExperience} />
 	<Route path="/reviewDestinations" component={ReviewDestinations} />
 	<Route path="/manageAirfields" component={ManageAirfields} />

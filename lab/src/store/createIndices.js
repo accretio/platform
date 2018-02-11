@@ -159,6 +159,16 @@ function prepES(ESClient) {
 				}
 			    },
 			    trips: { type: "keyword" }
+			  /*  comments: {
+				date: { type: "date" }
+				author: {
+				    properties: {
+					name: { type: "text" },
+					email: { type: "text" }
+				    }
+				}
+				message: { type: "text" }
+			    } */
 			}
 			
 		    }

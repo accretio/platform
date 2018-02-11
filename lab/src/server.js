@@ -348,6 +348,58 @@ app.post('/api/updateExperience', function(req, res) {
    
 })
 
+app.post('/api/saveExperienceDescription', function(req, res) {
+
+    ESClient.get({
+            index: experienceIndex,
+            type: experienceType,
+            id: req.body.id
+    }).then(function (body) {
+
+	var doc = body._source
+	doc.descriptionDraftJs = req.body.descriptionContent,
+	doc.descriptionPlainText= req.body.descriptionPlainText
+
+	console.log("updating the doc")
+	console.log(doc);
+
+	/* KEEP IT AROUND 
+	  return(ESClient.update({
+	    index: experienceIndex,
+	    type: experienceType,
+	    id: req.body.id,
+	    body: {
+		script : {
+		    "source": "ctx._source.descriptionDraftJs = params.descriptionDraftJs",
+		    "lang": "painless",
+		    "params" : {
+			"descriptionDraftJs" : req.body.descriptionContent
+		    }
+		}
+	    }
+	})) */
+	
+	return(ESClient.update({
+	    index: experienceIndex,
+	    type: experienceType,
+	    id: req.body.id,
+	    body: {
+		doc
+	    }
+	}))
+	       
+    }).then(function (body) {
+	res.status(200);
+        res.json({ id: body._id });
+    }, function (error) {
+        console.log(error);
+        res.status(500);
+        res.send(error.message);
+    })
+
+   
+})
+
 app.get('/api/runSearchAroundAirfield', function(req, res){
     console.log("running search around " + req.query.id)
     ESClient.get({
@@ -471,6 +523,74 @@ getESEntity(panelIndex, panelType);
 getESEntity(layoutIndex, layoutType);
 getESEntity(experienceIndex, experienceType);
 getESEntity(tripIndex, tripType);
+
+
+
+function getFullAirfield(id) {
+    console.log("looking for airfield")
+    console.log(id)
+    return (ESClient.get({
+        index: airfieldIndex,
+        type: airfieldType,
+        id: id
+    }).then(function (body) {
+	var entity = body._source
+	entity.id = body._id
+	return entity
+    }))
+}
+
+
+function getFullTrip(id) {
+    return (ESClient.get({
+            index: tripIndex,
+            type: tripType,
+            id: id
+	}).then(function (body) {
+	    var entity = body._source
+	    entity.id = body._id
+	    var promise =
+		Promise.all([ getFullAirfield(entity.departureAirfield),
+			       getFullAirfield(entity.destinationAirfield) ])
+
+	    return (promise.then(function(airfields) { return { entity, airfields } }))
+	}).then(function(entityWithAirfields){
+	    var entity = entityWithAirfields.entity
+	    entity.departureAirfield = entityWithAirfields.airfields[0]
+	    entity.destinationAirfield = entityWithAirfields.airfields[1]
+	    return entity ;
+	}))
+}
+
+app.post('/api/getFullExperience', function(req, res){
+	var id = req.body.id
+	console.log(">>> getting full experience " + id)
+	ESClient.get({
+            index: experienceIndex,
+            type: experienceType,
+            id: id
+	}).then(function (body) {
+	    var trips = body._source.trips
+	    return (
+		Promise.all(trips.map(getFullTrip))
+		    .then(function(trips){ return { body, trips } })
+		   )
+	}).then(function (tripsAndBody) {
+	    console.log(tripsAndBody)
+	    var trips = tripsAndBody.trips
+	    var body = tripsAndBody.body 
+	    var experience = body._source
+	    experience.id = body._id
+	    experience.trips = trips;
+	    res.status(200);
+	    res.json(experience)
+	},  function (error) {
+	    console.log(error.message);
+	    console.trace(error.message);
+            res.status(404);
+            res.send(error.message);
+	});	
+ })
 
 app.post('/api/listLayouts', function(req, res){
     console.log("query is " + req.body.query)
@@ -662,28 +782,65 @@ app.post('/api/admin/search', function(req, res){
 
 app.get('/api/autocompleteAirfields', function(req, res){
     console.log("autocomplete request for " + req.query.prefix)
-    ESClient.search(
+     ESClient.search(
 	{
 	    index: airfieldIndex,
-
-	    
 	    body: {
-		"suggest": {
-		    "airfields" : {
-			"prefix" : req.query.prefix, 
-			"completion" : { 
-			    "field" : "suggest" 
+		"query": {
+		    "bool": {
+			"should": [
+			    {
+				"term" : { identifier : req.query.prefix }
+			    }, {
+				"term" : { identifier : "k" + req.query.prefix }
+			    }
+			]
+		    }	    
+		}
+	    }
+	}).then(function (body) {
+
+	    var exactMatches = body.hits.hits
+	    return(ESClient.search(
+		{
+		    index: airfieldIndex,
+		    body: {
+			"suggest": {
+			    "airfields" : {
+				"prefix" : req.query.prefix, 
+				"completion" : { 
+				    "field" : "suggest",
+				    
+				}
+			    }
 			}
 		    }
 		}
-	    }
-	}
-    ).then(function (body) {
-	res.status(200)
-	res.json(body.suggest.airfields[0].options.map(function(res) {
-	    return { name: res._source.name + ' - ' + res._source.identifier, id: res._id }
+	    ).then(function(body) { return { body, exactMatches } }))
 
-	}))
+	}).then(function (bodyAndExactMatches) {
+	    res.status(200)
+
+	    var items = bodyAndExactMatches.body.suggest.airfields[0].options.map(function(res) {
+		var r = res._source
+		r.id = res._id
+		return r;
+	    })
+
+	    var itemsIds = items.map(function(item){ return item.id })
+
+	    bodyAndExactMatches.exactMatches.map(function(m) {
+		if (itemsIds.indexOf(m._id) == -1) {
+		    var r = m._source
+		    r.id = m._id
+		    items.unshift(r)
+		}
+	    })
+	    
+	    res.json(items.map(function(source) {
+		return { name: source.name + ' - ' + source.identifier, id: source.id }
+	    }))
+	    
     }, function (error) {
         console.trace(error.message);
         res.status(500);

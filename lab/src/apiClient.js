@@ -31,7 +31,24 @@ function getEntity(type) {
 var getPanel = getEntity("panel")
 var getLayout = getEntity("layout")
 var getTrip = getEntity("trip")
-var getExperience = getEntity("experience")
+
+// getExperience is a bit more difficult because we need to hydrate the trips
+function getExperience(id) {
+    return (fetch('/api/getFullExperience', {
+        method: 'post',
+        headers: new Headers({
+	    'Content-Type': 'application/json'
+        }),
+	body: JSON.stringify({ id : id })
+        }).then(function(response) {
+	    if (response.status == 200) {
+		return (response.json())
+	    } else {
+		throw new Exception("something went wrong")
+	    }
+	}))
+}
+
 
 function savePanel(panel) {
     return(fetch('/api/savePanel', {
@@ -167,6 +184,22 @@ function updateExperience(id, doc) {
     }))
 }
 
+function saveExperienceDescription(id, descriptionContent, descriptionPlainText) {
+  return(fetch('/api/saveExperienceDescription', {
+        method: 'post',
+        headers: new Headers({
+	    'Content-Type': 'application/json'
+        }),
+      body: JSON.stringify({id, descriptionContent, descriptionPlainText }) 
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
 function runSearchAroundAirfield(id) {
     console.log(id);
   return(fetch('/api/runSearchAroundAirfield?id=' + encodeURIComponent(id), {
@@ -181,4 +214,4 @@ function runSearchAroundAirfield(id) {
 
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience };
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription };

@@ -112,6 +112,7 @@ export default class SearchBox extends React.Component {
 
 	let airfieldTypeahead = <AsyncTypeahead
 	labelKey="name"
+	useCache={ false }
 	isLoading={this.state.isLoading}
 	onSearch={this._searchAirfields.bind(this)}
 	options={this.state.options}

@@ -65,9 +65,10 @@ export default class DisplayResultsMap extends React.Component {
 		console.log(result);
 
 		var latlng = [ result.location.lat, result.location.lon ];
+		var url = "window.location.href='/experience/" + result.id + "'" 
 		var popup = L.popup()
 		    .setLatLng(latlng)
-		    .setContent(result.title)
+		    .setContent('<div class="name">' + result.title + '</div><div class="details"><button class="btn btn-info" onClick="' + url + '">Details</button></div>')
 		   
 		var marker = L.marker(latlng);
 		marker.bindPopup(popup);
