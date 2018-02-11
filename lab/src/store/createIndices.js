@@ -1,4 +1,4 @@
-import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType, experienceIndex, experienceType, tripIndex, tripType } from './es.js';
+import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType, experienceIndex, experienceType, tripIndex, tripType, profileIndex, profileType } from './es.js';
 
 import { loadAirfields } from './loadAirfields.js';
 
@@ -182,6 +182,40 @@ function prepES(ESClient) {
 	    console.trace(error.message);
 	});
 	
+     }
+
+    function createProfileIndex() {
+	ESClient.indices.create({
+	    index: profileIndex,
+	    body: {
+		mappings: {
+		    profile: {
+			properties : {
+			    
+			    location: { type: "geo_point" },
+			    base: { type: "keyword" },
+			    name: { type: "text" },
+			    email: { type: "text" },
+			    availabilities: {
+				properties: {
+				    day: { type: "text" },
+				    isAvailable: { type: "boolean" }
+				}
+			    }
+			    
+			}
+			
+		    }
+		    
+		}
+	    } 
+	}).then(function (body) {
+	    
+	}, function (error) {
+	    console.log(error)
+	    console.trace(error.message);
+	});
+	
     }
     
     runIfIndexDoesNotExist(airfieldIndex, createAirfieldIndex)
@@ -189,8 +223,8 @@ function prepES(ESClient) {
     runIfIndexDoesNotExist(tripIndex, createTripIndex)
     // deleteThenRun(experienceIndex, createExperienceIndex)
     runIfIndexDoesNotExist(experienceIndex, createExperienceIndex)
+    runIfIndexDoesNotExist(profileIndex, createProfileIndex)
   
-    
 }
 
 

@@ -27,7 +27,7 @@ import elasticsearch from 'elasticsearch';
 import stripePackage from 'stripe';
 
 import { stripe_sk, aws_credentials, s3_bucket_name } from './config.js';
-import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType, experienceIndex, experienceType, tripIndex, tripType } from './store/es.js';
+import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, layoutIndex, layoutType, destinationIndex, destinationType, airfieldIndex, airfieldType, experienceIndex, experienceType, tripIndex, tripType, profileIndex, profileType } from './store/es.js';
 
 import { prepES } from './store/createIndices.js';
 
@@ -153,6 +153,7 @@ function store(index, type) {
 
 const storeTrip = store(tripIndex, tripType);
 const storeExperience = store(experienceIndex, experienceType);
+const storeProfile = store(profileIndex, profileType);
 
 app.post('/api/saveExperience', function(req, res){
 
@@ -205,6 +206,38 @@ app.post('/api/saveExperience', function(req, res){
 
 })
 
+
+app.post('/api/saveProfile', function(req, res){
+
+    console.log("saving profile " + req)
+
+    withAirfield(res, req.body.base.id).then(function(baseAirfield){
+	
+
+	var location = baseAirfield.location;
+	    
+	var profile = req.body
+	
+	var profilePersisted =
+		{
+		    location: location,
+		    base: baseAirfield.id,
+		    name: profile.name,
+		    email: profile.email,
+		    availabilities: profile.availabilities
+		}
+	    
+	// now we can store the whole experience
+	storeProfile(res, profilePersisted).then(function(profileId) {
+	    
+	    res.status(200);
+	    res.json({ id: profileId });
+	    
+	})
+	
+    })
+    
+})
 
 app.post('/api/saveAirfield', function(req, res){
 

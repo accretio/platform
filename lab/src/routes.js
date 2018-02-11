@@ -11,6 +11,7 @@ import ReviewDestinations from './components/ReviewDestinations';
 import ManageAirfields from './components/ManageAirfields';
 import Experience from './components/Experience';
 import ListExperiences from './components/ListExperiences';
+import TripSuggester from './components/TripSuggester';
 
 
 const routes = (
@@ -19,6 +20,8 @@ const routes = (
         <IndexRoute component={LandingPage}/>
 	<Route path="/experience/:id(/:edit)" component={Experience} />
 	<Route path="/shareExperience" component={ShareExperience} />
+	<Route path="/tripSuggester" component={TripSuggester} />
+
 	<Route path="/reviewDestinations" component={ReviewDestinations} />
 	<Route path="/manageAirfields" component={ManageAirfields} />
 	<Route path="/admin/experiences" component={ListExperiences} />

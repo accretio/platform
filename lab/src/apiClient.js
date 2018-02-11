@@ -110,6 +110,7 @@ function save(path){
 const saveSuggestion = save('saveSuggestion')
 const saveAirfield = save('saveAirfield')
 const saveExperience = save('saveExperience')
+const saveProfile = save('saveProfile')
 
 function getAllDestinations() {
     return(fetch('/api/getAllDestinations', {
@@ -214,4 +215,4 @@ function runSearchAroundAirfield(id) {
 
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription };
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription, saveProfile };
