@@ -1,6 +1,8 @@
 'use strict';
 
 import React, { PropTypes} from 'react';
+import { translate, Trans } from 'react-i18next';
+
 import { Link } from 'react-router';
 import fetch from 'isomorphic-fetch';
 
@@ -8,17 +10,24 @@ import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
 import { runSearchAroundAirfield } from './../apiClient.js';
 
-import SearchBox from './SearchBox';
+import SearchBox from './SearchBox'; 
 import DisplayResultsMap from './DisplayResultsMap.js';
+import DisplayResultsList from './DisplayResultsList.js';
 
-export default class LandingPage extends React.Component {
+class LandingPage extends React.Component {
     
     constructor(props) {
 	super(props);
+	var display = 'map';
+	if (window.innerWidth < 800) {
+	    display = 'list'; 
+	}
+	
 	this.state = {
 	    results: [],
 	    location: null,
-	    fullJumbotron: true
+	    fullJumbotron: true,
+	    display
 	};
     }
 
@@ -35,42 +44,51 @@ export default class LandingPage extends React.Component {
     
     render() {
 
-	var t = this;
+	const { t, i18n } = this.props;
 
-	console.log(this.state.results);
-	
-        var searchBox = <SearchBox handleResults= { this._handleResults.bind(this) } />;
+	var searchBox = <SearchBox handleResults= { this._handleResults.bind(this) } t = { this.props.t } i18n = { this.props.i18n } />;
         
 	var header;
 
 	if (this.state.fullJumbotron) {
-		header = <div><h1 className="display-4">Where are you flying next?</h1>
+	    header = <div><h1 className="display-4">{ t('landing_page_title') } </h1>
 
-	    <p className="lead">Browse aviation adventures. Plan your trip. Go fly!</p>
+		<p className="lead"> { t('landing_page_lead') } </p>
 
 	    <hr className="my-4" />
 		</div>;
 	}
 
+	var display;
+	
+	if (this.state.display == 'map') {
+	    
+	    display = <DisplayResultsMap centerOn={ this.state.location } results={ this.state.results }  t = { this.props.t } i18n = { this.props.i18n } history = { this.props.history } />
+		
+	    
+	} else {
+	    
+	    display = <DisplayResultsList centerOn={ this.state.location } results={ this.state.results }  t = { this.props.t } i18n = { this.props.i18n } history = { this.props.history } />
+		
+	}
 
 	
-	
 	return (
-		<div className="landing-page">
+		<div className= { "landing-page display-type-" + this.state.display } >
 		
 		<div className="jumbotron-wrapper">
 		<div className="jumbotron">
 		    { header }
-	    { searchBox }
-	   
+	            { searchBox }	   
                 </div>
 		</div>
 
-		<DisplayResultsMap centerOn={ this.state.location } results={ this.state.results } />
+	    { display }
 		
-     </div>);
-
-  }
+	    </div>);
+			
+    }
+    
 }
 
 LandingPage.contextTypes = {
@@ -80,3 +98,5 @@ LandingPage.contextTypes = {
 	push: React.PropTypes.func.isRequired
     })
 };
+
+export default (LandingPage);

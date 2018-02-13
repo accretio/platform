@@ -7,6 +7,7 @@ import mixpanel from 'mixpanel-browser';
 import MixpanelProvider from 'react-mixpanel';
 import {mixpanel_token, bypass_https} from './config';
 import {CookiesProvider} from 'react-cookie';
+import './i18n';
 
 window.onload = () => {
     if (location.protocol != 'https:' && !bypass_https)

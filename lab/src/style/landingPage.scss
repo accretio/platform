@@ -1,8 +1,7 @@
-.landing-page {
+.landing-page.display-type-map  {
 
     .jumbotron-wrapper {
 	top: 54px;
-	
 	z-index:1;
 	width: 800px;
 	max-width: 100%;
@@ -12,14 +11,37 @@
     .jumbotron {
 	margin: 40px 40px;
 	padding: 30px 30px!important;
-	
-
     }
     
+}
+
+.landing-page.display-type-list {
+
+    
+    .jumbotron-wrapper {
+	margin-top: 24px;
+    }
+    
+    .jumbotron {
+	margin: 20px 40px;
+	padding: 30px 30px!important;
+    }
+        
     .card-columns {
 	padding: 0 40px;
 	orphans: 1 !important;
 	widows:1 !important;
     }
 
+  
+    .card-text.tags {
+	margin-top: -10px;
+    
+  
+    .tag {
+	  margin-right: 10px;
+	  margin-top: 10px;
+    }
+
+    }
 }

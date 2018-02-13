@@ -108,7 +108,8 @@ export default class SearchBox extends React.Component {
     
     render() {
 	
-	var t = this;
+	var this_ = this;
+	const { t, i18n } = this.props;
 
 	let airfieldTypeahead = <AsyncTypeahead
 	labelKey="name"
@@ -116,7 +117,7 @@ export default class SearchBox extends React.Component {
 	isLoading={this.state.isLoading}
 	onSearch={this._searchAirfields.bind(this)}
 	options={this.state.options}
-	placeholder="Your homebase?"
+	placeholder= { t('search_box_homebase') }
 	onChange={this._handleChange.bind(this)}
 />;
 	var airfieldSearch =
@@ -129,26 +130,31 @@ export default class SearchBox extends React.Component {
 	var tags = Object.keys(tagsWithCounts).map(function(tag, i) {
 	    var count = tagsWithCounts[tag]
 	    var className; 
-		if (t.state.toggledOff.indexOf(tag) > -1) {
+		if (this_.state.toggledOff.indexOf(tag) > -1) {
 		    className = "btn btn-light" 
 		} else {
 		    className = "btn btn-info"
 		}
-	    return (<button key = { i } className= { className } onClick = { t._toggleTag.bind(t, tag) } >
-		    { tag + " (" + count + ")" } 
+	    return (<button key = { i } className= { className } onClick = { this_._toggleTag.bind(this_, tag) } >
+		    { t(tag) + " (" + count + ")" } 
 	            </button>) 
     
 	})
 
+	var tagsContainer;
+	if (tags.length > 0) {
+	    tagsContainer = <div className="row tags">
+		{ tags }
+		</div>
+	}
+	
 	return (<div className="searchBox">
 
 		<div className="row">
 		{ airfieldSearch }
 		</div>
 
-		<div className="row tags">
-		{ tags }
-		</div>
+		{ tagsContainer }
 
 		</div>); 
     }

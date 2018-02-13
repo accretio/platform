@@ -31,6 +31,7 @@ import { recipeIndex, recipeType, orderIndex, orderType, panelIndex, panelType, 
 
 import { prepES } from './store/createIndices.js';
 
+
 var config = require('./config');
 
 // initialize the server and configure support for ejs templates
@@ -483,6 +484,7 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 		    location: hit._source.location,
 		    title: hit._source.title,
 		    tags: hit._source.tags,
+		    short_description: hit._source.descriptionPlainText.substring(0, 100),
 		    distance: Math.round(hit.sort[0])
 		}
 							  
@@ -900,16 +902,8 @@ app.get('*', (req, res) => {
             }
 
             // generate the React markup for the current route
-            let markup;
-            if (renderProps) {
-                // if the current route matched we have renderProps
-                markup = renderToString(<CookiesProvider><RouterContext {...renderProps}/></CookiesProvider>);
-            } else { 
-                // otherwise we can render a 404 page
-                markup = renderToString(<NotfoundPage />);
-                res.status(404);
-            }
-
+            let markup = null;
+          
             // render the index template with the embedded React markup
             return res.render('index', { markup, config: JSON.stringify(config)});
         }
@@ -921,8 +915,6 @@ app.get('*', (req, res) => {
 
 
 prepES(ESClient);
-
-
 
 // start the server
 server.listen(port, err => {

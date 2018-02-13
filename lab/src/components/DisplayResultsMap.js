@@ -25,7 +25,7 @@ export default class DisplayResultsMap extends React.Component {
 	    lon: 14.3,
 	    zoom: 5,
 	}
-	
+
 	window.windytyMain = function(map) {
 	    // W.setOverlay("clouds");
 	    W.setOverlay("wind");
@@ -38,6 +38,7 @@ export default class DisplayResultsMap extends React.Component {
         script.src = "https://api.windytv.com/v2.3/boot.js";
         script.async = true;
         document.body.appendChild(script);
+	
     }
 
     componentWillUpdate(nextProps, nextState) {

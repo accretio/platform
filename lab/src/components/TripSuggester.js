@@ -90,38 +90,23 @@ export default class TripSuggester extends React.Component {
     }
 
     _createCheck(value) {
+
+	const { t, i18n } = this.props;
+
 	var id = value + '-name-check'
 	return(<div className="form-check form-check-inline">
 	       <input className="form-check-input" type="checkbox" id= { id } value= { value } ref={el => this.inputs[value] = el } />
-	       <label className="form-check-label" htmlFor={ id } > { value } </label>
+	       <label className="form-check-label" htmlFor={ id } > { t(value) } </label>
 	       </div>)
 	
-    }
-
-    _createTextarea(name, label) {
-	var id = name + '-name-input'
-	return(<div className="form-group row">
-	          <label htmlFor={ id } className="col-sm-4 col-form-label hidden-xs"> { label } </label>
-	          <div className="col-8">
-	             <textarea className="form-control" rows="3" id= { id } ref={el => this.inputs[name] = el } />
-	          </div>
-	       </div>);
-    }
-
-     _createDatepicker(name, label) {
-	var id = name + '-name-input'
-	return(<div className="form-group row">
-	          <label htmlFor={ id } className="col-sm-4 col-form-label hidden-xs"> { label } </label>
-	          <div className="col-8">
-	        <input className="form-control" type="date" id= { id } ref={el => this.inputs[name] = el } />
-	          </div>
-	       </div>);
     }
 
 
     _shareExperience() {
 
-	var t = this
+	const { t, i18n } = this.props;
+
+	var this_ = this
 	
 	if (!this.state[this._baseAirfield]) {
 	    this.context.mixpanel.track('trip suggester validation warning', { message: 'missing base airfield' });
@@ -151,7 +136,7 @@ export default class TripSuggester extends React.Component {
 
 	var profile = {
 	    base: this.state[this._baseAirfield],
-	    availabilities : [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ].map(function(day) { return { day: day, isAvailable: t.inputs[day].checked }; }),
+	    availabilities : [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ].map(function(day) { return { day: day, isAvailable: this_.inputs[day].checked }; }),
 			       
 	    name: this.inputs[this._contributorName].value,
 	    email: this.inputs[this._contributorEmail].value,
@@ -161,42 +146,43 @@ export default class TripSuggester extends React.Component {
 	this.context.mixpanel.track('submitting new profile', profile);
 	 
 	saveProfile(profile).then(function(body) {
-	    t.context.mixpanel.track('new profile', { id: body.id });
-	    t.props.setYesNo("Thank You", "Thanks, we will be in touch!",
+	    this_.context.mixpanel.track('new profile', { id: body.id });
+	    this_.props.setYesNo("Thank You", "Thanks, we will be in touch!",
 			     function() {
-				 t.context.history.push("/")
+				 this_.context.history.push("/")
 			     }, null)
 	}, function(error) {
-	    t.context.mixpanel.track('error in share experience page', { 'error': error });
-	    t._sendError("Sorry, something went wrong");
+	    this_.context.mixpanel.track('error in share experience page', { 'error': error });
+	    this_._sendError("Sorry, something went wrong");
 	})
-
-
 
     }
     
     render() {
-	var t = this;
+	var this_ = this;
+
+	const { t, i18n } = this.props;
 
 	let submitGroup =
 	    <div className="submit-group row text-center">
 	    <div className="col-12">
-	       <button type="submit" className="btn btn-primary" onClick={t._shareExperience.bind(t)}>Submit</button>
+	    <button type="submit" className="btn btn-primary" onClick={this_._shareExperience.bind(this_)}> {
+		t('Submit') } </button>
 	    </div>
 	    </div>
 
 	let availabilityGroup =
 	      <div className="form-group row">
-	          <label htmlFor="experienceId" className="col-sm-4 col-form-label hidden-xs"> When are you usually available? </label>
+	    <label htmlFor="experienceId" className="col-sm-4 col-form-label hidden-xs"> { t('When are you usually available?') } </label>
 	          <div className="col-8">
 
-	{ t._createCheck("Monday") }
-	{ t._createCheck("Tuesday") }
-	{ t._createCheck("Wednesday") }
-	{ t._createCheck("Thursday") }
-	{ t._createCheck("Friday") }
-	{ t._createCheck("Saturday") }
-	{ t._createCheck("Sunday") }
+	{ this._createCheck.bind(this)("Monday") }
+	{ this._createCheck.bind(this)("Tuesday") }
+	{ this._createCheck.bind(this)("Wednesday") }
+	{ this._createCheck.bind(this)("Thursday") }
+	{ this._createCheck.bind(this)("Friday") }
+	{ this._createCheck.bind(this)("Saturday") }
+	{ this._createCheck.bind(this)("Sunday") }
 	   
 	          </div>
 	    </div>
@@ -209,7 +195,7 @@ export default class TripSuggester extends React.Component {
 
 		   <div className="title row text-center">
 	              <div className="col-12">
-	                  <h2>Trip Suggester</h2>
+	        <h2> { t('Trip Suggester') } </h2>
 	              </div>
 	        </div>
 
@@ -217,7 +203,7 @@ export default class TripSuggester extends React.Component {
 	              <div className="col-12">
 	                <div className="card">
 		<div className="card-body">
-		Fill up the form below and we will send you and other pilots around you trips suggestions. If several pilots are up for the same trip on the same day, we will make it happen!
+		       { t('Fill up the form below and we will send you and other pilots around you trips suggestions. If several pilots are up for the same trip on the same day, we will make it happen!') }
 	     </div>
 </div>
 	              </div>
@@ -225,15 +211,13 @@ export default class TripSuggester extends React.Component {
 
 	    
 
-	    
-
-	    { t._createAirfieldInput(t._baseAirfield, "Where are you based?") }
+	    { this._createAirfieldInput(this._baseAirfield, t("Where are you based?")) }
 	    
 	    { availabilityGroup }
 	    
-	    { t._createInput(t._contributorEmail, "Your email (hidden)", "email") }
+	    { this._createInput(this._contributorEmail, t("Your email (hidden)")) }
 
-	    { t._createInput(t._contributorName, "Your name (optional)") }
+	    { this._createInput(this._contributorName, t("Your name (optional)")) }
 
 	    { submitGroup }
 	

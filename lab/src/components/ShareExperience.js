@@ -273,10 +273,13 @@ export default class ShareExperience extends React.Component {
     }
     
     render() {
-	var t = this;
+
+	const { t, i18n } = this.props;
+
+	var this_ = this;
 
 	let tags = this.state.tags;
-        let suggestions = [ "family-friendly", "sports", "museum", "landmark" ];
+        let suggestions = [ "family-friendly", "sports", "museum", "landmark" ].map(function(s) { return (t(s)) })
 
 	let tagsInputGroup =
 	    <div className="form-group row">
@@ -287,7 +290,8 @@ export default class ShareExperience extends React.Component {
 	classNames={{
 	    tag: 'btn btn-info',
 	}}
-                    suggestions={suggestions}
+        suggestions={suggestions}
+	placeholder={ t('Add a new tag') }
                     handleDelete={this.handleDelete}
                     handleAddition={this.handleAddition}
                     handleDrag={this.handleDrag} />
@@ -298,13 +302,15 @@ export default class ShareExperience extends React.Component {
 	let submitGroup =
 	    <div className="submit-group row text-center">
 	    <div className="col-12">
-	       <button type="submit" className="btn btn-primary" onClick={t._shareExperience.bind(t)}>Submit</button>
+	    <button type="submit" className="btn btn-primary" onClick={this._shareExperience.bind(this)}>
+	    { t('Submit') } </button>
 	    </div>
 	    </div>
 
 	let descriptionGroup =
 	      <div className="form-group row">
-	          <label htmlFor="experienceId" className="col-sm-4 col-form-label hidden-xs"> Description of your experience </label>
+	    <label htmlFor="experienceId" className="col-sm-4 col-form-label hidden-xs">
+	    { t('Description of your experience') } </label>
 	          <div className="col-8">
 
 	    <Editor editorState={this.state.editorState} onEditorStateChange={this._onEditorStateChange.bind(this)}  />
@@ -319,25 +325,25 @@ export default class ShareExperience extends React.Component {
 
 		   <div className="title row text-center">
 	              <div className="col-12">
-	                  <h2>Share an experience</h2>
+	        <h2> { t('share_an_experience') } </h2>
 	              </div>
 	        </div>
 
-	    { t._createAirfieldInput(t._departureAirfield, "Where did you depart from?") }
+	    { this_._createAirfieldInput(this_._departureAirfield, t("Where did you depart from?")) }
 	    
-	    { t._createAirfieldInput(t._destinationAirfield, "Where did you land at?") } 
+	    { this_._createAirfieldInput(this_._destinationAirfield, t("Where did you land at?")) } 
 
-	    { t._createDatepicker(t._tripDate, "When did you take the trip?") }
+	    { this_._createDatepicker(this_._tripDate, t("When did you take the trip?")) }
    
-	    { t._createInput(t._experienceTitle, "Title of your experience") }
+	    { this_._createInput(this_._experienceTitle, t("Title of your experience")) }
 	    
 	    { descriptionGroup }
 	    
 	    { tagsInputGroup }
 	    
-	    { t._createInput(t._contributorEmail, "Your email (hidden)", "email") }
+	    { this_._createInput(this_._contributorEmail, t("Your email (hidden)")) }
 
-	    { t._createInput(t._contributorName, "Your name (optional)") }
+	    { this_._createInput(this_._contributorName, t("Your name (optional)")) }
 
 	    { submitGroup }
 	

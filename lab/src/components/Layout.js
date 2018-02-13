@@ -1,17 +1,28 @@
 'use strict';
 
 import React from 'react';
+import { translate, Trans } from 'react-i18next';
+
 import { Link } from 'react-router';
 
 import Modal from 'react-modal';
 
-export default class Layout extends React.Component {
+class Layout extends React.Component {
 
     constructor(props) {
 	super(props);
+	const { t, i18n } = this.props;
 	this.state = {
-	    error: null
+	    error: null,
+	    language: i18n.language
 	}
+    }
+    
+    _changeLanguage(language) {
+	const { t, i18n } = this.props;
+	i18n.changeLanguage(language);
+	this.setState({ language });
+    
     }
     
     addDrift() {
@@ -85,7 +96,8 @@ export default class Layout extends React.Component {
     
     render() {
 
-	var t = this;
+	const { t, i18n } = this.props;
+	var this_ = this;
 
 	// this modal is used to display error messages throughout the app 
 	
@@ -124,11 +136,11 @@ export default class Layout extends React.Component {
             <div className="modal-dialog" role="document">
             <div className="modal-content">
             <div className="modal-header">
-            <h5 className="modal-title">Error</h5>
+            <h5 className="modal-title"> { t('Error') } </h5>
            
              </div>
             <div className="modal-body">
-            <p>{ this.state.error ? this.state.error.message : '' } </p>
+            <p>{ this.state.error ? t(this.state.error.message) : '' } </p>
             </div>
             <div className="modal-footer">
          
@@ -147,7 +159,7 @@ export default class Layout extends React.Component {
 
 	if (this.state.yesno ? this.state.yesno.no : null) {
 	    
-		buttonNo = <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ this.state.yesno ? this.state.yesno.no : function(){} } >No</button>
+	    buttonNo = <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ this.state.yesno ? this.state.yesno.no : function(){} } > { t('No') } </button>
   	}
 		
 		let yesNoModal =
@@ -160,16 +172,16 @@ export default class Layout extends React.Component {
             <div className="modal-dialog" role="document">
             <div className="modal-content">
             <div className="modal-header">
-            <h5 className="modal-title">{ this.state.yesno ?  this.state.yesno.title : '' }</h5>
+            <h5 className="modal-title">{ this.state.yesno ?  t(this.state.yesno.title) : '' }</h5>
            
              </div>
             <div className="modal-body">
-            <p>{ this.state.yesno ? this.state.yesno.message : '' } </p>
+            <p>{ this.state.yesno ? t(this.state.yesno.message) : '' } </p>
             </div>
             <div className="modal-footer">
 
 	{ buttonNo }
-	    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ this.state.yesno ? this.state.yesno.yes : function(){} }>Yes</button>
+	    <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ this.state.yesno ? this.state.yesno.yes : function(){} }> { t('Yes') } </button>
       
 	</div>
             </div>
@@ -180,29 +192,45 @@ export default class Layout extends React.Component {
 	
 	
 	var child =
-	    React.cloneElement(this.props.children, { messageTeam: this.messageTeam.bind(this), sendError: this._sendError.bind(this), setYesNo: this._setYesNo.bind(this) }) ;
+	    React.cloneElement(this.props.children, { messageTeam: this.messageTeam.bind(this), sendError: this._sendError.bind(this), setYesNo: this._setYesNo.bind(this), t: this.props.t, i18n: this.props.i18n }) ;
 
+
+	var contactBtn = <li className="nav-item">
+		<a className="nav-link" href="mailto:william@accret.io"> { t('contact') } </a>
+		</li>;
+
+	    
 	var suggestDestinationBtn = null;
 	var tripSuggesterBtn = null;
-	var togglerBtn = null;
 	
-	if (this.props.location.pathname != "/shareExperience") {
-		suggestDestinationBtn =  <li className="nav-item">
-        <a className="nav-link" href="/shareExperience">Share an experience</a>
-		</li>;
-	    
-	}
-
-	togglerBtn = <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	var togglerBtn = <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span className="navbar-toggler-icon"></span>
 	    </button>;
+
+	if (this.props.location.pathname != "/shareExperience") {
+		suggestDestinationBtn =  <li className="nav-item">
+		<Link className="nav-link" to="/shareExperience" onClick = { function() { this_.props.history.push('/shareExperience'); return false; } } > { t('share_an_experience') } </Link>
+		</li>;
+	}
 	
 	if (this.props.location.pathname != "/tripSuggester") {
 		tripSuggesterBtn =  <li className="nav-item">
-        <a className="nav-link" href="/tripSuggester">Trip Suggester</a>
+	
+	    	<Link className="nav-link" to="/tripSuggester" onClick = { function() { this_.props.history.push('/tripSuggester'); return false; } } > { t('trip_suggester') } </Link>
 		</li>;
 	}
 
+
+	var langToggler = <li className="nav-item dropdown">
+        <a className="nav-link dropdown-toggle dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            { t(this.state.language) }
+        </a>
+        <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+            <button className="dropdown-item" onClick={ this._changeLanguage.bind(this, "en") } type="button"> { t('en') } </button>
+	    <button className="dropdown-item" onClick={ this._changeLanguage.bind(this, "fr") } type="button">
+	    { t('fr') } </button>
+	</div>
+	    </li> ;
 
 	return (
 	   
@@ -210,18 +238,18 @@ export default class Layout extends React.Component {
 		{ errorModal }
 	    { yesNoModal }
 		<nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-	 
-		       <a className="navbar-brand" href="/">GA Adventures</a>
-	         
-	    { togglerBtn }
+		<Link className="navbar-brand" to="/" onClick = { function() { this_.props.history.push('/'); return false; } } >Accretio</Link>
+	
+		{ togglerBtn }
 
 
 
 	     <div className="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul className="navbar-nav mr-auto">
+		<ul className="navbar-nav mr-auto">
 		{ suggestDestinationBtn }
-	    { tripSuggesterBtn }
-    </ul>
+	        { tripSuggesterBtn }
+	    	{ langToggler }
+                </ul>
 
 	    </div>
 	        </nav>
@@ -239,3 +267,6 @@ Layout.contextTypes = {
 	push: React.PropTypes.func.isRequired
     })
 }
+
+export default translate('translations')(Layout);
+
