@@ -161,6 +161,9 @@ export default class ShareExperience extends React.Component {
     _shareExperience() {
 
 	var t = this
+	
+	const { i18n } = this.props;
+
 	var descriptionContent = this.state.editorState.getCurrentContent()
 	var descriptionDraftJs = convertToRaw(descriptionContent)
 	var descriptionPlainText = descriptionContent.getPlainText()
@@ -204,7 +207,8 @@ export default class ShareExperience extends React.Component {
 	// this is best effort 
 	this.context.mixpanel.register({
 	    'Email': this.inputs[this._contributorEmail].value,
-	    'Name': this.inputs[this._contributorName].value
+	    'Name': this.inputs[this._contributorName].value,
+	    'locale':  i18n.language
 	});
 
 	// this should be done behind a login, but for now it is enough
@@ -212,7 +216,8 @@ export default class ShareExperience extends React.Component {
 	this.context.mixpanel.people.set({
 	    "$email":  this.inputs[this._contributorEmail].value,   
             "$last_login": new Date(),         
-    	    "$name" : this.inputs[this._contributorName].value
+    	    "$name" : this.inputs[this._contributorName].value,
+	    "locale":  i18n.language
 	});
 
 	var trip = {

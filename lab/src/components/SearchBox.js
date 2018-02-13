@@ -22,6 +22,18 @@ export default class SearchBox extends React.Component {
 	};
     }
 
+    componentDidMount() {
+	var this_ = this
+	var baseAirport = this.context.cookies.get('baseAirport')
+	if (baseAirport) {
+	    runSearchAroundAirfield(baseAirport.id).then(function(results) {
+		this_._updateStateWithResults.bind(this_)(results.results)
+		this_.props.handleResults(results.location, results.results);
+	    })
+	}
+	 
+    }
+
     _searchAirfields(query) {
 	var t = this
 	this.setState({isLoading: true});
@@ -51,6 +63,7 @@ export default class SearchBox extends React.Component {
     _handleChange(e) {
 	var t = this
 	if (e.length > 0) {
+	    this.context.cookies.set('baseAirport', e[0])
 	    this.context.mixpanel.track('searching for experiences around airfield', { airfield: e[0] });
 	    runSearchAroundAirfield(e[0].id).then(function(results) {
 		 t._updateStateWithResults.bind(t)(results.results)
@@ -111,12 +124,20 @@ export default class SearchBox extends React.Component {
 	var this_ = this;
 	const { t, i18n } = this.props;
 
+	var selected = [];
+	var baseAirport = this.context.cookies.get('baseAirport')
+
+	if (baseAirport) {
+	    selected.push(baseAirport);
+	}
+	
 	let airfieldTypeahead = <AsyncTypeahead
 	labelKey="name"
 	useCache={ false }
 	isLoading={this.state.isLoading}
 	onSearch={this._searchAirfields.bind(this)}
 	options={this.state.options}
+	selected = { selected }
 	placeholder= { t('search_box_homebase') }
 	onChange={this._handleChange.bind(this)}
 />;
