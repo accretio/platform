@@ -53,10 +53,15 @@ export default class DisplayResultsMap extends React.Component {
     
     render() {
 
-	var t = this
+	var this_ = this
+	const { t, i18n } = this.props;
+
 	var results = this.props.results
 
 	var map = this.state.map
+
+	var readMore = t('Details')
+	
 	if (map) {
 	    console.log(results)
 	    console.log(">>> rendering " + results.length + " results");
@@ -69,21 +74,20 @@ export default class DisplayResultsMap extends React.Component {
 		var url = "window.location.href='/experience/" + result.id + "'" 
 		var popup = L.popup()
 		    .setLatLng(latlng)
-		    .setContent('<div class="name">' + result.title + '</div><div class="details"><button class="btn btn-info" onClick="' + url + '">Details</button></div>')
+		    .setContent('<div class="name">' + result.title + '</div><div class="details"><button class="btn btn-info" onClick="' + url + '">' + readMore + '</button></div>')
 		   
 		var marker = L.marker(latlng);
 		marker.bindPopup(popup);
 
-		t.state.markers.addLayer(marker);
+		this_.state.markers.addLayer(marker);
 		
 	    })
 
 	}
 
 	return (<div className="display-results-map">
-		
-		<div id="windyty" className="windyty"></div>
-	       </div>);
+		   <div id="windyty" className="windyty"></div>
+		</div>);
 
     }
     
