@@ -13,24 +13,61 @@ export default class Experience extends React.Component {
 
     constructor(props) {
 	super(props);
-	console.log(this.props.params);
+ 	console.log(this.props.params);
+	console.log("LANG>>> " + this.props.language);
 	this.state = {
 	    experience: null,
 	    editable: (this.props.params.edit ? true : false),
 	    editorState: EditorState.createEmpty()
 	}
+	
     }
     
     componentDidMount() {
+
+	var this_ = this;
+	const { t, i18n } = this.props;
+
+	var edit = ""
+	if (this.props.params.edit) {
+	    edit = "/edit"
+	}
+	if (this.props.params.language != i18n.language) {
+	    this.context.history.push("/experience/" + this.props.params.id + '/' + i18n.language + edit)
+	    this.props.params.language = i18n.language
+	} 
+
 	this.context.mixpanel.track("loading experience page", { id: this.props.params.id })
-
 	this._loadExperience()
-    }
 
+	i18n.on('languageChanged', function(lng) {
+	    if (this_.props.params.language != i18n.language) {
+		
+		var edit = ""
+		if (this_.props.params.edit) {
+		    edit = "/edit"
+		}
+		this_.context.history.push("/experience/" + this_.props.params.id + '/' + i18n.language + edit)
+		this_.props.params.language = i18n.language
+		this_._loadExperience()
+	    } 
+	});
+	
+    }
+   
     _loadExperience() {
+	
+
 	var t = this
 	let id = this.props.params.id
-	getExperience(id).then(function(experience){
+	var language = 'en'
+	if (this.props.params.language) {
+	    language = this.props.params.language
+	}
+
+	console.log(this.props.params)
+	
+	getExperience(id, language).then(function(experience){
 	    console.log(experience)
 	    var contentState = convertFromRaw(experience.descriptionDraftJs)
 	    var editorState = EditorState.createWithContent(contentState)
@@ -67,9 +104,16 @@ export default class Experience extends React.Component {
 	var descriptionDraftJs = convertToRaw(descriptionContent)
 	var descriptionPlainText = descriptionContent.getPlainText()
 
+
+	var language = 'en'
+	if (this.props.params.language) {
+	    language = this.props.params.language;
+	}
+	
 	console.log(descriptionPlainText)
 	console.log(descriptionDraftJs)
 	saveExperienceDescription(this.props.params.id,
+				  language,
 				  descriptionDraftJs,
 				  descriptionPlainText).then(function() {
 
@@ -81,7 +125,9 @@ export default class Experience extends React.Component {
     
     render() {
 
-	var t = this
+	const { t, i18n } = this.props;
+
+	var this_ = this
 	
 	var experience = this.state.experience
 
@@ -92,7 +138,7 @@ export default class Experience extends React.Component {
 
 	var title = <div className="row title text-center">
 	    <div className="col-12">
-	    <h1>{ experience.title }</h1>
+	    <h1>{ t(experience.title) }</h1>
 	    </div>
 	    </div>
 
@@ -100,7 +146,7 @@ export default class Experience extends React.Component {
 		<div className="row trips">
 	    <div className="col-12">
 	    <div className="alert alert-success" role="alert">
-	    { experience.trips.length } { (experience.trips.length > 2) ? "people": "person" } lived that experience
+	    { experience.trips.length } { (experience.trips.length > 2) ? (t("people")): (t("person")) } { t("lived that experience") }
 	    </div>
 	</div>
 	    </div>
@@ -122,16 +168,12 @@ export default class Experience extends React.Component {
 */
 
 	var airfieldsOfEntry =
-	      <div className="row airfield text-center">
+	    <div className="row airfield text-center">
 	    <div className="col-12">
 	    { airfields[0].name } - { airfields[0].identifier }
-	  
-	
+	    </div>
 	    </div>
 
-	    </div>
-
-	
 
 	var classNameEditor;
 	if (this.state.editable == false) {
@@ -150,6 +192,7 @@ export default class Experience extends React.Component {
 	        </div>
 		</div>
 	}
+	
 	var description =
 	    <div className="row">
 	    <div className= { "col-12 " + classNameEditor }>
@@ -157,12 +200,8 @@ export default class Experience extends React.Component {
 	    </div>
 	    </div>
 
-
-
-	    
 	return (<div className="experience-page">
 		<div className="container">
-
 
 		{ title }
 		{ airfieldsOfEntry }
@@ -171,17 +210,11 @@ export default class Experience extends React.Component {
 		{ saveButton }
 		
 		</div>
-		</div>
-
-		
-
-	       );
+		</div>);
 	
     }
 
-}
-
-
+};
 
 
 Experience.contextTypes = {

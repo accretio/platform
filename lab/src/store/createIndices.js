@@ -18,8 +18,24 @@ function prepES(ESClient) {
 	
     }
 
+    function runIfFieldDoesNotExistInIndex(indexName, indexType, fieldName, callback) {
 
-     function deleteThenRun(indexName, callback) {
+	ESClient.indices.getFieldMapping({
+	    index: indexName,
+	    type: indexType,
+	    fields: fieldName
+	}).then(function(body){
+	    console.log(body);
+	    if (body[indexName] == undefined) {
+		callback()
+	    } else {
+		console.log("field " + fieldName + " already exists in " + indexName + " - " + indexType)
+	    }
+	})
+	
+    }
+    
+    function deleteThenRun(indexName, callback) {
 	
 	ESClient.indices.delete({
 	    index: indexName
@@ -80,7 +96,6 @@ function prepES(ESClient) {
 				}
 				
 			    },
-			    
 			    
 			    "name": { type: "text" }
 			}
@@ -159,20 +174,8 @@ function prepES(ESClient) {
 				}
 			    },
 			    trips: { type: "keyword" }
-			  /*  comments: {
-				date: { type: "date" }
-				author: {
-				    properties: {
-					name: { type: "text" },
-					email: { type: "text" }
-				    }
-				}
-				message: { type: "text" }
-			    } */
 			}
-			
 		    }
-		    
 		}
 	    } 
 	}).then(function (body) {
@@ -184,6 +187,29 @@ function prepES(ESClient) {
 	
      }
 
+    function addTranslationToExperienceMapping() {
+	ESClient.indices.putMapping({
+	    index: experienceIndex,
+	    type: experienceType,
+	    body: {
+		properties: {
+		    translations: {
+			properties: {
+			    locale: { type: "text" },
+			    descriptionDraftJs: { enabled: false },
+			    descriptionPlainText: { type: "text" }
+			}
+		    }
+		}
+	    }
+	}).then(function (body) {
+	    
+	}, function (error) {
+	    console.log(error)
+	    console.trace(error.message);
+	});
+    }
+
     function createProfileIndex() {
 	ESClient.indices.create({
 	    index: profileIndex,
@@ -191,7 +217,6 @@ function prepES(ESClient) {
 		mappings: {
 		    profile: {
 			properties : {
-			    
 			    location: { type: "geo_point" },
 			    base: { type: "keyword" },
 			    name: { type: "text" },
@@ -202,11 +227,8 @@ function prepES(ESClient) {
 				    isAvailable: { type: "boolean" }
 				}
 			    }
-			    
 			}
-			
 		    }
-		    
 		}
 	    } 
 	}).then(function (body) {
@@ -224,7 +246,8 @@ function prepES(ESClient) {
     // deleteThenRun(experienceIndex, createExperienceIndex)
     runIfIndexDoesNotExist(experienceIndex, createExperienceIndex)
     runIfIndexDoesNotExist(profileIndex, createProfileIndex)
-  
+
+    runIfFieldDoesNotExistInIndex(experienceIndex, experienceType, "translations", addTranslationToExperienceMapping);
 }
 
 

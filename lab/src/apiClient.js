@@ -33,13 +33,13 @@ var getLayout = getEntity("layout")
 var getTrip = getEntity("trip")
 
 // getExperience is a bit more difficult because we need to hydrate the trips
-function getExperience(id) {
+function getExperience(id, language) {
     return (fetch('/api/getFullExperience', {
         method: 'post',
         headers: new Headers({
 	    'Content-Type': 'application/json'
         }),
-	body: JSON.stringify({ id : id })
+	body: JSON.stringify({ id : id, language: language })
         }).then(function(response) {
 	    if (response.status == 200) {
 		return (response.json())
@@ -185,13 +185,13 @@ function updateExperience(id, doc) {
     }))
 }
 
-function saveExperienceDescription(id, descriptionContent, descriptionPlainText) {
+function saveExperienceDescription(id, language, descriptionContent, descriptionPlainText) {
   return(fetch('/api/saveExperienceDescription', {
         method: 'post',
         headers: new Headers({
 	    'Content-Type': 'application/json'
         }),
-      body: JSON.stringify({id, descriptionContent, descriptionPlainText }) 
+      body: JSON.stringify({id, language, descriptionContent, descriptionPlainText }) 
     }).then(function(response) {
 	if (response.status == 200) {
 	    return (response.json())
@@ -201,9 +201,9 @@ function saveExperienceDescription(id, descriptionContent, descriptionPlainText)
     }))
 }
 
-function runSearchAroundAirfield(id) {
+function runSearchAroundAirfield(id, language) {
     console.log(id);
-  return(fetch('/api/runSearchAroundAirfield?id=' + encodeURIComponent(id), {
+  return(fetch('/api/runSearchAroundAirfield?id=' + encodeURIComponent(id) + '&language=' + language, {
 	method: 'get'
     }).then(function(response) {
 	if (response.status == 200) {

@@ -385,14 +385,33 @@ app.post('/api/updateExperience', function(req, res) {
 app.post('/api/saveExperienceDescription', function(req, res) {
 
     ESClient.get({
-            index: experienceIndex,
-            type: experienceType,
-            id: req.body.id
+        index: experienceIndex,
+        type: experienceType,
+        id: req.body.id
     }).then(function (body) {
 
 	var doc = body._source
-	doc.descriptionDraftJs = req.body.descriptionContent,
-	doc.descriptionPlainText= req.body.descriptionPlainText
+
+	var language = req.body.language.substring(0, 2)
+
+	if (language == 'en') {
+	    doc.descriptionDraftJs = req.body.descriptionContent,
+	    doc.descriptionPlainText= req.body.descriptionPlainText
+	} else {
+	    var translation = {
+		locale: language,
+		descriptionDraftJs: req.body.descriptionContent,
+		descriptionPlainText: req.body.descriptionPlainText
+	    }
+
+	    if (doc.translations == undefined) {
+		doc.translations = [ translation ]
+	    } else {
+		var translations = doc.translations.filter(function(t) { return (t.locale != language) })
+		translations.push(translation)
+		doc.translations = translations
+	    }
+	}
 
 	console.log("updating the doc")
 	console.log(doc);
@@ -444,6 +463,7 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 	console.log(doc)
 
 	var location = doc._source.location
+	var language = req.query.language.substring(0, 2)
 
 	ESClient.search({
 	    index: experienceIndex,
@@ -479,16 +499,29 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 	    res.status(200)
 	    res.json({
 		location: location,
-		results: body.hits.hits.map(function(hit) { return {
-		    id: hit._id,
-		    location: hit._source.location,
-		    title: hit._source.title,
-		    tags: hit._source.tags,
-		    short_description: hit._source.descriptionPlainText.substring(0, 100),
-		    distance: Math.round(hit.sort[0])
-		}
-							  
-							  })
+		results: body.hits.hits.map(function(hit) {
+
+		    var result = {
+			id: hit._id,
+			location: hit._source.location,
+			title: hit._source.title,
+			tags: hit._source.tags,
+			short_description: hit._source.descriptionPlainText.substring(0, 100),
+			distance: Math.round(hit.sort[0])
+		    }
+
+		    // swapping the translation
+		    var translations = hit._source.translations
+		    if (translations) {
+			var translation = translations.find(function(t) { return (t.locale == language) })
+			if (translation) {
+			    result.short_description = translation.descriptionPlainText.substring(0, 100);
+			}
+		    }
+		    
+		    return result; 
+		    
+		})
 	    })
  
 	}, function(error) {
@@ -598,7 +631,8 @@ function getFullTrip(id) {
 }
 
 app.post('/api/getFullExperience', function(req, res){
-	var id = req.body.id
+    var id = req.body.id
+    var language = req.body.language.substring(0, 2)
 	console.log(">>> getting full experience " + id)
 	ESClient.get({
             index: experienceIndex,
@@ -617,6 +651,17 @@ app.post('/api/getFullExperience', function(req, res){
 	    var experience = body._source
 	    experience.id = body._id
 	    experience.trips = trips;
+
+	    // swapping the translation
+	    var translations = experience.translations
+	    if (translations) {
+		var translation = translations.find(function(t) { return (t.locale == language) })
+		if (translation) {
+		    experience.descriptionDraftJs = translation.descriptionDraftJs;
+		    experience.descriptionPlainText = translation.descriptionPlainText;
+		}
+	    }
+	    
 	    res.status(200);
 	    res.json(experience)
 	},  function (error) {

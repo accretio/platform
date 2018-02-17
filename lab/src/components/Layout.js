@@ -96,6 +96,8 @@ class Layout extends React.Component {
     
     render() {
 
+
+	console.log("re-render layout with " + this.state.language);
 	const { t, i18n } = this.props;
 	var this_ = this;
 
@@ -189,15 +191,17 @@ class Layout extends React.Component {
 
         </Modal> ;
 
-	
-	
 	var child =
-	    React.cloneElement(this.props.children, { messageTeam: this.messageTeam.bind(this), sendError: this._sendError.bind(this), setYesNo: this._setYesNo.bind(this), t: this.props.t, i18n: this.props.i18n }) ;
+	    React.cloneElement(this.props.children, { messageTeam: this.messageTeam.bind(this),
+						      sendError: this._sendError.bind(this),
+						      setYesNo: this._setYesNo.bind(this),
+						      t: this.props.t,
+						      i18n: this.props.i18n }) ;
 
 
 	var contactBtn = <li className="nav-item">
-		<a className="nav-link" href="mailto:william@accret.io"> { t('contact') } </a>
-		</li>;
+	    <a className="nav-link" href="mailto:william@accret.io"> { t('contact') } </a>
+	    </li>;
 
 	    
 	var suggestDestinationBtn = null;

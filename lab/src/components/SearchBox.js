@@ -23,10 +23,11 @@ export default class SearchBox extends React.Component {
     }
 
     componentDidMount() {
+	const { i18n } = this.props;
 	var this_ = this
 	var baseAirport = this.context.cookies.get('baseAirport')
 	if (baseAirport) {
-	    runSearchAroundAirfield(baseAirport.id).then(function(results) {
+	    runSearchAroundAirfield(baseAirport.id, i18n.language).then(function(results) {
 		this_._updateStateWithResults.bind(this_)(results.results)
 		this_.props.handleResults(results.location, results.results);
 	    })
@@ -61,11 +62,13 @@ export default class SearchBox extends React.Component {
     }
     
     _handleChange(e) {
+	const { i18n } = this.props;
+
 	var t = this
 	if (e.length > 0) {
 	    this.context.cookies.set('baseAirport', e[0])
 	    this.context.mixpanel.track('searching for experiences around airfield', { airfield: e[0] });
-	    runSearchAroundAirfield(e[0].id).then(function(results) {
+	    runSearchAroundAirfield(e[0].id, i18n.language).then(function(results) {
 		 t._updateStateWithResults.bind(t)(results.results)
 		 t.props.handleResults(results.location, results.results);
 	    })
