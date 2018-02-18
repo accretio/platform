@@ -7,7 +7,8 @@ import { getExperience, getTrip } from './../apiClient.js';
 import { EditorState, ContentState, convertToRaw, convertFromRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 
-import { saveExperienceDescription } from './../apiClient.js';
+import { saveExperienceDescription, uploadImage } from './../apiClient.js';
+import ImageUploader from 'react-images-upload';
 
 export default class Experience extends React.Component {
 
@@ -18,7 +19,8 @@ export default class Experience extends React.Component {
 	this.state = {
 	    experience: null,
 	    editable: (this.props.params.edit ? true : false),
-	    editorState: EditorState.createEmpty()
+	    editorState: EditorState.createEmpty(),
+	    files: []
 	}
 	
     }
@@ -99,7 +101,7 @@ export default class Experience extends React.Component {
     }
 
     _saveExperience() {
-	var t = this
+	var this_ = this
 	var descriptionContent = this.state.editorState.getCurrentContent()
 	var descriptionDraftJs = convertToRaw(descriptionContent)
 	var descriptionPlainText = descriptionContent.getPlainText()
@@ -112,15 +114,52 @@ export default class Experience extends React.Component {
 	
 	console.log(descriptionPlainText)
 	console.log(descriptionDraftJs)
-	saveExperienceDescription(this.props.params.id,
-				  language,
-				  descriptionDraftJs,
-				  descriptionPlainText).then(function() {
 
-				  }, function() {
-				      t.props.sendError("Couldn't save experience")
-				  })
+	// then we need to send the files one by one
 	
+	var filesPromises = this.state.files.map(function(fileList) {
+
+	    const files = [...fileList]
+	    return Promise.all(files.map(function(file) {
+
+	    return (uploadImage(file).then(function(response) {
+		console.log(">>> RESPONSE")
+		var imageUrl = response.imageUrl
+		return imageUrl
+	    }))
+		
+	    }))
+	    
+	})
+
+	Promise.all(filesPromises).then(function(allFilesUrls) {
+	    console.log("allFilesUrls")
+	    console.log(allFilesUrls)
+	    var allUrls = [].concat.apply([], allFilesUrls);
+	    return saveExperienceDescription(this_.props.params.id,
+					     language,
+					     descriptionDraftJs,
+					     descriptionPlainText, allUrls)
+
+	}).then(function() {
+
+	}, function(err) {
+	    console.log(err)
+	    this_.props.sendError("Couldn't save experience")
+	})
+		
+    }
+
+    _onDrop(picture) {
+	console.log(picture)
+	this.setState({
+            files: this.state.files.concat(picture),
+        });
+    }
+
+    _onDelete(picture) {
+	// todo: this doesn't work
+	console.log(picture)
     }
     
     render() {
@@ -192,6 +231,28 @@ export default class Experience extends React.Component {
 	        </div>
 		</div>
 	}
+
+
+
+	var imgUploader = null
+
+	if (this.state.editable == true) {
+
+	     imgUploader = <ImageUploader
+                	withIcon={true}
+                	buttonText='Choose images'
+            onChange={this._onDrop.bind(this) }
+	     onDelete={this._onDelete.bind(this) }
+           
+                	imgExtension={['.jpg', '.gif', '.png', '.gif']}
+            maxFileSize={5242880}
+	    withPreview={true}
+	 
+            />
+
+	    
+
+	} 
 	
 	var description =
 	    <div className="row">
@@ -200,13 +261,69 @@ export default class Experience extends React.Component {
 	    </div>
 	    </div>
 
+
+	var carrousel = null ;
+
+
+	if (experience.imagesUrls && experience.imagesUrls.length > 0) {
+
+	    var indicators =
+		experience.imagesUrls.map(function(imageUrl, i) {
+
+		    var className = ""
+		    if (i == 0) {
+			className = "active"
+		    }
+		    
+		    return <li data-target="#carouselExampleIndicators"
+		    key = { i }
+		    data-slide-to="0"
+		    className= { className } >
+			</li>
+			
+		})
+
+	    var images =
+		experience.imagesUrls.map(function(imageUrl, i) {
+		     var className = "carousel-item "
+		    if (i == 0) {
+			className = "carousel-item active"
+		    }
+		    return <div className= { className } key = { i } >
+			<img className="d-block w-100" src= { imageUrl } alt="" />
+			</div>
+			
+		})
+	    
+	    
+		carrousel = <div id="carouselExampleIndicators" className="carousel slide" data-ride="carousel">
+		<ol className="carousel-indicators"> { indicators } </ol>
+  <div className="carousel-inner">
+		{ images }
+  </div>
+  <a className="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span className="sr-only">Previous</span>
+  </a>
+  <a className="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+    <span className="carousel-control-next-icon" aria-hidden="true"></span>
+    <span className="sr-only">Next</span>
+  </a>
+</div>
+
+	}
+
 	return (<div className="experience-page">
 		<div className="container">
 
+	
 		{ title }
 		{ airfieldsOfEntry }
+	
+		{ carrousel }
 		{ trips }
 		{ description }
+		{ imgUploader }
 		{ saveButton }
 		
 		</div>

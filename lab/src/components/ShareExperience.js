@@ -13,7 +13,6 @@ const AsyncTypeahead = asyncContainer(Typeahead);
 import { EditorState, ContentState, convertToRaw} from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 
-
 //require('react-draft-wysiwyg/dist/react-draft-wysiwyg.css');
 
 
@@ -321,6 +320,7 @@ export default class ShareExperience extends React.Component {
 	    <Editor editorState={this.state.editorState} onEditorStateChange={this._onEditorStateChange.bind(this)}  />
 	    </div>
 	    </div>
+
   
 	return (
 

@@ -209,6 +209,23 @@ function prepES(ESClient) {
 	    console.trace(error.message);
 	});
     }
+    
+    function addImagesUrlsTranslationToExperienceMapping() {
+	ESClient.indices.putMapping({
+	    index: experienceIndex,
+	    type: experienceType,
+	    body: {
+		properties: {
+		    imagesUrls: { type: "keyword" }
+		}
+	    }
+	}).then(function (body) {
+	    
+	}, function (error) {
+	    console.log(error)
+	    console.trace(error.message);
+	});
+    }
 
     function createProfileIndex() {
 	ESClient.indices.create({
@@ -248,6 +265,7 @@ function prepES(ESClient) {
     runIfIndexDoesNotExist(profileIndex, createProfileIndex)
 
     runIfFieldDoesNotExistInIndex(experienceIndex, experienceType, "translations", addTranslationToExperienceMapping);
+     runIfFieldDoesNotExistInIndex(experienceIndex, experienceType, "imagesUrls", addImagesUrlsTranslationToExperienceMapping);
 }
 
 

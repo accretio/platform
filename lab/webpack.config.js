@@ -45,13 +45,26 @@ module.exports = [
 		/*
 		  your other rules for JavaScript transpiling go in here
 		*/
-		{ test: /\.js$/,
-		  exclude: /node_modules/,
-		  loader: "babel-loader",
-		  query: {
-                      cacheDirectory: 'babel_cache',
-                      presets: debug ? ['react', 'es2015', 'react-hmre'] : ['react', 'es2015']
-		  }
+		{
+		    test: /\.js$/,
+		    exclude: /node_modules/,
+		    loader: "babel-loader",
+		    query: {
+			cacheDirectory: 'babel_cache',
+			presets: debug ? ['react', 'es2015', 'react-hmre'] : ['react', 'es2015']
+		    }
+		},
+		{
+		    test: /node_modules\/react-images-upload\/index.js$/,
+		    loader: "babel-loader",
+		    query: {
+			cacheDirectory: 'babel_cache',
+			presets: [ 'react', 'es2015']
+		    }
+		}, 
+		{
+		    test: /\.svg$/,
+		    loader: 'svg-inline-loader'
 		},
 		{
 		    test: /\.css$/,
@@ -70,7 +83,8 @@ module.exports = [
             extractSass,
 	    new ExtractTextPlugin("styles.css"),
 	]
-    },
+    }
+     ,
         
     {
 	// The configuration for the server-side rendering
@@ -84,21 +98,34 @@ module.exports = [
 	
 	externals: /^[a-z\-0-9]+$/,
 	module: {
-	   rules: [
-		{ test: /\.js$/,
-		  exclude: /node_modules/,
-		  use: {
-		      loader: 'babel-loader',
-		      options: {
-			  presets: [ "react", "es2015", "env" ],
-			  plugins: [ ]
-		      }
-		  }
-		},
-	       	{
-		    test: /\.css$/,
-		    use: ExtractTextPlugin.extract([ 'css-loader' ])
-		}
+	    rules: [
+	       {
+		   test: /\.js$/,
+		   exclude: /node_modules/,
+		   use: {
+		       loader: 'babel-loader',
+		       options: {
+			   presets: [ "react", "es2015", "env" ],
+			   plugins: [ ]
+		       }
+		   }
+	       },
+	       {
+		   test: /node_modules\/react-images-upload\/index.js$/,
+		   loader: "babel-loader",
+		   query: {
+                       cacheDirectory: 'babel_cache',
+                       presets: [ 'react', 'es2015']
+		   }
+	       }, 
+	       {
+		   test: /\.svg$/,
+		   loader: 'svg-inline-loader'
+	       },
+	       {
+		   test: /\.css$/,
+		   use: ExtractTextPlugin.extract([ 'css-loader' ])
+	       }
 	   ] 
 	    
 	},

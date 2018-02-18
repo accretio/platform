@@ -4,3 +4,4 @@ babel_cache/
 static/
 npm-debug.log
 *lab-secret*
+*private*

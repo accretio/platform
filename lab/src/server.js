@@ -7,7 +7,6 @@ import Express from 'express';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { match, RouterContext } from 'react-router';
-import routes from './routes';
 
 import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
@@ -23,6 +22,9 @@ import { env, port, elasticsearch_endpoint } from './config';
 import AWS from 'aws-sdk';
 import bodyParser from 'body-parser';
 import elasticsearch from 'elasticsearch';
+
+const Multer = require('multer');
+import ImgUpload from './imgUpload' ;
 
 import stripePackage from 'stripe';
 
@@ -413,6 +415,20 @@ app.post('/api/saveExperienceDescription', function(req, res) {
 	    }
 	}
 
+	var existingUrls = doc.imagesUrls
+	if (existingUrls == undefined) {
+	    existingUrls = []
+	}
+
+	req.body.filesUrls.map(function(url) {
+	    if (existingUrls.indexOf(url) == -1) {
+		existingUrls.push(url)
+	    }
+	})
+	
+
+	doc.imagesUrls = existingUrls
+	
 	console.log("updating the doc")
 	console.log(doc);
 
@@ -932,27 +948,8 @@ app.get('/api/autocompleteAirfields', function(req, res){
 // universal routing and rendering
 
 app.get('*', (req, res) => {
-    match(
-        { routes, location: req.url },
-        (err, redirectLocation, renderProps) => {
-            console.error(err);
-            // in case of error display the error message
-            if (err) {
-                return res.status(500).send(err.message);
-            }
-
-            // in case of redirect propagate the redirect to the browser
-            if (redirectLocation) {
-                return res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-            }
-
-            // generate the React markup for the current route
-            let markup = null;
-          
-            // render the index template with the embedded React markup
-            return res.render('index', { markup, config: JSON.stringify(config)});
-        }
-    );
+    let markup = null;
+    return res.render('index', { markup, config: JSON.stringify(config)});
 });
 
 
@@ -960,6 +957,22 @@ app.get('*', (req, res) => {
 
 
 prepES(ESClient);
+
+
+// load images
+
+const multer = Multer({
+  storage: Multer.MemoryStorage,
+  fileSize: 5 * 1024 * 1024
+});
+
+app.post('/api/image-upload', multer.single('image'), ImgUpload.uploadToGcs, function(request, response, next) {
+  const data = request.body;
+  if (request.file && request.file.cloudStoragePublicUrl) {
+    data.imageUrl = request.file.cloudStoragePublicUrl;
+  }
+  response.send(data);
+})
 
 // start the server
 server.listen(port, err => {
@@ -969,3 +982,6 @@ server.listen(port, err => {
    
     console.info(`Server running on http://localhost:${port} [${env}]`);
 });
+
+
+

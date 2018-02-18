@@ -185,13 +185,32 @@ function updateExperience(id, doc) {
     }))
 }
 
-function saveExperienceDescription(id, language, descriptionContent, descriptionPlainText) {
+function saveExperienceDescription(id, language, descriptionContent, descriptionPlainText, filesUrls) {
+    console.log("saveExperienceDescription")
   return(fetch('/api/saveExperienceDescription', {
         method: 'post',
         headers: new Headers({
 	    'Content-Type': 'application/json'
         }),
-      body: JSON.stringify({id, language, descriptionContent, descriptionPlainText }) 
+      body: JSON.stringify({id, language, descriptionContent, descriptionPlainText, filesUrls }) 
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
+function uploadImage(file) {
+    var formData = new FormData();
+    formData.append('image', file);
+    return(fetch('/api/image-upload', {
+        method: 'post',
+        headers: new Headers({
+	    'Accept': 'application/json'
+        }),
+	body: formData
     }).then(function(response) {
 	if (response.status == 200) {
 	    return (response.json())
@@ -215,4 +234,4 @@ function runSearchAroundAirfield(id, language) {
 
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription, saveProfile };
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription, saveProfile, uploadImage };

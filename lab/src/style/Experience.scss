@@ -1,6 +1,6 @@
 .experience-page {
 
-
+    position: relative;
     .title {
 	margin-bottom: 10px;
     }
@@ -17,5 +17,30 @@
 	    display: none;
 	}
     }
+
+    .fileContainer {
+	box-shadow: none;
+    }
+
+    .experience-header {
+	position: absolute;
+	top: 0;
+	z-index: 1000;
+	text-align: center;
+	width: 100%;
+	left: 0; 
+    }
+    .carousel {
+	margin-bottom: 10px;
+	.carousel-item {
+	    height: 500px;
+	    img {
+	
+		vertical-align: middle;
+	    }
+
+	}
+    }
+    
 
 }
