@@ -23,8 +23,9 @@ import AWS from 'aws-sdk';
 import bodyParser from 'body-parser';
 import elasticsearch from 'elasticsearch';
 
-const Multer = require('multer');
-import ImgUpload from './imgUpload' ;
+const multer = require('multer');
+const gcsSharp = require('multer-sharp');
+
 
 import stripePackage from 'stripe';
 
@@ -961,17 +962,27 @@ prepES(ESClient);
 
 // load images
 
-const multer = Multer({
-  storage: Multer.MemoryStorage,
-  fileSize: 5 * 1024 * 1024
+
+const storage = gcsSharp({
+    filename: (req, file, cb) => {
+	cb(null, `${file.originalname}`);
+    },
+    bucket: 'ga-lunches-img',
+    projectId: 'galunches-193923',
+    keyFilename: './private/galunches-d3a4d64bef6b.json', 
+    acl: 'publicRead', 
+    sizes: [
+	{ suffix: 'original' },
+	{ suffix: 'md', height: 500 }
+    ],
+    max: true
 });
 
-app.post('/api/image-upload', multer.single('image'), ImgUpload.uploadToGcs, function(request, response, next) {
-  const data = request.body;
-  if (request.file && request.file.cloudStoragePublicUrl) {
-    data.imageUrl = request.file.cloudStoragePublicUrl;
-  }
-  response.send(data);
+const upload= multer({ storage });
+
+app.post('/api/image-upload', upload.single('image'), function(request, response, next) {
+    console.log(request.file)
+    response.send({ imageUrl: request.file.md.path });
 })
 
 // start the server
