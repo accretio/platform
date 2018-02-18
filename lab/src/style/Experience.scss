@@ -22,18 +22,14 @@
 	box-shadow: none;
     }
 
-    .experience-header {
-	position: absolute;
-	top: 0;
-	z-index: 1000;
-	text-align: center;
-	width: 100%;
-	left: 0; 
-    }
+    
     .carousel {
-	margin-bottom: 10px;
+
+	max-width: 1200px;
+	margin: 0 auto 10px auto;
 	.carousel-item {
-	    height: 500px;
+	    max-height: 500px;
+	   
 	    img {
 	
 		vertical-align: middle;

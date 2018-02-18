@@ -973,7 +973,7 @@ const storage = gcsSharp({
     acl: 'publicRead', 
     sizes: [
 	{ suffix: 'original' },
-	{ suffix: 'md', height: 500 }
+	{ suffix: 'md', width: 1200 }
     ],
     max: true
 });
