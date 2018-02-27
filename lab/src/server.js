@@ -429,6 +429,7 @@ app.post('/api/saveExperienceDescription', function(req, res) {
 	
 
 	doc.imagesUrls = existingUrls
+	doc.tags = req.body.tags
 	
 	console.log("updating the doc")
 	console.log(doc);

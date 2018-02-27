@@ -185,14 +185,14 @@ function updateExperience(id, doc) {
     }))
 }
 
-function saveExperienceDescription(id, language, descriptionContent, descriptionPlainText, filesUrls) {
+function saveExperienceDescription(id, language, descriptionContent, descriptionPlainText, filesUrls, tags) {
     console.log("saveExperienceDescription")
   return(fetch('/api/saveExperienceDescription', {
         method: 'post',
         headers: new Headers({
 	    'Content-Type': 'application/json'
         }),
-      body: JSON.stringify({id, language, descriptionContent, descriptionPlainText, filesUrls }) 
+      body: JSON.stringify({id, language, descriptionContent, descriptionPlainText, filesUrls, tags}) 
     }).then(function(response) {
 	if (response.status == 200) {
 	    return (response.json())

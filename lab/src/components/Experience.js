@@ -6,6 +6,7 @@ import { getExperience, getTrip } from './../apiClient.js';
 
 import { EditorState, ContentState, convertToRaw, convertFromRaw } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
+import { WithContext as ReactTags } from 'react-tag-input';
 
 import { saveExperienceDescription, uploadImage } from './../apiClient.js';
 import ImageUploader from 'react-images-upload';
@@ -20,8 +21,13 @@ export default class Experience extends React.Component {
 	    experience: null,
 	    editable: (this.props.params.edit ? true : false),
 	    editorState: EditorState.createEmpty(),
-	    files: []
+	    files: [],
+	    tags: []
 	}
+	this.handleDelete = this.handleDelete.bind(this);
+        this.handleAddition = this.handleAddition.bind(this);
+        this.handleDrag = this.handleDrag.bind(this);
+
 	
     }
     
@@ -73,7 +79,7 @@ export default class Experience extends React.Component {
 	    console.log(experience)
 	    var contentState = convertFromRaw(experience.descriptionDraftJs)
 	    var editorState = EditorState.createWithContent(contentState)
-	    t.setState({ experience, editorState })
+	    t.setState({ experience, editorState, tags: experience.tags.map(function(tag, i) { return { id: i, text: tag}}) })
 	}, function() {
 	    t.props.sendError("This experience does not exist", function() {
 		t.context.history.push("/")
@@ -136,10 +142,11 @@ export default class Experience extends React.Component {
 	    console.log("allFilesUrls")
 	    console.log(allFilesUrls)
 	    var allUrls = [].concat.apply([], allFilesUrls);
+	    var tags = this_.state.tags.map(function(t){ return t.text })
 	    return saveExperienceDescription(this_.props.params.id,
 					     language,
 					     descriptionDraftJs,
-					     descriptionPlainText, allUrls)
+					     descriptionPlainText, allUrls, tags)
 
 	}).then(function() {
 
@@ -160,6 +167,32 @@ export default class Experience extends React.Component {
     _onDelete(picture) {
 	// todo: this doesn't work
 	console.log(picture)
+    }
+
+    handleDelete(i) {
+        let tags = this.state.tags;
+        tags.splice(i, 1);
+        this.setState({tags: tags});
+    }
+ 
+    handleAddition(tag) {
+        let tags = this.state.tags;
+        tags.push({
+            id: tags.length + 1,
+            text: tag
+        });
+        this.setState({tags: tags});
+    }
+ 
+    handleDrag(tag, currPos, newPos) {
+        let tags = this.state.tags;
+ 
+        // mutate array
+        tags.splice(currPos, 1);
+        tags.splice(newPos, 0, tag);
+ 
+        // re-render
+        this.setState({ tags: tags });
     }
     
     render() {
@@ -235,7 +268,8 @@ export default class Experience extends React.Component {
 
 
 	var imgUploader = null
-
+	var tagsUpdater = null
+	
 	if (this.state.editable == true) {
 
 	     imgUploader = <ImageUploader
@@ -248,11 +282,33 @@ export default class Experience extends React.Component {
             maxFileSize={20971520}
 	    withPreview={true}
 	 
-            />
+		/>
+
+	let tags = this.state.tags ;
+        let suggestions = [ "family-friendly", "sports", "museum", "landmark" ].map(function(s) { return (t(s)) })
+
+	    tagsUpdater =   <div className="form-group row">
+	         
+	          <div className="col-12 tags-widget">
+
+	    <ReactTags tags={tags}
+	classNames={{
+	    tag: 'btn btn-info',
+	}}
+        suggestions={suggestions}
+	placeholder={ t('Add a new tag') }
+            handleDelete={this.handleDelete}
+                    handleAddition={this.handleAddition}
+                    handleDrag={this.handleDrag} />
+        
+	          </div>
+	    </div>;
 
 	    
 
-	} 
+	}
+
+	
 	
 	var description =
 	    <div className="row">
@@ -324,6 +380,7 @@ export default class Experience extends React.Component {
 		{ trips }
 		{ description }
 		{ imgUploader }
+		{ tagsUpdater }
 		{ saveButton }
 		
 		</div>
