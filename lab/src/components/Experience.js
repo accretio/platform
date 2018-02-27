@@ -245,7 +245,7 @@ export default class Experience extends React.Component {
 	     onDelete={this._onDelete.bind(this) }
            
                 	imgExtension={['.jpg', '.gif', '.png', '.gif']}
-            maxFileSize={5242880}
+            maxFileSize={20971520}
 	    withPreview={true}
 	 
             />
