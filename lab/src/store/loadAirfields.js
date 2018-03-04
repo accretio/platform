@@ -18,7 +18,7 @@ function loadAirfields(ESClient) {
 		
 	request('http://ourairports.com/data/airports.csv').pipe(fs.createWriteStream('/tmp/airports.csv')).on('finish', function () {
 	    
-	    var stream = fs.createReadStream("/tmp/airports.csv");
+	    var stream = fs.createReadStream("/Users/wleferrand/Downloads/airports.csv");
 	    
 	    var csvStream = csv()
 		.transform(function(data, next){

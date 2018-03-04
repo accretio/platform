@@ -56,6 +56,11 @@ export default class ListExperiences extends React.Component {
 	    t.props.sendError("Couldn't update the experience")
 	})
     }
+
+    _mailTo(email) {
+	console.log(email)
+	window.location = "mailto:"+email
+    }
     
     _formatExperience(experience, i) {
 
@@ -75,11 +80,16 @@ export default class ListExperiences extends React.Component {
 		Publish
 	    </button>
 	}
-	
+
+	var emailBtn = <span
+	    className="">
+	    { experience.result.authors[0].email }
+	    </span>
+	    
 	return(<div className="row experience" key = { i } >
 
 
-	        <div className="col-4">
+	        <div className="col-3">
 	          { experience.result.title }
 	       </div>
 
@@ -91,12 +101,17 @@ export default class ListExperiences extends React.Component {
 	       { statusBtn }
 	       </div>
 
-	       <div className="col-2">
+	       <div className="col-1">
 	       <button className="btn btn-primary" onClick = { this._gotoExperience.bind(this, experience.id) }>
 	       Open
 	       </button>
 	      
 	       </div>
+
+	          <div className="col-2">
+	       { emailBtn }
+	       </div>
+
 	       
 	       </div>)
 
