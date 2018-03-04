@@ -194,7 +194,8 @@ app.post('/api/saveExperience', function(req, res){
 		    descriptionPlainText: experience.descriptionPlainText,
 		    tags: experience.tags,
 		    authors: [ experience.author ],
-		    trips: [ tripId ]
+		    trips: [ tripId ],
+		    imagesUrls: experience.imagesUrls
 		}
 		
 		// now we can store the whole experience
@@ -383,6 +384,59 @@ app.post('/api/updateExperience', function(req, res) {
         res.send(error.message);
     })
    
+})
+
+app.post('/api/shareTrip', function(req, res) {
+
+      console.log("saving trip " + req)
+
+    var trip = req.body 
+    withAirfield(res, trip.departureAirfield.id).then(function(departureAirfield){
+
+
+	var tripPersisted =
+	    	{
+		    date: trip.date,
+		    departureAirfield: departureAirfield.id,
+		    destinationAirfield: trip.destinationAirfield.id,
+		    departureLocation: departureAirfield.location,
+		    destinationLocation: trip.destinationAirfield.location,
+		    crew: trip.crew,
+		    name: '',
+		    comment: trip.comment,
+		    attachments: trip.attachments
+		}
+	
+	storeTrip(res, tripPersisted).then(function(tripId) {
+	    
+	    // now we need to update the experience
+	    
+	    ESClient.update({
+		index: experienceIndex,
+		type: experienceType,
+		id: trip.experienceId,
+		body: {
+		   script : {
+		       source: "ctx._source.trips.add(params.trip)",
+		       lang: "painless",
+		       params : {
+			   trip : tripId
+		       }
+		   }
+		}
+	    }).then(function (body) {
+		res.status(200);
+		res.json({ id: tripId });
+	    }, function (error) {
+		console.log(error);
+		res.status(500);
+		res.send(error.message);
+	    })
+	  
+	    
+	})
+	
+    })
 })
 
 app.post('/api/saveExperienceDescription', function(req, res) {

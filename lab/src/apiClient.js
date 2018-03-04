@@ -234,4 +234,24 @@ function runSearchAroundAirfield(id, language) {
 
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription, saveProfile, uploadImage };
+function shareTrip(trip) {
+    
+    return(fetch('/api/shareTrip', {
+        method: 'post',
+        headers: new Headers({
+	    'Content-Type': 'application/json'
+        }),
+      body: JSON.stringify(trip) 
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    throw new Exception("something went wrong")
+	}
+    }))
+
+}
+
+
+
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription, saveProfile, uploadImage, shareTrip };

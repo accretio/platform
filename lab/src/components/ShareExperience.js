@@ -2,7 +2,6 @@
 
 import React, { PropTypes} from 'react';
 
-
 import {asyncContainer, Typeahead} from 'react-bootstrap-typeahead';
 
 import { WithContext as ReactTags } from 'react-tag-input';
@@ -14,9 +13,10 @@ import { EditorState, ContentState, convertToRaw} from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 
 //require('react-draft-wysiwyg/dist/react-draft-wysiwyg.css');
+import ImageUploader from 'react-images-upload';
 
 
-import { autocompleteAirfields, saveExperience } from './../apiClient.js';
+import { autocompleteAirfields, saveExperience, uploadImage } from './../apiClient.js';
 
 export default class ShareExperience extends React.Component {
 
@@ -24,11 +24,10 @@ export default class ShareExperience extends React.Component {
 	super(props)
 	this.state = {
 	    tags: [],
-	    thankYou: false,
-	    error: null,
 	    allowNew: false,
 	    multiple: false,
-	    editorState: EditorState.createEmpty()
+	    editorState: EditorState.createEmpty(),
+	    files: []
 	};
 	
 	this.inputs = {};
@@ -160,7 +159,7 @@ export default class ShareExperience extends React.Component {
     _shareExperience() {
 
 	var t = this
-	
+	var this_ = this
 	const { i18n } = this.props;
 
 	var descriptionContent = this.state.editorState.getCurrentContent()
@@ -230,39 +229,61 @@ export default class ShareExperience extends React.Component {
 		}
 	    ]
 	}
-	
-	var experience = {
-	    title: this.inputs[this._experienceTitle].value,
-	    descriptionDraftJs: descriptionDraftJs,
-	    descriptionPlainText: descriptionPlainText, 
-	    tags: this.state.tags.map(function(t){ return t.text }),
-	    author: {
-		name: this.inputs[this._contributorName].value,
-		email: this.inputs[this._contributorEmail].value,
-	    },
-	    trip: trip
-	}
 
-	console.log(experience)
-	this.context.mixpanel.track('saving new experience', { title: this.inputs[this._experienceTitle].value });
-	 
-	saveExperience(experience).then(function(body) {
-	    t.context.mixpanel.track('new experience saved', { id: body.id });
-	    t.props.setYesNo("Thank You", "Do you want to share another experience?",
-			     function() {
-				 t.context.mixpanel.track('sharing another experience');
-	   			 t._reset().bind(t)
-			     },
-			     function() {
-				 t.context.history.push("/")
-			     })
-	}, function(error) {
-	    t.context.mixpanel.track('error in share experience page', { 'error': error });
-	    t._sendError("Sorry, something went wrong");
+	var filesPromises = this.state.files.map(function(fileList) {
+
+	    const files = [...fileList]
+	    return Promise.all(files.map(function(file) {
+
+	    return (uploadImage(file).then(function(response) {
+		console.log(">>> RESPONSE")
+		var imageUrl = response.imageUrl
+		return imageUrl
+	    }))
+		
+	    }))
+	    
 	})
 
+	Promise.all(filesPromises).then(function(allFilesUrls) {
+	    
+	    var allUrls = [].concat.apply([], allFilesUrls);
+	    
+	    var experience = {
+		title: this_.inputs[this_._experienceTitle].value,
+		descriptionDraftJs: descriptionDraftJs,
+		descriptionPlainText: descriptionPlainText, 
+		tags: this_.state.tags.map(function(t){ return t.text }),
+		author: {
+		    name: this_.inputs[this_._contributorName].value,
+		    email: this_.inputs[this_._contributorEmail].value,
+		},
+		trip: trip,
+		imagesUrls: allUrls
+	    }
+	    
+	    console.log(experience)
+	    this_.context.mixpanel.track('saving new experience', { title: this_.inputs[this_._experienceTitle].value });
+	    
+	    saveExperience(experience).then(function(body) {
+		t.context.mixpanel.track('new experience saved', { id: body.id });
+		t.props.setYesNo("Thank You", "Do you want to share another experience?",
+				 function() {
+				     t.context.mixpanel.track('sharing another experience');
+	   			     t._reset().bind(t)
+				 },
+				 function() {
+				     t.context.history.push("/")
+				 })
+	    }, function(error) {
+		t.context.mixpanel.track('error in share experience page', { 'error': error });
+		t._sendError("Sorry, something went wrong");
+	    })
+	    
+	})
+	
     }
-
+    
     _onEditorStateChange(editorState) {
 	this.setState({
 	    editorState,
@@ -273,7 +294,19 @@ export default class ShareExperience extends React.Component {
 	const editorState = EditorState.push(this.state.editorState, ContentState.createFromText(''));
 	this.inputs[this._tripDate].value = ''
 	this.inputs[this._experienceTitle].value = ''
-	this.setState({ editorState, tags: [] });
+	this.setState({ editorState, tags: [], files: [] });
+    }
+
+      _onDrop(picture) {
+	console.log(picture)
+	this.setState({
+            files: this.state.files.concat(picture),
+        });
+    }
+
+    _onDelete(picture) {
+	// todo: this doesn't work
+	console.log(picture)
     }
     
     render() {
@@ -321,7 +354,19 @@ export default class ShareExperience extends React.Component {
 	    </div>
 	    </div>
 
-  
+
+	var imgUploader =  <ImageUploader
+                	withIcon={true}
+                	buttonText='Choose images'
+            onChange={this._onDrop.bind(this) }
+	     onDelete={this._onDelete.bind(this) }
+           
+                	imgExtension={['.jpg', '.gif', '.png', '.gif']}
+            maxFileSize={20971520}
+	    withPreview={true}
+	 
+	    />
+	    
 	return (
 
 	    <div className="share-experience-page">
@@ -350,6 +395,8 @@ export default class ShareExperience extends React.Component {
 
 	    { this_._createInput(this_._contributorName, t("Your name (optional)")) }
 
+	    { imgUploader }
+	    
 	    { submitGroup }
 	
 	    </div>
