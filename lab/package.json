@@ -79,8 +79,7 @@
 						"slick-carousel": "^1.6.0",
 						"stripe": "^4.15.1",
 						"style-loader": "^0.13.2",
-						"superagent": "^3.5.0",
-						"validator": "^9.4.1"
+						"superagent": "^3.5.0"
 			},
 			"devDependencies": {
 						"babel-cli": "^6.26.0",

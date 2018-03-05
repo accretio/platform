@@ -190,11 +190,11 @@ export default class ShareExperience extends React.Component {
 	    return;
 	}
 	
-	if (this.state.tags.length == 0) {
+	/* if (this.state.tags.length == 0) {
 	    this.context.mixpanel.track('share experience validation warning', { message: 'no tags' });
 	    this._sendError("Please add at least one tag so that others can find your writeup")
 	    return;
-	}
+	} */
 	
 	if (this.inputs[this._contributorEmail].value == '') {
 	    this._sendError("Please leave your email so that we can get in touch. It won't be displayed")

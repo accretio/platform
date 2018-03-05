@@ -14,7 +14,7 @@ import { autocompleteAirfields, shareTrip, uploadImage } from './../apiClient.js
 
 import ImageUploader from 'react-images-upload';
 
-import validator from 'validator';
+// import validator from 'validator';
 
 export default class ShareTrip extends React.Component {
 
@@ -51,7 +51,7 @@ export default class ShareTrip extends React.Component {
 	
 	const { t, i18n } = this.props;
 
-	if (validator.isEmail(tag)) {
+	if (true) { //  (validator.isEmail(tag)) {
             let participants = this.state.participants;	    
             participants.push({
 		id: participants.length + 1,
