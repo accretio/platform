@@ -249,6 +249,7 @@ export default class ShareTrip extends React.Component {
 	classNames={{
 	    tag: 'btn btn-info',
 	}}
+	autofocus = { false }
     	placeholder={ t("Add a new participant's email") }
                     handleDelete={this.handleDelete}
                     handleAddition={this.handleAddition}

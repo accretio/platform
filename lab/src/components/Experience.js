@@ -306,6 +306,7 @@ export default class Experience extends React.Component {
 	classNames={{
 	    tag: 'btn btn-info',
 	}}
+	    autofocus = { false }
         suggestions={suggestions}
 	placeholder={ t('Add a new tag') }
             handleDelete={this.handleDelete}
