@@ -56,7 +56,7 @@ export default class ExperienceFeedMenu extends React.Component {
 	    break;
 	}
  
-	return <div className="card text-center">
+	return <div className="card text-center experience-feed-menu">
 	    { header }
 	    { body }
 	    </div>; 
