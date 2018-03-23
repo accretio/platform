@@ -194,7 +194,8 @@ app.post('/api/saveExperience', function(req, res){
 		    descriptionPlainText: experience.descriptionPlainText,
 		    tags: experience.tags,
 		    authors: [ experience.author ],
-		    trips: [ tripId ]
+		    trips: [ tripId ],
+		    imagesUrls: experience.imagesUrls
 		}
 		
 		// now we can store the whole experience
@@ -385,6 +386,59 @@ app.post('/api/updateExperience', function(req, res) {
    
 })
 
+app.post('/api/shareTrip', function(req, res) {
+
+      console.log("saving trip " + req)
+
+    var trip = req.body 
+    withAirfield(res, trip.departureAirfield.id).then(function(departureAirfield){
+
+
+	var tripPersisted =
+	    	{
+		    date: trip.date,
+		    departureAirfield: departureAirfield.id,
+		    destinationAirfield: trip.destinationAirfield.id,
+		    departureLocation: departureAirfield.location,
+		    destinationLocation: trip.destinationAirfield.location,
+		    crew: trip.crew,
+		    name: '',
+		    comment: trip.comment,
+		    attachments: trip.attachments
+		}
+	
+	storeTrip(res, tripPersisted).then(function(tripId) {
+	    
+	    // now we need to update the experience
+	    
+	    ESClient.update({
+		index: experienceIndex,
+		type: experienceType,
+		id: trip.experienceId,
+		body: {
+		   script : {
+		       source: "ctx._source.trips.add(params.trip)",
+		       lang: "painless",
+		       params : {
+			   trip : tripId
+		       }
+		   }
+		}
+	    }).then(function (body) {
+		res.status(200);
+		res.json({ id: tripId });
+	    }, function (error) {
+		console.log(error);
+		res.status(500);
+		res.send(error.message);
+	    })
+	  
+	    
+	})
+	
+    })
+})
+
 app.post('/api/saveExperienceDescription', function(req, res) {
 
     ESClient.get({
@@ -471,6 +525,54 @@ app.post('/api/saveExperienceDescription', function(req, res) {
    
 })
 
+
+function docToExperience(language, hit) {
+    
+    var result = {
+	id: hit._id,
+	location: hit._source.location,
+	title: hit._source.title,
+	tags: hit._source.tags,
+	short_description: hit._source.descriptionPlainText.substring(0, 100)
+    }
+
+    if (hit.sort) {
+	result.distance = Math.round(hit.sort[0])
+    }
+    
+    // swapping the translation
+    var translations = hit._source.translations
+    if (translations) {
+	var translation = translations.find(function(t) { return (t.locale == language) })
+	if (translation) {
+	    result.short_description = translation.descriptionPlainText.substring(0, 100);
+	}
+    }
+
+    return result;
+    
+}
+
+app.get('/api/getAllExperiencesForLandingPage', function(req, res){
+    var language = req.query.language.substring(0, 2)
+    ESClient.search({
+	index: experienceIndex,
+        type: experienceType,
+	body: {
+	    query: {
+		match_all: {}
+	    }
+	}
+    }).then(function(body) {
+	res.status(200)
+	res.json(body.hits.hits.map(docToExperience.bind(null, language)))
+    }, function(error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    })
+})
+
 app.get('/api/runSearchAroundAirfield', function(req, res){
     console.log("running search around " + req.query.id)
     ESClient.get({
@@ -517,29 +619,7 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 	    res.status(200)
 	    res.json({
 		location: location,
-		results: body.hits.hits.map(function(hit) {
-
-		    var result = {
-			id: hit._id,
-			location: hit._source.location,
-			title: hit._source.title,
-			tags: hit._source.tags,
-			short_description: hit._source.descriptionPlainText.substring(0, 100),
-			distance: Math.round(hit.sort[0])
-		    }
-
-		    // swapping the translation
-		    var translations = hit._source.translations
-		    if (translations) {
-			var translation = translations.find(function(t) { return (t.locale == language) })
-			if (translation) {
-			    result.short_description = translation.descriptionPlainText.substring(0, 100);
-			}
-		    }
-		    
-		    return result; 
-		    
-		})
+		results: body.hits.hits.map(docToExperience.bind(null, language))
 	    })
  
 	}, function(error) {

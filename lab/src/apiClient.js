@@ -231,7 +231,38 @@ function runSearchAroundAirfield(id, language) {
 	    throw new Exception("something went wrong")
 	}
     }))
+}
+
+function getAllExperiences(language) {
+    return(fetch('/api/getAllExperiencesForLandingPage?language=' + language, {
+	method: 'get'
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
+function shareTrip(trip) {
+    
+    return(fetch('/api/shareTrip', {
+        method: 'post',
+        headers: new Headers({
+	    'Content-Type': 'application/json'
+        }),
+      body: JSON.stringify(trip) 
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    throw new Exception("something went wrong")
+	}
+    }))
 
 }
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription, saveProfile, uploadImage };
+
+
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription, saveProfile, uploadImage, shareTrip };

@@ -227,6 +227,25 @@ function prepES(ESClient) {
 	});
     }
 
+
+    function addAttachementsToTripMapping() {
+	ESClient.indices.putMapping({
+	    index: tripIndex,
+	    type: tripType,
+	    body: {
+		properties: {
+		    attachments: { type: "keyword" },
+		    comment: { type: "text" }
+		}
+	    }
+	}).then(function (body) {
+	    
+	}, function (error) {
+	    console.log(error)
+	    console.trace(error.message);
+	});
+    }
+    
     function createProfileIndex() {
 	ESClient.indices.create({
 	    index: profileIndex,
@@ -265,7 +284,10 @@ function prepES(ESClient) {
     runIfIndexDoesNotExist(profileIndex, createProfileIndex)
 
     runIfFieldDoesNotExistInIndex(experienceIndex, experienceType, "translations", addTranslationToExperienceMapping);
-     runIfFieldDoesNotExistInIndex(experienceIndex, experienceType, "imagesUrls", addImagesUrlsTranslationToExperienceMapping);
+    runIfFieldDoesNotExistInIndex(experienceIndex, experienceType, "imagesUrls", addImagesUrlsTranslationToExperienceMapping);
+
+    runIfFieldDoesNotExistInIndex(tripIndex, tripType, "attachments", addAttachementsToTripMapping);
+    
 }
 
 

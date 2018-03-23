@@ -11,6 +11,8 @@ import { WithContext as ReactTags } from 'react-tag-input';
 import { saveExperienceDescription, uploadImage } from './../apiClient.js';
 import ImageUploader from 'react-images-upload';
 
+import ExperienceFeedMenu from './ExperienceFeedMenu.js';
+
 export default class Experience extends React.Component {
 
     constructor(props) {
@@ -214,11 +216,20 @@ export default class Experience extends React.Component {
 	    </div>
 	    </div>
 
+	var people = []
+	experience.trips.map(function(trip) {
+	    trip.crew.map(function(member) {
+		if (people.indexOf(member.email) == -1) {
+		    people.push(member.email)
+		}
+	    })
+	})
+	
 	var trips = 
 		<div className="row trips">
 	    <div className="col-12">
 	    <div className="alert alert-success" role="alert">
-	    { experience.trips.length } { (experience.trips.length > 2) ? (t("people")): (t("person")) } { t("lived that experience") }
+	    { people.length } { (people.length > 2) ? (t("people lived that experience")): (t("person lived that experience")) }
 	    </div>
 	</div>
 	    </div>
@@ -295,6 +306,7 @@ export default class Experience extends React.Component {
 	classNames={{
 	    tag: 'btn btn-info',
 	}}
+	    autofocus = { false }
         suggestions={suggestions}
 	placeholder={ t('Add a new tag') }
             handleDelete={this.handleDelete}
@@ -369,6 +381,10 @@ export default class Experience extends React.Component {
 
 	}
 
+	/* the feed */
+	var feed = 
+	    <ExperienceFeedMenu reloadExperience = { this._loadExperience.bind(this) } experience = { experience } destinationAirfield = { airfields[0] } { ...this.props} />;
+
 	return (<div className="experience-page">
 		<div className="container">
 
@@ -382,6 +398,8 @@ export default class Experience extends React.Component {
 		{ imgUploader }
 		{ tagsUpdater }
 		{ saveButton }
+
+		{ feed }
 		
 		</div>
 		</div>);

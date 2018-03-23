@@ -1,4 +1,4 @@
-LAB_VERSION=0.29
+LAB_VERSION=0.34
 MIXPANEL_TOKEN=6221bafa38007f6f95fb31da88456141
 URL=https://accret.io
 
@@ -38,4 +38,4 @@ disk:
 
 
 secret:
-	kubectl create secret tls tls-secret --key=/tmp/accret.io.key --cert=ops/STAR_accret_io.crt
+	kubectl create secret tls tls-sec --key=/tmp/accret.io.key --cert=ops/STAR_accret_io.crt
