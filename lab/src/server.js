@@ -525,6 +525,54 @@ app.post('/api/saveExperienceDescription', function(req, res) {
    
 })
 
+
+function docToExperience(language, hit) {
+    
+    var result = {
+	id: hit._id,
+	location: hit._source.location,
+	title: hit._source.title,
+	tags: hit._source.tags,
+	short_description: hit._source.descriptionPlainText.substring(0, 100)
+    }
+
+    if (hit.sort) {
+	result.distance = Math.round(hit.sort[0])
+    }
+    
+    // swapping the translation
+    var translations = hit._source.translations
+    if (translations) {
+	var translation = translations.find(function(t) { return (t.locale == language) })
+	if (translation) {
+	    result.short_description = translation.descriptionPlainText.substring(0, 100);
+	}
+    }
+
+    return result;
+    
+}
+
+app.get('/api/getAllExperiencesForLandingPage', function(req, res){
+    var language = req.query.language.substring(0, 2)
+    ESClient.search({
+	index: experienceIndex,
+        type: experienceType,
+	body: {
+	    query: {
+		match_all: {}
+	    }
+	}
+    }).then(function(body) {
+	res.status(200)
+	res.json(body.hits.hits.map(docToExperience.bind(null, language)))
+    }, function(error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send(error.message);
+    })
+})
+
 app.get('/api/runSearchAroundAirfield', function(req, res){
     console.log("running search around " + req.query.id)
     ESClient.get({
@@ -571,29 +619,7 @@ app.get('/api/runSearchAroundAirfield', function(req, res){
 	    res.status(200)
 	    res.json({
 		location: location,
-		results: body.hits.hits.map(function(hit) {
-
-		    var result = {
-			id: hit._id,
-			location: hit._source.location,
-			title: hit._source.title,
-			tags: hit._source.tags,
-			short_description: hit._source.descriptionPlainText.substring(0, 100),
-			distance: Math.round(hit.sort[0])
-		    }
-
-		    // swapping the translation
-		    var translations = hit._source.translations
-		    if (translations) {
-			var translation = translations.find(function(t) { return (t.locale == language) })
-			if (translation) {
-			    result.short_description = translation.descriptionPlainText.substring(0, 100);
-			}
-		    }
-		    
-		    return result; 
-		    
-		})
+		results: body.hits.hits.map(docToExperience.bind(null, language))
 	    })
  
 	}, function(error) {

@@ -231,7 +231,18 @@ function runSearchAroundAirfield(id, language) {
 	    throw new Exception("something went wrong")
 	}
     }))
+}
 
+function getAllExperiences(language) {
+    return(fetch('/api/getAllExperiencesForLandingPage?language=' + language, {
+	method: 'get'
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    throw new Exception("something went wrong")
+	}
+    }))
 }
 
 function shareTrip(trip) {

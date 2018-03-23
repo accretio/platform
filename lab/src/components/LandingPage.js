@@ -8,11 +8,12 @@ import fetch from 'isomorphic-fetch';
 
 import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
-import { runSearchAroundAirfield } from './../apiClient.js';
+import { getAllExperiences } from './../apiClient.js';
 
 import SearchBox from './SearchBox'; 
 import DisplayResultsMap from './DisplayResultsMap.js';
 import DisplayResultsList from './DisplayResultsList.js';
+
 
 class LandingPage extends React.Component {
     
@@ -33,9 +34,19 @@ class LandingPage extends React.Component {
 
     componentDidMount() {
         this.context.mixpanel.track('landing page loaded');
-
-	
 	window.scrollTo(0, 0)
+	this._loadAllResults()
+    }
+
+    _loadAllResults() {
+
+	const { i18n } = this.props;
+	var this_ = this;
+
+	getAllExperiences(i18n.language).then(function(results) {
+	    this_.setState({ fullJumbotron: false, results: results })
+ 	})
+
     }
 
     _handleResults(location, results) {
@@ -76,13 +87,6 @@ class LandingPage extends React.Component {
 	return (
 		<div className= { "landing-page display-type-" + this.state.display } >
 		
-		<div className="jumbotron-wrapper">
-		<div className="jumbotron">
-		    { header }
-	            { searchBox }	   
-                </div>
-		</div>
-
 	    { display }
 		
 	    </div>);

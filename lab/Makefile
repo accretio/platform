@@ -38,4 +38,4 @@ disk:
 
 
 secret:
-	kubectl create secret tls tls-secret --key=/tmp/accret.io.key --cert=ops/STAR_accret_io.crt
+	kubectl create secret tls tls-sec --key=/tmp/accret.io.key --cert=ops/STAR_accret_io.crt

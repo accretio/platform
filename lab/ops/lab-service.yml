@@ -11,14 +11,13 @@
         "selector": {
             "app": "lab"
         },
-        "type": "NodePort",
+	"type": "NodePort",
         "ports": [
-        {
-        "name": "http",
-        "protocol": "TCP",
-        "port": 80,
-        "targetPort": 3000
-        }
+       	 {
+      	   "protocol": "TCP",
+      	   "port": 80,
+      	   "targetPort": 3000
+         }
         ]
     }
 }

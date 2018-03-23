@@ -4,7 +4,7 @@ metadata:
   name: lab-ingress
 spec:
   tls:
-  - secretName: tls-secret
+  - secretName: tls-sec
   backend:
     serviceName: lab
     servicePort: 80
