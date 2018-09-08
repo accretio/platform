@@ -1,7 +1,10 @@
 .display-results-map {
 
+    height: 100%;
+    
     .windyty {
-	padding-top: 100px;
+	padding-top: 80px;
+	height:100%;
     }
 
 
@@ -17,7 +20,8 @@
 	font-size: 16px;
 
 	.name {
-	    text-align: center; 
+	    text-align: center;
+	    margin-bottom: 5px!important;
 	}
 
 	.details {

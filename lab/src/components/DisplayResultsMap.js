@@ -16,9 +16,9 @@ export default class DisplayResultsMap extends React.Component {
     componentDidMount() {
 	var t = this
 	// load the windy api
-	window.windytyInit =  {
+	var options =  {
 	    // Required: API key
-	    key: 'PsL-At-XpsPTZexBwUkO7Mx5I',
+	    key: 'jZBYyFtDKvygPdoRBQ7ZN5QdVlC2q3wO',
 	    
 	    // Optional: Initial state of the map
 	    lat: 50.4,
@@ -26,18 +26,22 @@ export default class DisplayResultsMap extends React.Component {
 	    zoom: 5,
 	}
 
-	window.windytyMain = function(map) {
-	    // W.setOverlay("clouds");
-	    W.setOverlay("wind");
-	    var markers = L.markerClusterGroup()
+	windyInit( options,  windyAPI => {
+	    
+            // windyAPI is ready, and contain 'map', 'store',
+            // 'picker' and other usefull stuff
+	    
+            const { map } = windyAPI
+            // .map is instance of Leaflet map
+	    
+	    var markers = L.layerGroup()
+	
 	    map.addLayer(markers);
 	    t.setState({ map, markers })
-	}
-	
-	const script = document.createElement("script");
-        script.src = "https://api.windytv.com/v2.3/boot.js";
-        script.async = true;
-        document.body.appendChild(script);
+     
+     
+	})
+
 	
     }
 
@@ -87,7 +91,7 @@ export default class DisplayResultsMap extends React.Component {
 	}
 
 	return (<div className="display-results-map">
-		   <div id="windyty" className="windyty"></div>
+		   <div id="windy" className="windyty"></div>
 		</div>);
 
     }
