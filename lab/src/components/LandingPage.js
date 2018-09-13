@@ -8,7 +8,7 @@ import fetch from 'isomorphic-fetch';
 
 import { CookiesProvider, withCookies, Cookies } from 'react-cookie';
 
-import { getAllExperiences } from './../apiClient.js';
+import { getAllExperiencesForLandingPage } from './../apiClient.js';
 
 import SearchBox from './SearchBox'; 
 import DisplayResultsMap from './DisplayResultsMap.js';
@@ -43,7 +43,7 @@ class LandingPage extends React.Component {
 	const { i18n } = this.props;
 	var this_ = this;
 
-	getAllExperiences(i18n.language).then(function(results) {
+	getAllExperiencesForLandingPage(i18n.language).then(function(results) {
 	    this_.setState({ fullJumbotron: false, results: results })
  	})
 

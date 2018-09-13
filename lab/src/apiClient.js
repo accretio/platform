@@ -233,8 +233,20 @@ function runSearchAroundAirfield(id, language) {
     }))
 }
 
-function getAllExperiences(language) {
+function getAllExperiencesForLandingPage(language) {
     return(fetch('/api/getAllExperiencesForLandingPage?language=' + language, {
+	method: 'get'
+    }).then(function(response) {
+	if (response.status == 200) {
+	    return (response.json())
+	} else {
+	    throw new Exception("something went wrong")
+	}
+    }))
+}
+
+function getAllExperiences() {
+    return(fetch('/api/getAllExperiences', {
 	method: 'get'
     }).then(function(response) {
 	if (response.status == 200) {
@@ -265,4 +277,4 @@ function shareTrip(trip) {
 
 
 
-export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, updateExperience, saveExperienceDescription, saveProfile, uploadImage, shareTrip };
+export { getPanel, getLayout, savePanel, listLayouts, saveSuggestion, autocompleteAirfields, getAllDestinations, updateDestination, runSearchAroundAirfield, saveAirfield, saveExperience, getExperience, getTrip, getAllExperiences, getAllExperiencesForLandingPage, updateExperience, saveExperienceDescription, saveProfile, uploadImage, shareTrip };
